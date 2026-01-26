@@ -8,5 +8,14 @@ namespace ENTITY
 {
     public class RelacionJerarquica
     {
+        public int IdRelacion { get; set; }
+
+        public int IdJefe { get; set; }
+
+        public int IdEmpleado { get; set; }
+
+        public DateTime FechaInicio { get; set; }
+
+        public DateTime? FechaFin { get; set; }
     }
 }

@@ -8,7 +8,18 @@ namespace ENTITY
 {
     public class Bonos
     {
-        public int bono {set : get}
-         public int bono {set : get}
+        public int IdBono { get; set; }
+
+        public int IdUsuario { get; set; }
+
+        public int IdRegla { get; set; }
+
+        public decimal? Monto { get; set; }
+
+        public int IdPeriodo { get; set; }
+
+        public string Motivo { get; set; }
+
+        public DateTime FechaCreacion { get; set; }
     }
 }

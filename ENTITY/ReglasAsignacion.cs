@@ -8,5 +8,18 @@ namespace ENTITY
 {
     public class ReglasAsignacion
     {
+        public int IdRegla { get; set; }
+
+        public string Nombre { get; set; }
+
+        public decimal? PesoDisponibilidad { get; set; }
+
+        public decimal? PesoCalificacion { get; set; }
+
+        public decimal? PesoCarga { get; set; }
+
+        public decimal? PesoProductividad { get; set; }
+
+        public bool? Activo { get; set; }
     }
 }

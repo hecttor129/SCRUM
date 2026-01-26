@@ -8,7 +8,17 @@ namespace ENTITY
 {
     public class EvaluacionTareas
     {
+        public int IdEvaluacion { get; set; }
 
+        public int IdTarea { get; set; }
+
+        public int IdUsuario { get; set; }
+
+        public int? Puntuacion { get; set; }
+
+        public string Comentario { get; set; }
+
+        public DateTime Fecha { get; set; }
 
     }
 }

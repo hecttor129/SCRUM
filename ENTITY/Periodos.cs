@@ -8,6 +8,14 @@ namespace ENTITY
 {
     public class Periodos
     {
+        public int IdPeriodo { get; set; }
 
+        public string Tipo { get; set; }
+
+        public DateTime? FechaInicio { get; set; }
+
+        public DateTime? FechaFin { get; set; }
+
+        public bool? Activo { get; set; }
     }
 }

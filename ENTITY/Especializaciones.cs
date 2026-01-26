@@ -8,6 +8,10 @@ namespace ENTITY
 {
     public class Especializaciones
     {
+        public int IdEspecializacion { get; set; }
 
+        public string NombreEspecializacion { get; set; }
+
+        public string Descripcion { get; set; }
     }
 }

@@ -8,5 +8,8 @@ namespace ENTITY
 {
     public class UsuariosEspecializacion
     {
+        public int IdUsuario { get; set; }
+
+        public int IdEspecializacion { get; set; }
     }
 }

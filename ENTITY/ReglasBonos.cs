@@ -8,5 +8,16 @@ namespace ENTITY
 {
     public class ReglasBonos
     {
+        public int IdRegla { get; set; }
+
+        public string TipoMetrica { get; set; }
+
+        public string Operador { get; set; }   // >, <, >=, <=, =
+
+        public decimal? ValorObjetivo { get; set; }
+
+        public decimal? Monto { get; set; }
+
+        public bool? Activo { get; set; }
     }
 }

@@ -8,5 +8,16 @@ namespace ENTITY
 {
     public class Eventos
     {
+        public int IdEvento { get; set; }
+
+        public int IdUsuario { get; set; }
+
+        public int? IdTarea { get; set; }
+
+        public string TipoEvento { get; set; }
+
+        public string Descripcion { get; set; }
+
+        public DateTime Fecha { get; set; }
     }
 }
