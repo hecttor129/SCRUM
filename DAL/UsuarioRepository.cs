@@ -8,7 +8,7 @@ using ENTITY;
 
 namespace DAL
 {
-    public class UsuarioRepository : DB_Context, IRepository<Usuarios>
+    public class UsuarioRepository : IRepository<Usuario>
     {
 
 

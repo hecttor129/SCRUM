@@ -7,7 +7,7 @@ using static ENTITY.ENUMS;
 
 namespace ENTITY
 {
-    public class Tareas
+    public class Tarea
     {
         public int IdTarea { get; set; }
 
@@ -27,5 +27,7 @@ namespace ENTITY
         public DateTime? FechaLimite { get; set; }
 
         public DateTime FechaCreacion { get; set; }
+
+        public Especializacion Especializacion { get; set; }
     }
 }

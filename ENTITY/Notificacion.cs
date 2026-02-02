@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ENTITY
 {
-    public class Notificaciones
+    public class Notificacion
     {
         public int IdNotificacion { get; set; }
 

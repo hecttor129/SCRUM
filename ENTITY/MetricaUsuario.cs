@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ENTITY
 {
-    public class MetricaUsuarios
+    public class MetricaUsuario
     {
         public int IdMetrica { get; set; }
 

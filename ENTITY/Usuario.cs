@@ -7,7 +7,7 @@ using static ENTITY.ENUMS;
 
 namespace ENTITY
 {
-    public class Usuarios
+    public class Usuario
     {
         public int IdUsuario { get; set; }
 

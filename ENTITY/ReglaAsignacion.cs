@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ENTITY
 {
-    public class ReglasAsignacion
+    public class ReglaAsignacion
     {
         public int IdRegla { get; set; }
 

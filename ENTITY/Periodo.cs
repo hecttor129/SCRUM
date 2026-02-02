@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ENTITY
 {
-    public class Periodos
+    public class Periodo
     {
         public int IdPeriodo { get; set; }
 
