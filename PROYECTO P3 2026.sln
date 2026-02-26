@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36518.9 d17.14
+VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VISTA", "VISTA\VISTA.csproj", "{0C29AED9-B4B8-45F7-A839-C74E87797426}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{59CEF6F8-0D7D-4BD0-9150-5DE52F9EE253}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ENTITY", "ENTITY\ENTITY.csproj", "{3D18906E-FFA3-4080-A862-83B7C61CC6B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "conexion db test", "conexion db test\conexion db test.csproj", "{5B3F87C9-84D7-4612-A7E5-CF33A4A36D56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{3D18906E-FFA3-4080-A862-83B7C61CC6B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D18906E-FFA3-4080-A862-83B7C61CC6B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D18906E-FFA3-4080-A862-83B7C61CC6B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B3F87C9-84D7-4612-A7E5-CF33A4A36D56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B3F87C9-84D7-4612-A7E5-CF33A4A36D56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B3F87C9-84D7-4612-A7E5-CF33A4A36D56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B3F87C9-84D7-4612-A7E5-CF33A4A36D56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
