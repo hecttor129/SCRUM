@@ -10,7 +10,7 @@ namespace DAL
 {
     public class UsuarioRepository : IRepository<Usuario>
     {
-
+        
 
 
     }
