@@ -214,7 +214,7 @@ namespace VISTA
             _context.Dispose();
             base.OnClosed(e);
         }
-
+        //principal
         private class ProyectoVista
         {
             public int IdProyecto { get; set; }
