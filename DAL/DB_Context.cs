@@ -14,7 +14,8 @@ namespace DAL
             protected override void OnConfiguring(DbContextOptionsBuilder options)
             {
                 options.UseOracle(
-                    "User Id=consultorProyecto;Password=consultor123;Data Source=localhost:1521/XEPDB1;");
+                    "User Id=luis_scrum;Password=luis123;Data Source=127.0.0.1:1521/XEPDB1;");
+                    
             }
 
         public DbSet<Usuario> Usuarios { get; set; }
