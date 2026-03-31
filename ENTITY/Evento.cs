@@ -9,7 +9,7 @@ namespace ENTITY
     public class Evento
     {
         public int IdEvento { get; set; }
- public int IdEvsento { get; set; }
+
         public int IdUsuario { get; set; }
 
         public int? IdTarea { get; set; }
