@@ -1,12 +1,276 @@
 ﻿<Window x:Class="VISTA.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:VISTA"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Empresa"
+        Height="850"
+        Width="1450"
+        Background="White"
+        WindowStartupLocation="CenterScreen">
 
+    <Window.Resources>
+        <Style x:Key="SidebarButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+            <Setter Property="BorderBrush" Value="#E5E7EB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style x:Key="TopButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border x:Name="SidebarContainer"
+                Grid.Column="0"
+                Width="230"
+                MinWidth="0"
+                Background="#F8FAFC"
+                BorderBrush="#E5E7EB"
+                BorderThickness="0,0,1,0"
+                ClipToBounds="True"
+                Opacity="1">
+            <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0">
+                    <TextBlock Text="SCRUM"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="#111827"
+                               Margin="6,10,0,20"/>
+
+                    <Button Style="{StaticResource SidebarButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⌂" FontSize="15" Width="24"/>
+                            <TextBlock Text="Inicio" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarButtonStyle}" Background="#E8EEF9">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="▣" FontSize="15" Width="24"/>
+                            <TextBlock Text="Empresa" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="◫" FontSize="15" Width="24"/>
+                            <TextBlock Text="Proyectos" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="◧" FontSize="15" Width="24"/>
+                            <TextBlock Text="Entornos" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="👥" FontSize="15" Width="24"/>
+                            <TextBlock Text="Equipo" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource SidebarButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="▤" FontSize="15" Width="24"/>
+                            <TextBlock Text="Reportes" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Margin="6,0,0,10">
+                    <TextBlock Text="Luis Paredes"
+                               Foreground="#111827"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="Administrador"
+                               Foreground="#6B7280"
+                               FontSize="12"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main -->
+        <Grid Grid.Column="1" Background="White">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Topbar -->
+            <Border Grid.Row="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+                <Grid Margin="18,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Hamburguesa en topbar -->
+                    <Button x:Name="btnHamburguesa"
+                            Grid.Column="0"
+                            Content="☰"
+                            Width="42"
+                            Height="40"
+                            FontSize="18"
+                            Background="Transparent"
+                            Foreground="#111827"
+                            BorderBrush="#D1D5DB"
+                            BorderThickness="1"
+                            Cursor="Hand"
+                            Click="BtnHamburguesa_Click"/>
+
+                    <Button Grid.Column="1"
+                            Content="+ Crear"
+                            Width="100"
+                            Height="40"
+                            Margin="12,0,0,0"
+                            Style="{StaticResource TopButtonStyle}"/>
+
+                    <TextBox Grid.Column="2"
+                             x:Name="txtBuscarProyecto"
+                             Height="40"
+                             Margin="20,0,20,0"
+                             Background="White"
+                             Foreground="#111827"
+                             BorderBrush="#D1D5DB"
+                             BorderThickness="1"
+                             Padding="14,8"
+                             FontSize="14"
+                             VerticalContentAlignment="Center"
+                             TextChanged="txtBuscarProyecto_TextChanged"/>
+
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Editar empresa" Style="{StaticResource TopButtonStyle}" Click="BtnEditarEmpresa_Click"/>
+                        <Button Content="Nuevo proyecto" Style="{StaticResource TopButtonStyle}" Click="BtnNuevoProyecto_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Body -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="22">
+
+                    <Border Background="White" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock x:Name="txtNombreEmpresa"
+                                       Text="Empresa"
+                                       Foreground="#111827"
+                                       FontSize="30"
+                                       FontWeight="Bold"/>
+
+                            <TextBlock x:Name="txtDescripcionEmpresa"
+                                       Text="Descripción"
+                                       Foreground="#6B7280"
+                                       FontSize="14"
+                                       Margin="0,6,0,0"/>
+
+                            <WrapPanel Margin="0,10,0,0">
+                                <TextBlock x:Name="txtNitEmpresa" Foreground="#111827" Margin="0,0,20,0"/>
+                                <TextBlock x:Name="txtCorreoEmpresa" Foreground="#111827" Margin="0,0,20,0"/>
+                                <TextBlock x:Name="txtTelefonoEmpresa" Foreground="#111827"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <UniformGrid Columns="4" Margin="0,0,0,18">
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Proyectos activos" Foreground="#6B7280"/>
+                                <TextBlock x:Name="txtProyectosActivos" Text="0" Foreground="#111827" FontSize="28" FontWeight="Bold" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Finalizados" Foreground="#6B7280"/>
+                                <TextBlock x:Name="txtProyectosFinalizados" Text="0" Foreground="#111827" FontSize="28" FontWeight="Bold" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="En pausa" Foreground="#6B7280"/>
+                                <TextBlock x:Name="txtProyectosPausados" Text="0" Foreground="#111827" FontSize="28" FontWeight="Bold" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}" Margin="0">
+                            <StackPanel>
+                                <TextBlock Text="Responsables asignados" Foreground="#6B7280"/>
+                                <TextBlock x:Name="txtResponsablesAsignados" Text="0" Foreground="#111827" FontSize="28" FontWeight="Bold" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+                    <Border Background="#F8FAFC" CornerRadius="12" Padding="14" BorderBrush="#E5E7EB" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="Proyectos" Foreground="#111827" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                            <DataGrid x:Name="dgProyectos"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      IsReadOnly="True"
+                                      Background="White"
+                                      Foreground="#111827"
+                                      BorderThickness="0"
+                                      RowBackground="White"
+                                      AlternatingRowBackground="#F9FAFB"
+                                      GridLinesVisibility="Horizontal"
+                                      HeadersVisibility="Column"
+                                      ColumnHeaderHeight="40"
+                                      RowHeight="40"
+                                      SelectionMode="Single"
+                                      SelectionUnit="FullRow">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Proyecto" Binding="{Binding Nombre}" Width="220"/>
+                                    <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*"/>
+                                    <DataGridTextColumn Header="Supervisor" Binding="{Binding Supervisor}" Width="170"/>
+                                    <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="110"/>
+                                    <DataGridTextColumn Header="Inicio" Binding="{Binding FechaInicio}" Width="110"/>
+                                    <DataGridTextColumn Header="Fin" Binding="{Binding FechaFin}" Width="110"/>
+                                    <DataGridTextColumn Header="Progreso" Binding="{Binding Progreso}" Width="100"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </Window>

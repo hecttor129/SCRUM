@@ -31,7 +31,8 @@ namespace DAL
         public DbSet<Notificacion> Notificaciones { get; set; }
         public DbSet<MetricaUsuario> MetricasUsuario { get; set; }
         public DbSet<UsuarioEspecializacion> UsuarioEspecializaciones { get; set; }
-
+        public DbSet<Empresa> Empresas { get; set; }
+        public DbSet<Proyecto> Proyectos { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -65,7 +66,7 @@ namespace DAL
                 entity.HasIndex(e => e.Email).IsUnique();
 
                 entity.Property(e => e.password)
-                      .HasColumnName("CONTRASEÑA")
+                      .HasColumnName("CONTRASENA")
                       .HasMaxLength(64)
                       .IsRequired();
 
@@ -525,6 +526,107 @@ namespace DAL
                 entity.HasOne<Usuario>()
                       .WithMany()
                       .HasForeignKey(e => e.IdEmpleado)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<Empresa>(entity =>
+            {
+                entity.ToTable("EMPRESAS");
+
+                entity.HasKey(e => e.IdEmpresa);
+
+                entity.Property(e => e.IdEmpresa)
+                      .HasColumnName("ID_EMPRESA")
+                      .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Nombre)
+                      .HasColumnName("NOMBRE")
+                      .HasMaxLength(80)
+                      .IsRequired();
+
+                entity.Property(e => e.Descripcion)
+                      .HasColumnName("DESCRIPCION")
+                      .HasMaxLength(200);
+
+                entity.Property(e => e.Nit)
+                      .HasColumnName("NIT")
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.Property(e => e.Direccion)
+                      .HasColumnName("DIRECCION")
+                      .HasMaxLength(120);
+
+                entity.Property(e => e.Correo)
+                      .HasColumnName("CORREO")
+                      .HasMaxLength(80);
+
+                entity.Property(e => e.Telefono)
+                      .HasColumnName("TELEFONO")
+                      .HasMaxLength(20);
+
+                entity.Property(e => e.Activo)
+                      .HasColumnName("ACTIVO");
+
+
+                entity.Property(e => e.FechaCreacion)
+                      .HasColumnName("FECHA_CREACION");
+            });
+
+            modelBuilder.Entity<Proyecto>(entity =>
+            {
+                entity.ToTable("PROYECTOS");
+
+                entity.HasKey(e => e.IdProyecto);
+
+                entity.Property(e => e.IdProyecto)
+                      .HasColumnName("ID_PROYECTO")
+                      .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.IdEmpresa)
+                      .HasColumnName("ID_EMPRESA")
+                      .IsRequired();
+
+                entity.Property(e => e.IdSupervisor)
+                      .HasColumnName("ID_SUPERVISOR");
+
+                entity.Property(e => e.Nombre)
+                      .HasColumnName("NOMBRE")
+                      .HasMaxLength(80)
+                      .IsRequired();
+
+                entity.Property(e => e.Descripcion)
+                      .HasColumnName("DESCRIPCION")
+                      .HasMaxLength(250);
+
+                entity.Property(e => e.Estado)
+                      .HasColumnName("ESTADO")
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.Property(e => e.FechaInicio)
+                      .HasColumnName("FECHA_INICIO");
+
+                entity.Property(e => e.FechaFin)
+                      .HasColumnName("FECHA_FIN");
+
+                entity.Property(e => e.Progreso)
+                      .HasColumnName("PROGRESO")
+                      .HasPrecision(5, 2);
+
+                entity.Property(e => e.Activo)
+                      .HasColumnName("ACTIVO");
+
+
+                entity.Property(e => e.FechaCreacion)
+                      .HasColumnName("FECHA_CREACION");
+
+                entity.HasOne<Empresa>()
+                      .WithMany()
+                      .HasForeignKey(e => e.IdEmpresa);
+
+                entity.HasOne<Usuario>()
+                      .WithMany()
+                      .HasForeignKey(e => e.IdSupervisor)
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
