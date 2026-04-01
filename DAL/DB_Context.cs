@@ -33,7 +33,7 @@ namespace DAL
         public DbSet<UsuarioEspecializacion> UsuarioEspecializaciones { get; set; }
         public DbSet<Empresa> Empresas { get; set; }
         public DbSet<Proyecto> Proyectos { get; set; }
-
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -629,7 +629,7 @@ namespace DAL
                       .HasForeignKey(e => e.IdSupervisor)
                       .OnDelete(DeleteBehavior.Restrict);
             });
-
+            
 
         }
     }

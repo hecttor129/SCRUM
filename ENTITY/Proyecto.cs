@@ -21,5 +21,6 @@ namespace ENTITY
         public int? Activo { get; set; }
 
         public DateTime? FechaCreacion { get; set; }
+       
     }
 }

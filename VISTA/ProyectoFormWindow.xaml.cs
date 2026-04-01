@@ -42,10 +42,11 @@ namespace VISTA
         {
             var supervisores = _context.Usuarios
                 .AsNoTracking()
+                .Where(u => u.Activo)
                 .Select(u => new UsuarioComboItem
                 {
                     IdUsuario = u.IdUsuario,
-                    NombreCompleto = u.Nombre + " " + u.Apellido
+                    NombreCompleto = ((u.Nombre ?? "") + " " + (u.Apellido ?? "")).Trim()
                 })
                 .OrderBy(x => x.NombreCompleto)
                 .ToList();
@@ -62,7 +63,9 @@ namespace VISTA
 
         private void CargarProyecto(int idProyecto)
         {
-            _proyectoEditando = _context.Proyectos.FirstOrDefault(p => p.IdProyecto == idProyecto);
+            _proyectoEditando = _context.Proyectos
+                .AsNoTracking()
+                .FirstOrDefault(p => p.IdProyecto == idProyecto && p.IdEmpresa == _idEmpresa);
 
             if (_proyectoEditando == null)
             {
@@ -76,9 +79,9 @@ namespace VISTA
             txtModoVentana.Text = "Modo edición";
             btnGuardar.Content = "Guardar cambios";
 
-            txtNombre.Text = _proyectoEditando.Nombre;
-            txtDescripcion.Text = _proyectoEditando.Descripcion ?? "";
-            slProgreso.Value = Convert.ToDouble(_proyectoEditando.Progreso);
+            txtNombre.Text = _proyectoEditando.Nombre ?? string.Empty;
+            txtDescripcion.Text = _proyectoEditando.Descripcion ?? string.Empty;
+            slProgreso.Value = Convert.ToDouble(_proyectoEditando.Progreso ?? 0);
 
             if (_proyectoEditando.FechaInicio.HasValue)
                 dpFechaInicio.SelectedDate = _proyectoEditando.FechaInicio.Value;
@@ -88,25 +91,21 @@ namespace VISTA
 
             foreach (ComboBoxItem item in cbEstado.Items)
             {
-                if ((item.Content?.ToString() ?? "") == _proyectoEditando.Estado)
+                if (string.Equals(item.Content?.ToString(), _proyectoEditando.Estado, StringComparison.OrdinalIgnoreCase))
                 {
                     cbEstado.SelectedItem = item;
                     break;
                 }
             }
 
-            if (_proyectoEditando.IdSupervisor.HasValue)
+            if (_proyectoEditando.IdSupervisor.HasValue && cbSupervisor.ItemsSource is System.Collections.IEnumerable supervisorItems)
             {
-                var supervisor = cbSupervisor.ItemsSource as System.Collections.IEnumerable;
-                if (supervisor != null)
+                foreach (var item in supervisorItems)
                 {
-                    foreach (var item in supervisor)
+                    if (item is UsuarioComboItem usuario && usuario.IdUsuario == _proyectoEditando.IdSupervisor.Value)
                     {
-                        if (item is UsuarioComboItem usuario && usuario.IdUsuario == _proyectoEditando.IdSupervisor.Value)
-                        {
-                            cbSupervisor.SelectedItem = item;
-                            break;
-                        }
+                        cbSupervisor.SelectedItem = item;
+                        break;
                     }
                 }
             }
@@ -128,14 +127,27 @@ namespace VISTA
                     return;
                 }
 
+                if (nombre.Length > 80)
+                {
+                    MessageBox.Show("El nombre no puede superar 80 caracteres.");
+                    txtNombre.Focus();
+                    return;
+                }
+
+                if (descripcion.Length > 250)
+                {
+                    MessageBox.Show("La descripción no puede superar 250 caracteres.");
+                    txtDescripcion.Focus();
+                    return;
+                }
+
                 if (cbEstado.SelectedItem is not ComboBoxItem estadoItem)
                 {
                     MessageBox.Show("Selecciona un estado.");
                     return;
                 }
 
-                string estado = estadoItem.Content?.ToString() ?? "Activo";
-
+                string estado = estadoItem.Content?.ToString()?.Trim() ?? "Activo";
                 DateTime? fechaInicio = dpFechaInicio.SelectedDate;
                 DateTime? fechaFin = dpFechaFin.SelectedDate;
 
@@ -151,7 +163,7 @@ namespace VISTA
                     idSupervisor = supervisor.IdUsuario;
                 }
 
-                decimal progreso = Convert.ToDecimal(slProgreso.Value);
+                decimal progreso = Convert.ToDecimal(Math.Round(slProgreso.Value, 2));
 
                 if (_proyectoEditando == null)
                 {
@@ -160,7 +172,7 @@ namespace VISTA
                         IdEmpresa = _idEmpresa,
                         IdSupervisor = idSupervisor,
                         Nombre = nombre,
-                        Descripcion = descripcion,
+                        Descripcion = string.IsNullOrWhiteSpace(descripcion) ? null : descripcion,
                         Estado = estado,
                         FechaInicio = fechaInicio,
                         FechaFin = fechaFin,
@@ -173,13 +185,21 @@ namespace VISTA
                 }
                 else
                 {
-                    _proyectoEditando.IdSupervisor = idSupervisor;
-                    _proyectoEditando.Nombre = nombre;
-                    _proyectoEditando.Descripcion = descripcion;
-                    _proyectoEditando.Estado = estado;
-                    _proyectoEditando.FechaInicio = fechaInicio;
-                    _proyectoEditando.FechaFin = fechaFin;
-                    _proyectoEditando.Progreso = progreso;
+                    var proyectoDb = _context.Proyectos.FirstOrDefault(p => p.IdProyecto == _proyectoEditando.IdProyecto);
+
+                    if (proyectoDb == null)
+                    {
+                        MessageBox.Show("No se encontró el proyecto para actualizar.");
+                        return;
+                    }
+
+                    proyectoDb.IdSupervisor = idSupervisor;
+                    proyectoDb.Nombre = nombre;
+                    proyectoDb.Descripcion = string.IsNullOrWhiteSpace(descripcion) ? null : descripcion;
+                    proyectoDb.Estado = estado;
+                    proyectoDb.FechaInicio = fechaInicio;
+                    proyectoDb.FechaFin = fechaFin;
+                    proyectoDb.Progreso = progreso;
                 }
 
                 _context.SaveChanges();

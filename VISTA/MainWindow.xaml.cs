@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using ENTITY;
+using System.Windows.Input;
 using System.Windows.Media.Animation;
+using ENTITY;
 
 namespace VISTA
 {
@@ -15,11 +16,11 @@ namespace VISTA
         private bool _sidebarVisible = true;
         private readonly DB_Context _context = new DB_Context();
         private List<ProyectoVista> _proyectos = new();
+        private int _idEmpresaActual;
 
         public MainWindow()
         {
-            
-        InitializeComponent();
+            InitializeComponent();
             Loaded += MainWindow_Loaded;
         }
 
@@ -37,19 +38,23 @@ namespace VISTA
                     .Select(e => new
                     {
                         e.IdEmpresa,
-                        Nombre = e.Nombre,
-                        Descripcion = e.Descripcion,
-                        Nit = e.Nit,
-                        Correo = e.Correo,
-                        Telefono = e.Telefono
+                        e.Nombre,
+                        e.Descripcion,
+                        e.Nit,
+                        e.Correo,
+                        e.Telefono
                     })
                     .FirstOrDefault();
 
                 if (empresa == null)
                 {
                     MessageBox.Show("No hay empresa registrada.");
+                    dgProyectos.ItemsSource = null;
+                    _proyectos = new List<ProyectoVista>();
                     return;
                 }
+
+                _idEmpresaActual = empresa.IdEmpresa;
 
                 txtNombreEmpresa.Text = string.IsNullOrWhiteSpace(empresa.Nombre)
                     ? "Sin nombre"
@@ -92,22 +97,22 @@ namespace VISTA
                     .Select(u => new
                     {
                         u.IdUsuario,
-                        NombreCompleto = (u.Nombre ?? "") + " " + (u.Apellido ?? "")
+                        NombreCompleto = ((u.Nombre ?? "") + " " + (u.Apellido ?? "")).Trim()
                     })
                     .ToDictionary(
                         u => u.IdUsuario,
-                        u => string.IsNullOrWhiteSpace(u.NombreCompleto) ? "Sin nombre" : u.NombreCompleto.Trim()
+                        u => string.IsNullOrWhiteSpace(u.NombreCompleto) ? "Sin nombre" : u.NombreCompleto
                     );
 
                 _proyectos = proyectosDb.Select(p => new ProyectoVista
                 {
                     IdProyecto = p.IdProyecto,
-                    Nombre = string.IsNullOrWhiteSpace(p.Nombre) ? "Sin nombre" : p.Nombre,
-                    Descripcion = string.IsNullOrWhiteSpace(p.Descripcion) ? "-" : p.Descripcion,
+                    Nombre = string.IsNullOrWhiteSpace(p.Nombre) ? "Sin nombre" : p.Nombre.Trim(),
+                    Descripcion = string.IsNullOrWhiteSpace(p.Descripcion) ? "-" : p.Descripcion.Trim(),
                     Supervisor = p.IdSupervisor.HasValue && supervisores.ContainsKey(p.IdSupervisor.Value)
                         ? supervisores[p.IdSupervisor.Value]
                         : "Sin asignar",
-                    Estado = string.IsNullOrWhiteSpace(p.Estado) ? "Sin estado" : p.Estado,
+                    Estado = string.IsNullOrWhiteSpace(p.Estado) ? "Sin estado" : p.Estado.Trim(),
                     FechaInicio = p.FechaInicio.HasValue ? p.FechaInicio.Value.ToString("dd/MM/yyyy") : "-",
                     FechaFin = p.FechaFin.HasValue ? p.FechaFin.Value.ToString("dd/MM/yyyy") : "-",
                     Progreso = $"{(p.Progreso ?? 0):0.##}%"
@@ -115,16 +120,17 @@ namespace VISTA
 
                 dgProyectos.ItemsSource = _proyectos;
 
-                txtProyectosActivos.Text = _proyectos.Count(x => x.Estado == "Activo").ToString();
-                txtProyectosFinalizados.Text = _proyectos.Count(x => x.Estado == "Finalizado").ToString();
-                txtProyectosPausados.Text = _proyectos.Count(x => x.Estado == "Pausado").ToString();
+                txtProyectosActivos.Text = _proyectos.Count(x => x.Estado.Equals("Activo", StringComparison.OrdinalIgnoreCase)).ToString();
+                txtProyectosFinalizados.Text = _proyectos.Count(x => x.Estado.Equals("Finalizado", StringComparison.OrdinalIgnoreCase)).ToString();
+                txtProyectosPausados.Text = _proyectos.Count(x => x.Estado.Equals("Pausado", StringComparison.OrdinalIgnoreCase)).ToString();
                 txtResponsablesAsignados.Text = _proyectos.Count(x => x.Supervisor != "Sin asignar").ToString();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error cargando empresa:\n{ex}");
+                MessageBox.Show($"Error cargando empresa:\n{ex.Message}");
             }
         }
+
         private void BtnHamburguesa_Click(object sender, RoutedEventArgs e)
         {
             const double abierto = 230;
@@ -151,6 +157,7 @@ namespace VISTA
 
             _sidebarVisible = !_sidebarVisible;
         }
+
         private void txtBuscarProyecto_TextChanged(object sender, TextChangedEventArgs e)
         {
             string texto = txtBuscarProyecto.Text.Trim().ToLower();
@@ -179,19 +186,69 @@ namespace VISTA
 
         private void BtnNuevoProyecto_Click(object sender, RoutedEventArgs e)
         {
+            AbrirFormularioProyecto(null);
+        }
+
+        private void BtnEditarProyecto_Click(object sender, RoutedEventArgs e)
+        {
+            var proyecto = ObtenerProyectoSeleccionado();
+            if (proyecto == null)
+            {
+                MessageBox.Show("Selecciona un proyecto para editar.");
+                return;
+            }
+
+            AbrirFormularioProyecto(proyecto.IdProyecto);
+        }
+
+        private void BtnEliminarProyecto_Click(object sender, RoutedEventArgs e)
+        {
+            var proyecto = ObtenerProyectoSeleccionado();
+            if (proyecto == null)
+            {
+                MessageBox.Show("Selecciona un proyecto para eliminar.");
+                return;
+            }
+
+            EliminarProyecto(proyecto.IdProyecto, proyecto.Nombre);
+        }
+
+        private void BtnEditarFilaProyecto_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is ProyectoVista proyecto)
+            {
+                AbrirFormularioProyecto(proyecto.IdProyecto);
+            }
+        }
+
+        private void BtnEliminarFilaProyecto_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is ProyectoVista proyecto)
+            {
+                EliminarProyecto(proyecto.IdProyecto, proyecto.Nombre);
+            }
+        }
+
+        private void dgProyectos_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var proyecto = ObtenerProyectoSeleccionado();
+            if (proyecto != null)
+            {
+                AbrirFormularioProyecto(proyecto.IdProyecto);
+            }
+        }
+
+        private void AbrirFormularioProyecto(int? idProyecto)
+        {
             try
             {
-                var empresa = _context.Empresas
-                    .AsNoTracking()
-                    .FirstOrDefault();
-
-                if (empresa == null)
+                if (_idEmpresaActual <= 0)
                 {
-                    MessageBox.Show("No hay empresa registrada.");
+                    MessageBox.Show("No se encontró una empresa válida.");
                     return;
                 }
 
-                var ventana = new ProyectoFormWindow(empresa.IdEmpresa)
+                var ventana = new ProyectoFormWindow(_idEmpresaActual, idProyecto)
                 {
                     Owner = this
                 };
@@ -209,12 +266,55 @@ namespace VISTA
             }
         }
 
+        private void EliminarProyecto(int idProyecto, string nombreProyecto)
+        {
+            try
+            {
+                var confirmacion = MessageBox.Show(
+                    $"¿Deseas eliminar el proyecto \"{nombreProyecto}\"?",
+                    "Confirmar eliminación",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (confirmacion != MessageBoxResult.Yes)
+                    return;
+
+                var proyecto = _context.Proyectos.FirstOrDefault(p => p.IdProyecto == idProyecto);
+
+                if (proyecto == null)
+                {
+                    MessageBox.Show("El proyecto ya no existe o no se pudo encontrar.");
+                    CargarPantallaEmpresa();
+                    return;
+                }
+
+                _context.Proyectos.Remove(proyecto);
+                _context.SaveChanges();
+
+                MessageBox.Show("Proyecto eliminado correctamente.");
+                CargarPantallaEmpresa();
+            }
+            catch (DbUpdateException)
+            {
+                MessageBox.Show("No se puede eliminar el proyecto porque tiene registros relacionados en la base de datos.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error eliminando proyecto:\n" + ex.Message);
+            }
+        }
+
+        private ProyectoVista? ObtenerProyectoSeleccionado()
+        {
+            return dgProyectos.SelectedItem as ProyectoVista;
+        }
+
         protected override void OnClosed(EventArgs e)
         {
             _context.Dispose();
             base.OnClosed(e);
         }
-        //principal
+
         private class ProyectoVista
         {
             public int IdProyecto { get; set; }

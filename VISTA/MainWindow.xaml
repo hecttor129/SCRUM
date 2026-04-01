@@ -93,7 +93,7 @@
                     <Button Style="{StaticResource SidebarButtonStyle}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="◧" FontSize="15" Width="24"/>
-                            <TextBlock Text="Entornos" VerticalAlignment="Center"/>
+                            <TextBlock Text="Equipo" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
@@ -177,6 +177,8 @@
                     <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
                         <Button Content="Editar empresa" Style="{StaticResource TopButtonStyle}" Click="BtnEditarEmpresa_Click"/>
                         <Button Content="Nuevo proyecto" Style="{StaticResource TopButtonStyle}" Click="BtnNuevoProyecto_Click"/>
+                        <Button Content="Editar proyecto" Style="{StaticResource TopButtonStyle}" Click="BtnEditarProyecto_Click"/>
+                        <Button Content="Eliminar proyecto" Style="{StaticResource TopButtonStyle}" Click="BtnEliminarProyecto_Click"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -253,9 +255,10 @@
                                       GridLinesVisibility="Horizontal"
                                       HeadersVisibility="Column"
                                       ColumnHeaderHeight="40"
-                                      RowHeight="40"
+                                      RowHeight="46"
                                       SelectionMode="Single"
-                                      SelectionUnit="FullRow">
+                                      SelectionUnit="FullRow"
+                                      MouseDoubleClick="dgProyectos_MouseDoubleClick">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Proyecto" Binding="{Binding Nombre}" Width="220"/>
                                     <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*"/>
@@ -264,6 +267,27 @@
                                     <DataGridTextColumn Header="Inicio" Binding="{Binding FechaInicio}" Width="110"/>
                                     <DataGridTextColumn Header="Fin" Binding="{Binding FechaFin}" Width="110"/>
                                     <DataGridTextColumn Header="Progreso" Binding="{Binding Progreso}" Width="100"/>
+                                    <DataGridTemplateColumn Header="Acciones" Width="190">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button Content="Editar"
+                                                            Margin="0,0,8,0"
+                                                            Padding="10,4"
+                                                            Background="#DBEAFE"
+                                                            Foreground="#1D4ED8"
+                                                            BorderBrush="#BFDBFE"
+                                                            Click="BtnEditarFilaProyecto_Click"/>
+                                                    <Button Content="Eliminar"
+                                                            Padding="10,4"
+                                                            Background="#FEE2E2"
+                                                            Foreground="#B91C1C"
+                                                            BorderBrush="#FECACA"
+                                                            Click="BtnEliminarFilaProyecto_Click"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>
