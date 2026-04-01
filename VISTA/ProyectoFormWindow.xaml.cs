@@ -42,7 +42,7 @@ namespace VISTA
         {
             var supervisores = _context.Usuarios
                 .AsNoTracking()
-                .Where(u => u.Activo)
+                .Where(u => u.Activo == 1)
                 .Select(u => new UsuarioComboItem
                 {
                     IdUsuario = u.IdUsuario,

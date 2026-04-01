@@ -17,7 +17,8 @@ namespace VISTA
         private readonly DB_Context _context = new DB_Context();
         private List<ProyectoVista> _proyectos = new();
         private int _idEmpresaActual;
-
+        private int? _idProyectoSeleccionado;
+        private List<EquipoVista> _equipos = new();
         public MainWindow()
         {
             InitializeComponent();
@@ -308,7 +309,181 @@ namespace VISTA
         {
             return dgProyectos.SelectedItem as ProyectoVista;
         }
+        private void dgProyectos_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (dgProyectos.SelectedItem is ProyectoVista proyecto)
+            {
+                _idProyectoSeleccionado = proyecto.IdProyecto;
+            }
+        }
 
+        private void BtnEquipoSidebar_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_idProyectoSeleccionado.HasValue)
+            {
+                MessageBox.Show("Primero selecciona un proyecto.");
+                return;
+            }
+
+            CargarEquiposProyecto(_idProyectoSeleccionado.Value);
+            panelEmpresa.Visibility = Visibility.Collapsed;
+            panelEquipos.Visibility = Visibility.Visible;
+        }
+
+        private void BtnVolverEmpresa_Click(object sender, RoutedEventArgs e)
+        {
+            panelEquipos.Visibility = Visibility.Collapsed;
+            panelEmpresa.Visibility = Visibility.Visible;
+        }
+
+        private void CargarEquiposProyecto(int idProyecto)
+        {
+            try
+            {
+                var proyecto = _context.Proyectos
+                    .AsNoTracking()
+                    .FirstOrDefault(p => p.IdProyecto == idProyecto && p.Activo == 1);
+
+                if (proyecto == null)
+                {
+                    MessageBox.Show("No se encontró el proyecto.");
+                    return;
+                }
+
+                txtTituloEquipos.Text = $"Equipos de {proyecto.Nombre}";
+
+                var equipos = (
+                    from eq in _context.Equipos.AsNoTracking()
+                    join u in _context.Usuarios.AsNoTracking()
+                        on eq.IdSupervisor equals u.IdUsuario
+                    where eq.IdProyecto == idProyecto && eq.Activo == 1
+                    orderby eq.Nombre
+                    select new EquipoVista
+                    {
+                        IdEquipo = eq.IdEquipo,
+                        Nombre = eq.Nombre,
+                        Descripcion = string.IsNullOrWhiteSpace(eq.Descripcion) ? "-" : eq.Descripcion,
+                        Supervisor = (u.Nombre + " " + u.Apellido).Trim(),
+                        Trabajadores = _context.EquipoUsuarios.Count(eu =>
+                            eu.IdEquipo == eq.IdEquipo && eu.Activo == 1),
+                        FechaCreacion = eq.FechaCreacion.HasValue
+                            ? eq.FechaCreacion.Value.ToString("dd/MM/yyyy")
+                            : "-"
+                    }).ToList();
+
+                dgEquipos.ItemsSource = equipos;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error cargando equipos:\n" + ex.Message);
+            }
+        }
+
+        private void BtnNuevoEquipo_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_idProyectoSeleccionado.HasValue)
+            {
+                MessageBox.Show("Selecciona un proyecto.");
+                return;
+            }
+
+            if (!PermisosEquipoHelper.PuedeGestionarEquipos(_context, _idProyectoSeleccionado.Value))
+            {
+                MessageBox.Show("No tienes permisos para crear equipos en este proyecto.");
+                return;
+            }
+
+            var ventana = new EquipoFormWindow(_idProyectoSeleccionado.Value)
+            {
+                Owner = this
+            };
+
+            bool? resultado = ventana.ShowDialog();
+            if (resultado == true)
+            {
+                CargarEquiposProyecto(_idProyectoSeleccionado.Value);
+            }
+        }
+
+        private void BtnEditarEquipo_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_idProyectoSeleccionado.HasValue)
+            {
+                MessageBox.Show("Selecciona un proyecto.");
+                return;
+            }
+
+            if (dgEquipos.SelectedItem is not EquipoVista equipo)
+            {
+                MessageBox.Show("Selecciona un equipo.");
+                return;
+            }
+
+            if (!PermisosEquipoHelper.PuedeGestionarEquipos(_context, _idProyectoSeleccionado.Value))
+            {
+                MessageBox.Show("No tienes permisos para editar este equipo.");
+                return;
+            }
+
+            var ventana = new EquipoFormWindow(_idProyectoSeleccionado.Value, equipo.IdEquipo)
+            {
+                Owner = this
+            };
+
+            bool? resultado = ventana.ShowDialog();
+            if (resultado == true)
+            {
+                CargarEquiposProyecto(_idProyectoSeleccionado.Value);
+            }
+        }
+
+        private void BtnEliminarEquipo_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_idProyectoSeleccionado.HasValue)
+            {
+                MessageBox.Show("Selecciona un proyecto.");
+                return;
+            }
+
+            if (dgEquipos.SelectedItem is not EquipoVista equipoVista)
+            {
+                MessageBox.Show("Selecciona un equipo.");
+                return;
+            }
+
+            if (!PermisosEquipoHelper.PuedeGestionarEquipos(_context, _idProyectoSeleccionado.Value))
+            {
+                MessageBox.Show("No tienes permisos para eliminar este equipo.");
+                return;
+            }
+
+            var confirmacion = MessageBox.Show(
+                $"¿Deseas eliminar el equipo '{equipoVista.Nombre}'?",
+                "Confirmar",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (confirmacion != MessageBoxResult.Yes)
+                return;
+
+            var equipo = _context.Equipos.FirstOrDefault(e => e.IdEquipo == equipoVista.IdEquipo);
+            if (equipo == null)
+            {
+                MessageBox.Show("No se encontró el equipo.");
+                return;
+            }
+
+            equipo.Activo = 0;
+            _context.SaveChanges();
+
+            CargarEquiposProyecto(_idProyectoSeleccionado.Value);
+            MessageBox.Show("Equipo eliminado correctamente.");
+        }
+
+        private void dgEquipos_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // aquí después puedes cargar tareas, archivos, estadísticas y entorno del equipo seleccionado
+        }
         protected override void OnClosed(EventArgs e)
         {
             _context.Dispose();
@@ -325,6 +500,16 @@ namespace VISTA
             public string FechaInicio { get; set; } = string.Empty;
             public string FechaFin { get; set; } = string.Empty;
             public string Progreso { get; set; } = string.Empty;
+
+        }
+        private class EquipoVista
+        {
+            public int IdEquipo { get; set; }
+            public string Nombre { get; set; } = string.Empty;
+            public string Descripcion { get; set; } = string.Empty;
+            public string Supervisor { get; set; } = string.Empty;
+            public int Trabajadores { get; set; }
+            public string FechaCreacion { get; set; } = string.Empty;
         }
     }
 }

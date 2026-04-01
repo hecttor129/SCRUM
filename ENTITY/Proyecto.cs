@@ -23,4 +23,5 @@ namespace ENTITY
         public DateTime? FechaCreacion { get; set; }
        
     }
+
 }

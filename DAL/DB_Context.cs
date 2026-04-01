@@ -33,7 +33,8 @@ namespace DAL
         public DbSet<UsuarioEspecializacion> UsuarioEspecializaciones { get; set; }
         public DbSet<Empresa> Empresas { get; set; }
         public DbSet<Proyecto> Proyectos { get; set; }
-        
+        public DbSet<Equipo> Equipos { get; set; }
+        public DbSet<EquipoUsuario> EquipoUsuarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -629,7 +630,82 @@ namespace DAL
                       .HasForeignKey(e => e.IdSupervisor)
                       .OnDelete(DeleteBehavior.Restrict);
             });
-            
+            modelBuilder.Entity<Equipo>(entity =>
+            {
+                entity.ToTable("EQUIPOS");
+
+                entity.HasKey(e => e.IdEquipo);
+
+                entity.Property(e => e.IdEquipo)
+                      .HasColumnName("ID_EQUIPO")
+                      .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.IdProyecto)
+                      .HasColumnName("ID_PROYECTO")
+                      .IsRequired();
+
+                entity.Property(e => e.IdSupervisor)
+                      .HasColumnName("ID_SUPERVISOR")
+                      .IsRequired();
+
+                entity.Property(e => e.Nombre)
+                      .HasColumnName("NOMBRE")
+                      .HasMaxLength(80)
+                      .IsRequired();
+
+                entity.Property(e => e.Descripcion)
+                      .HasColumnName("DESCRIPCION")
+                      .HasMaxLength(250);
+
+                entity.Property(e => e.Activo)
+                      .HasColumnName("ACTIVO");
+
+                entity.Property(e => e.FechaCreacion)
+                      .HasColumnName("FECHA_CREACION");
+
+                entity.HasOne<Proyecto>()
+                      .WithMany()
+                      .HasForeignKey(e => e.IdProyecto);
+
+                entity.HasOne<Usuario>()
+                      .WithMany()
+                      .HasForeignKey(e => e.IdSupervisor)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<EquipoUsuario>(entity =>
+            {
+                entity.ToTable("EQUIPO_USUARIOS");
+
+                entity.HasKey(e => e.IdEquipoUsuario);
+
+                entity.Property(e => e.IdEquipoUsuario)
+                      .HasColumnName("ID_EQUIPO_USUARIO")
+                      .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.IdEquipo)
+                      .HasColumnName("ID_EQUIPO")
+                      .IsRequired();
+
+                entity.Property(e => e.IdUsuario)
+                      .HasColumnName("ID_USUARIO")
+                      .IsRequired();
+
+                entity.Property(e => e.FechaAsignacion)
+                      .HasColumnName("FECHA_ASIGNACION");
+
+                entity.Property(e => e.Activo)
+                      .HasColumnName("ACTIVO");
+
+                entity.HasOne<Equipo>()
+                      .WithMany()
+                      .HasForeignKey(e => e.IdEquipo);
+
+                entity.HasOne<Usuario>()
+                      .WithMany()
+                      .HasForeignKey(e => e.IdUsuario)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
 
         }
     }
