@@ -1,7 +1,7 @@
-﻿using DAL;
+using BLL;
 using ENTITY;
-using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +12,10 @@ namespace VISTA
 {
     public partial class ProyectoFormWindow : Window
     {
-        private readonly DB_Context _context = new DB_Context();
+        // ── Servicios BLL ────────────────────────────────────────────────────
+        private readonly ProyectoService _proyectoService = new();
+
+        // ── Estado ───────────────────────────────────────────────────────────
         private readonly int _idEmpresa;
         private readonly int? _idProyecto;
         private Proyecto? _proyectoEditando;
@@ -31,41 +34,23 @@ namespace VISTA
             cbEstado.SelectedIndex = 0;
 
             if (_idProyecto.HasValue)
-            {
                 CargarProyecto(_idProyecto.Value);
-            }
 
             RefrescarVistaPrevia();
         }
 
+        // ── Carga inicial ────────────────────────────────────────────────────
+
         private void CargarSupervisores()
         {
-            var supervisores = _context.Usuarios
-                .AsNoTracking()
-                .Where(u => u.Activo == 1)
-                .Select(u => new UsuarioComboItem
-                {
-                    IdUsuario = u.IdUsuario,
-                    NombreCompleto = ((u.Nombre ?? "") + " " + (u.Apellido ?? "")).Trim()
-                })
-                .OrderBy(x => x.NombreCompleto)
-                .ToList();
-
-            supervisores.Insert(0, new UsuarioComboItem
-            {
-                IdUsuario = 0,
-                NombreCompleto = "Sin asignar"
-            });
-
+            var supervisores = _proyectoService.ObtenerSupervisoresDisponibles();
             cbSupervisor.ItemsSource = supervisores;
             cbSupervisor.SelectedIndex = 0;
         }
 
         private void CargarProyecto(int idProyecto)
         {
-            _proyectoEditando = _context.Proyectos
-                .AsNoTracking()
-                .FirstOrDefault(p => p.IdProyecto == idProyecto && p.IdEmpresa == _idEmpresa);
+            _proyectoEditando = _proyectoService.ObtenerPorId(idProyecto, _idEmpresa);
 
             if (_proyectoEditando == null)
             {
@@ -98,9 +83,9 @@ namespace VISTA
                 }
             }
 
-            if (_proyectoEditando.IdSupervisor.HasValue && cbSupervisor.ItemsSource is System.Collections.IEnumerable supervisorItems)
+            if (_proyectoEditando.IdSupervisor.HasValue && cbSupervisor.ItemsSource is System.Collections.IEnumerable items)
             {
-                foreach (var item in supervisorItems)
+                foreach (var item in items)
                 {
                     if (item is UsuarioComboItem usuario && usuario.IdUsuario == _proyectoEditando.IdSupervisor.Value)
                     {
@@ -113,33 +98,14 @@ namespace VISTA
             RefrescarVistaPrevia();
         }
 
+        // ── Guardar ──────────────────────────────────────────────────────────
+
         private void BtnGuardar_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 string nombre = txtNombre.Text.Trim();
                 string descripcion = txtDescripcion.Text.Trim();
-
-                if (string.IsNullOrWhiteSpace(nombre))
-                {
-                    MessageBox.Show("El nombre del proyecto es obligatorio.");
-                    txtNombre.Focus();
-                    return;
-                }
-
-                if (nombre.Length > 80)
-                {
-                    MessageBox.Show("El nombre no puede superar 80 caracteres.");
-                    txtNombre.Focus();
-                    return;
-                }
-
-                if (descripcion.Length > 250)
-                {
-                    MessageBox.Show("La descripción no puede superar 250 caracteres.");
-                    txtDescripcion.Focus();
-                    return;
-                }
 
                 if (cbEstado.SelectedItem is not ComboBoxItem estadoItem)
                 {
@@ -151,22 +117,15 @@ namespace VISTA
                 DateTime? fechaInicio = dpFechaInicio.SelectedDate;
                 DateTime? fechaFin = dpFechaFin.SelectedDate;
 
-                if (fechaInicio.HasValue && fechaFin.HasValue && fechaFin.Value.Date < fechaInicio.Value.Date)
-                {
-                    MessageBox.Show("La fecha fin no puede ser menor que la fecha inicio.");
-                    return;
-                }
-
                 int? idSupervisor = null;
                 if (cbSupervisor.SelectedItem is UsuarioComboItem supervisor && supervisor.IdUsuario != 0)
-                {
                     idSupervisor = supervisor.IdUsuario;
-                }
 
                 decimal progreso = Convert.ToDecimal(Math.Round(slProgreso.Value, 2));
 
                 if (_proyectoEditando == null)
                 {
+                    // Crear
                     var nuevoProyecto = new Proyecto
                     {
                         IdEmpresa = _idEmpresa,
@@ -181,32 +140,23 @@ namespace VISTA
                         FechaCreacion = DateTime.Now
                     };
 
-                    _context.Proyectos.Add(nuevoProyecto);
+                    _proyectoService.CrearProyecto(nuevoProyecto);
+                    MessageBox.Show("Proyecto creado correctamente.");
                 }
                 else
                 {
-                    var proyectoDb = _context.Proyectos.FirstOrDefault(p => p.IdProyecto == _proyectoEditando.IdProyecto);
+                    // Editar
+                    _proyectoEditando.IdSupervisor = idSupervisor;
+                    _proyectoEditando.Nombre = nombre;
+                    _proyectoEditando.Descripcion = string.IsNullOrWhiteSpace(descripcion) ? null : descripcion;
+                    _proyectoEditando.Estado = estado;
+                    _proyectoEditando.FechaInicio = fechaInicio;
+                    _proyectoEditando.FechaFin = fechaFin;
+                    _proyectoEditando.Progreso = progreso;
 
-                    if (proyectoDb == null)
-                    {
-                        MessageBox.Show("No se encontró el proyecto para actualizar.");
-                        return;
-                    }
-
-                    proyectoDb.IdSupervisor = idSupervisor;
-                    proyectoDb.Nombre = nombre;
-                    proyectoDb.Descripcion = string.IsNullOrWhiteSpace(descripcion) ? null : descripcion;
-                    proyectoDb.Estado = estado;
-                    proyectoDb.FechaInicio = fechaInicio;
-                    proyectoDb.FechaFin = fechaFin;
-                    proyectoDb.Progreso = progreso;
+                    _proyectoService.EditarProyecto(_proyectoEditando);
+                    MessageBox.Show("Proyecto actualizado correctamente.");
                 }
-
-                _context.SaveChanges();
-
-                MessageBox.Show(_proyectoEditando == null
-                    ? "Proyecto creado correctamente."
-                    : "Proyecto actualizado correctamente.");
 
                 DialogResult = true;
                 Close();
@@ -217,26 +167,15 @@ namespace VISTA
             }
         }
 
-        private void BtnCancelar_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
+        // ── UI helpers ───────────────────────────────────────────────────────
 
-        private void BtnCerrarVentana_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void BtnMinimizarVentana_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
-        }
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e) => Close();
+        private void BtnCerrarVentana_Click(object sender, RoutedEventArgs e) => Close();
+        private void BtnMinimizarVentana_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
         private void TopBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount == 2)
-                return;
-
+            if (e.ClickCount == 2) return;
             DragMove();
         }
 
@@ -246,10 +185,7 @@ namespace VISTA
             RefrescarVistaPrevia();
         }
 
-        private void ActualizarVistaPrevia(object sender, EventArgs e)
-        {
-            RefrescarVistaPrevia();
-        }
+        private void ActualizarVistaPrevia(object sender, EventArgs e) => RefrescarVistaPrevia();
 
         private void RefrescarVistaPrevia()
         {
@@ -296,12 +232,10 @@ namespace VISTA
                     bdPreviewEstado.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3B2A12"));
                     txtPreviewEstado.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FCD34D"));
                     break;
-
                 case "Finalizado":
                     bdPreviewEstado.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#123026"));
                     txtPreviewEstado.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#86EFAC"));
                     break;
-
                 default:
                     bdPreviewEstado.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E3A5F"));
                     txtPreviewEstado.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#93C5FD"));
@@ -317,21 +251,8 @@ namespace VISTA
                 txtPreviewSupervisor.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D8B4FE"));
                 return;
             }
-
             bdPreviewSupervisor.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#123026"));
             txtPreviewSupervisor.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#86EFAC"));
-        }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            _context.Dispose();
-            base.OnClosed(e);
-        }
-
-        private class UsuarioComboItem
-        {
-            public int IdUsuario { get; set; }
-            public string NombreCompleto { get; set; } = string.Empty;
         }
     }
 }

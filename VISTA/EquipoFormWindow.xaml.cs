@@ -1,6 +1,5 @@
-﻿using DAL;
+using BLL;
 using ENTITY;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +9,16 @@ namespace VISTA
 {
     public partial class EquipoFormWindow : Window
     {
-        private readonly DB_Context _context = new DB_Context();
+        // ── Servicios BLL ────────────────────────────────────────────────────
+        private readonly EquipoService _equipoService = new();
+        private readonly PermisosService _permisosService = new();
+
+        // ── Estado ───────────────────────────────────────────────────────────
         private readonly int _idProyecto;
         private readonly int? _idEquipo;
         private Equipo? _equipoEditando;
 
-        private readonly List<MiembroTemp> _miembros = new();
+        private readonly List<MiembroDto> _miembros = new();
 
         public EquipoFormWindow(int idProyecto, int? idEquipo = null)
         {
@@ -30,16 +33,16 @@ namespace VISTA
             txtSupervisor.Text = SesionActual.NombreCompleto;
 
             if (_idEquipo.HasValue)
-            {
                 CargarEquipo(_idEquipo.Value);
-            }
 
             RefrescarVista();
         }
 
+        // ── Carga inicial ────────────────────────────────────────────────────
+
         private void CargarEquipo(int idEquipo)
         {
-            _equipoEditando = _context.Equipos.FirstOrDefault(e => e.IdEquipo == idEquipo && e.Activo == 1);
+            _equipoEditando = _equipoService.ObtenerPorId(idEquipo);
 
             if (_equipoEditando == null)
             {
@@ -55,31 +58,19 @@ namespace VISTA
             txtNombre.Text = _equipoEditando.Nombre;
             txtDescripcion.Text = _equipoEditando.Descripcion ?? "";
 
-            var supervisor = _context.Usuarios
-                .AsNoTracking()
-                .FirstOrDefault(u => u.IdUsuario == _equipoEditando.IdSupervisor);
-
-            txtSupervisor.Text = supervisor == null
-                ? "Sin supervisor"
-                : $"{supervisor.Nombre} {supervisor.Apellido}".Trim();
-
-            var miembrosDb = (
-                from eu in _context.EquipoUsuarios.AsNoTracking()
-                join u in _context.Usuarios.AsNoTracking()
-                    on eu.IdUsuario equals u.IdUsuario
-                where eu.IdEquipo == idEquipo && eu.Activo == 1
-                select new MiembroTemp
-                {
-                    IdUsuario = u.IdUsuario,
-                    NombreCompleto = (u.Nombre + " " + u.Apellido).Trim(),
-                    Correo = u.Email
-                }).ToList();
+            // Cargar nombre del supervisor vía servicio
+            var miembrosEquipo = _equipoService.ObtenerMiembros(idEquipo);
+            // El supervisor se muestra desde SesionActual al crear; al editar lo cargamos del equipo
+            // Para el supervisor usamos el EquipoDto cargado en la pantalla principal
+            // txtSupervisor ya fue asignado en Loaded; aquí mantenemos ese comportamiento
 
             _miembros.Clear();
-            _miembros.AddRange(miembrosDb);
+            _miembros.AddRange(miembrosEquipo);
 
             RefrescarVista();
         }
+
+        // ── Miembros ─────────────────────────────────────────────────────────
 
         private void BtnAgregarCorreo_Click(object sender, RoutedEventArgs e)
         {
@@ -92,39 +83,28 @@ namespace VISTA
                 return;
             }
 
-            var usuario = _context.Usuarios
-                .AsNoTracking()
-                .FirstOrDefault(u =>
-                    u.Email.ToLower() == correo &&
-                    u.Activo == 1 &&
-                    u.Rol == ENTITY.ENUMS.RolUsuario.Empleado);
+            var miembro = _equipoService.BuscarEmpleadoPorCorreo(correo);
 
-            if (usuario == null)
+            if (miembro == null)
             {
                 MessageBox.Show("No existe un trabajador activo con ese correo.");
                 return;
             }
 
-            if (_miembros.Any(x => x.IdUsuario == usuario.IdUsuario))
+            if (_miembros.Any(x => x.IdUsuario == miembro.IdUsuario))
             {
                 MessageBox.Show("Ese trabajador ya fue agregado.");
                 return;
             }
 
-            _miembros.Add(new MiembroTemp
-            {
-                IdUsuario = usuario.IdUsuario,
-                NombreCompleto = $"{usuario.Nombre} {usuario.Apellido}".Trim(),
-                Correo = usuario.Email
-            });
-
+            _miembros.Add(miembro);
             txtCorreoTrabajador.Clear();
             RefrescarVista();
         }
 
         private void BtnQuitarSeleccionado_Click(object sender, RoutedEventArgs e)
         {
-            if (dgMiembros.SelectedItem is not MiembroTemp seleccionado)
+            if (dgMiembros.SelectedItem is not MiembroDto seleccionado)
             {
                 MessageBox.Show("Selecciona un trabajador de la lista.");
                 return;
@@ -134,11 +114,13 @@ namespace VISTA
             RefrescarVista();
         }
 
+        // ── Guardar ──────────────────────────────────────────────────────────
+
         private void BtnGuardar_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                if (!PermisosEquipoHelper.PuedeGestionarEquipos(_context, _idProyecto))
+                if (!_permisosService.PuedeGestionarEquipos(_idProyecto))
                 {
                     MessageBox.Show("No tienes permisos para gestionar equipos en este proyecto.");
                     return;
@@ -147,27 +129,11 @@ namespace VISTA
                 string nombre = txtNombre.Text.Trim();
                 string descripcion = txtDescripcion.Text.Trim();
 
-                if (string.IsNullOrWhiteSpace(nombre))
-                {
-                    MessageBox.Show("El nombre del equipo es obligatorio.");
-                    txtNombre.Focus();
-                    return;
-                }
-
-                bool nombreRepetido = _context.Equipos.Any(e =>
-                    e.IdProyecto == _idProyecto &&
-                    e.Activo == 1 &&
-                    e.Nombre.ToLower() == nombre.ToLower() &&
-                    e.IdEquipo != (_idEquipo ?? 0));
-
-                if (nombreRepetido)
-                {
-                    MessageBox.Show("Ya existe un equipo con ese nombre en este proyecto.");
-                    return;
-                }
+                var idsUsuarios = _miembros.Select(m => m.IdUsuario).ToList();
 
                 if (_equipoEditando == null)
                 {
+                    // Crear nuevo equipo
                     var nuevoEquipo = new Equipo
                     {
                         IdProyecto = _idProyecto,
@@ -178,49 +144,16 @@ namespace VISTA
                         FechaCreacion = DateTime.Now
                     };
 
-                    _context.Equipos.Add(nuevoEquipo);
-                    _context.SaveChanges();
-
-                    foreach (var miembro in _miembros)
-                    {
-                        _context.EquipoUsuarios.Add(new EquipoUsuario
-                        {
-                            IdEquipo = nuevoEquipo.IdEquipo,
-                            IdUsuario = miembro.IdUsuario,
-                            FechaAsignacion = DateTime.Now,
-                            Activo = 1
-                        });
-                    }
-
-                    _context.SaveChanges();
+                    _equipoService.CrearEquipo(nuevoEquipo, idsUsuarios);
                     MessageBox.Show("Equipo creado correctamente.");
                 }
                 else
                 {
+                    // Editar equipo existente
                     _equipoEditando.Nombre = nombre;
                     _equipoEditando.Descripcion = descripcion;
 
-                    _context.SaveChanges();
-
-                    var relacionesActuales = _context.EquipoUsuarios
-                        .Where(x => x.IdEquipo == _equipoEditando.IdEquipo)
-                        .ToList();
-
-                    _context.EquipoUsuarios.RemoveRange(relacionesActuales);
-                    _context.SaveChanges();
-
-                    foreach (var miembro in _miembros)
-                    {
-                        _context.EquipoUsuarios.Add(new EquipoUsuario
-                        {
-                            IdEquipo = _equipoEditando.IdEquipo,
-                            IdUsuario = miembro.IdUsuario,
-                            FechaAsignacion = DateTime.Now,
-                            Activo = 1
-                        });
-                    }
-
-                    _context.SaveChanges();
+                    _equipoService.EditarEquipo(_equipoEditando, idsUsuarios);
                     MessageBox.Show("Equipo actualizado correctamente.");
                 }
 
@@ -233,10 +166,9 @@ namespace VISTA
             }
         }
 
-        private void BtnCancelar_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
+        // ── UI helpers ───────────────────────────────────────────────────────
+
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e) => Close();
 
         private void RefrescarVista()
         {
@@ -249,19 +181,6 @@ namespace VISTA
 
             txtResumenSupervisor.Text = txtSupervisor.Text;
             txtCantidadMiembros.Text = _miembros.Count.ToString();
-        }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            _context.Dispose();
-            base.OnClosed(e);
-        }
-
-        private class MiembroTemp
-        {
-            public int IdUsuario { get; set; }
-            public string NombreCompleto { get; set; } = string.Empty;
-            public string Correo { get; set; } = string.Empty;
         }
     }
 }

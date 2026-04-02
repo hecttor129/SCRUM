@@ -1,29 +1,18 @@
-﻿using DAL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static ENTITY.ENUMS;
+using BLL;
 
 namespace VISTA
 {
+    /// <summary>
+    /// Helper de compatibilidad en VISTA que delega al PermisosService en BLL.
+    /// Mantenido para no romper llamadas existentes mientras se migra el resto del código.
+    /// </summary>
     public static class PermisosEquipoHelper
     {
-        public static bool PuedeGestionarEquipos(DB_Context context, int idProyecto)
+        private static readonly PermisosService _service = new();
+
+        public static bool PuedeGestionarEquipos(int idProyecto)
         {
-            if (SesionActual.Rol == RolUsuario.Admin)
-                return true;
-
-            if (SesionActual.Rol == RolUsuario.Jefe)
-            {
-                return context.Proyectos.Any(p =>
-                    p.IdProyecto == idProyecto &&
-                    p.IdSupervisor == SesionActual.IdUsuario &&
-                    p.Activo == 1);
-            }
-
-            return false;
+            return _service.PuedeGestionarEquipos(idProyecto);
         }
     }
 }
