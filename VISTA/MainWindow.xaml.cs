@@ -34,7 +34,21 @@ namespace VISTA
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            InicializarSidebar();
             CargarPantallaEmpresa();
+        }
+
+        private void InicializarSidebar()
+        {
+            // Info del usuario logueado
+            txtSidebarNombre.Text = SesionActual.NombreCompleto;
+            txtSidebarRol.Text = SesionActual.Rol.ToString();
+
+            // Solo el administrador ve el botón de "Usuarios"
+            if (SesionActual.Rol == ENTITY.ENUMS.RolUsuario.Admin)
+            {
+                btnUsuarios.Visibility = Visibility.Visible;
+            }
         }
 
         // ── Empresa ──────────────────────────────────────────────────────────
@@ -366,6 +380,12 @@ namespace VISTA
             SidebarContainer.BeginAnimation(OpacityProperty, animOpacity);
 
             _sidebarVisible = !_sidebarVisible;
+        }
+
+        private void BtnUsuarios_Click(object sender, RoutedEventArgs e)
+        {
+            var ventana = new UsuariosWindow() { Owner = this };
+            ventana.ShowDialog();
         }
     }
 }

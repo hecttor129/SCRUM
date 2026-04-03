@@ -1,4 +1,4 @@
-﻿<Window x:Class="VISTA.MainWindow"
+<Window x:Class="VISTA.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Empresa"
@@ -97,10 +97,10 @@
                         </StackPanel>
                     </Button>
 
-                    <Button Style="{StaticResource SidebarButtonStyle}">
+                    <Button x:Name="btnUsuarios" Style="{StaticResource SidebarButtonStyle}" Visibility="Collapsed" Click="BtnUsuarios_Click">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="👥" FontSize="15" Width="24"/>
-                            <TextBlock Text="Equipo" VerticalAlignment="Center"/>
+                            <TextBlock Text="👤" FontSize="15" Width="24"/>
+                            <TextBlock Text="Usuarios" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
@@ -113,10 +113,10 @@
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Margin="6,0,0,10">
-                    <TextBlock Text="Luis Paredes"
+                    <TextBlock x:Name="txtSidebarNombre" Text="Nombre"
                                Foreground="#111827"
                                FontWeight="SemiBold"/>
-                    <TextBlock Text="Administrador"
+                    <TextBlock x:Name="txtSidebarRol" Text="Rol"
                                Foreground="#6B7280"
                                FontSize="12"/>
                 </StackPanel>

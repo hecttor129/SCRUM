@@ -1,0 +1,44 @@
+<Window x:Class="VISTA.UsuarioFormWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Usuario" Height="620" Width="440"
+        WindowStartupLocation="CenterScreen" Background="White">
+    <Grid Margin="25">
+        <StackPanel>
+            <TextBlock x:Name="txtTitulo" FontSize="20" FontWeight="Bold" Foreground="#111827" Margin="0,0,0,15"/>
+
+            <TextBlock Text="Nombre" Foreground="#374151" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <TextBox x:Name="txtNombre" Height="34" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#D1D5DB" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Apellido" Foreground="#374151" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <TextBox x:Name="txtApellido" Height="34" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#D1D5DB" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Correo electrónico" Foreground="#374151" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <TextBox x:Name="txtEmail" Height="34" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#D1D5DB" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Contraseña" Foreground="#374151" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <PasswordBox x:Name="pwdPassword" Height="34" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#D1D5DB" Margin="0,0,0,2"/>
+            <TextBlock x:Name="txtHintPwd" Text="(Dejar vacío para no cambiar la contraseña)" FontSize="11" Foreground="#6B7280" Visibility="Collapsed" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Rol" Foreground="#374151" FontWeight="SemiBold" Margin="0,5,0,5"/>
+            <ComboBox x:Name="cbRol" Height="34" BorderBrush="#D1D5DB" Margin="0,0,0,10">
+                <ComboBoxItem Content="Jefe"/>
+                <ComboBoxItem Content="Empleado"/>
+            </ComboBox>
+
+            <TextBlock Text="Superior directo" Foreground="#374151" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <ComboBox x:Name="cbSuperior" Height="34" DisplayMemberPath="NombreConNivel" BorderBrush="#D1D5DB" Margin="0,0,0,2" SelectionChanged="CbSuperior_SelectionChanged"/>
+            <TextBlock x:Name="txtNivelCalculado" Text="Nivel jerárquico asignado: -" FontSize="12" Foreground="#059669" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Salario (opcional)" Foreground="#374151" FontWeight="SemiBold" Margin="0,0,0,5"/>
+            <TextBox x:Name="txtSalario" Height="34" Padding="8,0" VerticalContentAlignment="Center" BorderBrush="#D1D5DB" Margin="0,0,0,10"/>
+
+            <TextBlock x:Name="txtError" Foreground="#EF4444" TextWrapping="Wrap" Margin="0,5,0,10" Visibility="Collapsed"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button Content="Cancelar" Width="90" Height="36" Margin="0,0,10,0" Background="#F3F4F6" BorderThickness="0" Click="BtnCancelar_Click"/>
+                <Button x:Name="btnGuardar" Content="Guardar" Width="130" Height="36" Background="#2563EB" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Click="BtnGuardar_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
