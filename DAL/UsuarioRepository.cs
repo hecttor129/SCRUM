@@ -98,9 +98,15 @@ namespace DAL
         /// </summary>
         public bool ExisteAdmin()
         {
-            return _context.Usuarios
+            // Evitar que EF Core/Oracle genere literales booleanos en SQL (TRUE/FALSE).
+            // Seleccionamos un Id (entero) y comprobamos en cliente si existe.
+            var id = _context.Usuarios
                 .AsNoTracking()
-                .Any(u => u.Rol == RolUsuario.Admin && u.Activo)
+                .Where(u => EF.Property<string>(u, "ROL") == "Admin" && u.Activo == 1)
+                .Select(u => u.IdUsuario)
+                .FirstOrDefault(); // devuelve 0 si no hay filas
+
+            return id != 0;
         }
 
         /// <summary>
