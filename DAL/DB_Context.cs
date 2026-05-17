@@ -74,10 +74,8 @@ namespace DAL
                       .IsRequired();
 
                 entity.Property(e => e.Rol)
-                      .HasColumnName("ROL")
-                      .HasConversion<string>()
-                      .HasMaxLength(10)
-                      .IsRequired();
+             .HasColumnName("ROL")
+               .HasConversion<string>();
 
                 entity.Property(e => e.NivelJerarquico)
                       .HasColumnName("NIVEL_JERARQUICO");
