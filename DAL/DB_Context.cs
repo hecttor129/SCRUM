@@ -5,18 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using ENTITY;
 using Microsoft.EntityFrameworkCore;
-using Oracle.EntityFrameworkCore;
+
 
 namespace DAL
 {
     public class DB_Context : DbContext
     {
-            protected override void OnConfiguring(DbContextOptionsBuilder options)
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        {
+            if (!options.IsConfigured)
             {
-                options.UseOracle(
-                    "User Id=luis_scrum;Password=luis123;Data Source=127.0.0.1:1521/XEPDB1;");
-                    
+                options.UseNpgsql(
+                    "Host=localhost;Port=5432;Database=scrum_db;Username=scrum_user;Password=scrum123");
             }
+        }
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<RelacionJerarquica> RelacionesJerarquicas { get; set; }
@@ -82,7 +84,7 @@ namespace DAL
 
                 entity.Property(e => e.Salario)
                       .HasColumnName("SALARIO")
-                      .HasColumnType("NUMBER(12,2)");
+                      .HasPrecision(12, 2);
 
                 entity.Property(e => e.Activo)
                       .HasColumnName("ACTIVO")
@@ -111,7 +113,7 @@ namespace DAL
 
                 entity.Property(e => e.Descripcion)
                       .HasColumnName("DESCRIPCION")
-                      .HasColumnType("CLOB");
+                      .HasColumnType("text");
             });
 
             // =========================
@@ -136,7 +138,7 @@ namespace DAL
 
                 entity.Property(e => e.Descripcion)
                       .HasColumnName("DESCRIPCION")
-                      .HasColumnType("CLOB");
+                      .HasColumnType("text");
 
                 entity.Property(e => e.Prioridad)
                       .HasColumnName("PRIORIDAD");
@@ -289,19 +291,19 @@ namespace DAL
 
                 entity.Property(e => e.PesoDisponibilidad)
                       .HasColumnName("PESO_DISPONIBILIDAD")
-                      .HasColumnType("NUMBER(5,2)");
+                     .HasPrecision(12, 2);
 
                 entity.Property(e => e.PesoCalificacion)
                       .HasColumnName("PESO_CALIFICACION")
-                      .HasColumnType("NUMBER(5,2)");
+                      .HasPrecision(5, 2);
 
                 entity.Property(e => e.PesoCarga)
                       .HasColumnName("PESO_CARGA")
-                      .HasColumnType("NUMBER(5,2)");
+                      .HasPrecision(5, 2);
 
                 entity.Property(e => e.PesoProductividad)
                       .HasColumnName("PESO_PRODUCTIVIDAD")
-                      .HasColumnType("NUMBER(5,2)");
+                      .HasPrecision(5, 2);
 
                 entity.Property(e => e.Activo)
                       .HasColumnName("ACTIVO")
@@ -331,7 +333,7 @@ namespace DAL
 
                 entity.Property(e => e.Comentario)
                       .HasColumnName("COMENTARIO")
-                      .HasColumnType("CLOB");
+                      .HasColumnType("text");
 
                 entity.Property(e => e.Fecha)
                       .HasColumnName("FECHA");
@@ -370,7 +372,7 @@ namespace DAL
 
                 entity.Property(e => e.Descripcion)
                       .HasColumnName("DESCRIPCION")
-                      .HasColumnType("CLOB");
+                      .HasColumnType("text");
 
                 entity.Property(e => e.Fecha)
                       .HasColumnName("FECHA");
@@ -404,7 +406,7 @@ namespace DAL
 
                 entity.Property(e => e.CapacidadPorDia)
                       .HasColumnName("CAPACIDAD_POR_DIA")
-                      .HasColumnType("NUMBER(5,2)");
+                      .HasPrecision(5, 2);
 
                 entity.HasOne<Usuario>()
                       .WithMany()
@@ -429,7 +431,7 @@ namespace DAL
 
                 entity.Property(e => e.Mensaje)
                       .HasColumnName("MENSAJE")
-                      .HasColumnType("CLOB");
+                     .HasColumnType("text");
 
                 entity.Property(e => e.Tipo)
                       .HasColumnName("TIPO")
@@ -470,19 +472,19 @@ namespace DAL
 
                 entity.Property(e => e.CumplimientoPlazoPct)
                       .HasColumnName("CUMPLIMIENTO_PLAZO_PCT")
-                      .HasColumnType("NUMBER(5,4)");
+                      .HasPrecision(5, 4);
 
                 entity.Property(e => e.CargaPromedio)
                       .HasColumnName("CARGA_PROMEDIO")
-                      .HasColumnType("NUMBER(5,4)");
+                      .HasPrecision(5, 4);
 
                 entity.Property(e => e.Confiabilidad)
                       .HasColumnName("CONFIABILIDAD")
-                      .HasColumnType("NUMBER(5,4)");
+                     .HasPrecision(5, 4);
 
                 entity.Property(e => e.CalificacionActual)
                       .HasColumnName("CALIFICACION_ACTUAL")
-                      .HasColumnType("NUMBER(5,4)");
+                      .HasPrecision(5, 4);
 
                 entity.HasOne<Usuario>()
                       .WithMany()
