@@ -100,7 +100,7 @@ namespace DAL
         {
             return _context.Usuarios
                 .AsNoTracking()
-                .Any(u => u.Rol == RolUsuario.Admin && u.Activo);
+                .Any(u => u.Rol == RolUsuario.Admin && u.Activo == 1);
         }
 
         /// <summary>
