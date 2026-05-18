@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +12,11 @@ namespace ENTITY
         public int IdTarea { get; set; }
 
         public int IdEspecializacion { get; set; }
+
+        // Nuevas llaves foráneas opcionales para la jerarquía de tareas
+        public int? IdEmpresa { get; set; }
+        public int? IdProyecto { get; set; }
+        public int? IdEquipo { get; set; }
 
         public string Titulo { get; set; }
 
@@ -29,5 +34,9 @@ namespace ENTITY
         public DateTime FechaCreacion { get; set; }
 
         public Especializacion Especializacion { get; set; }
+        
+        public Empresa Empresa { get; set; }
+        public Proyecto Proyecto { get; set; }
+        public Equipo Equipo { get; set; }
     }
 }

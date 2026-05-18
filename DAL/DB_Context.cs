@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +11,11 @@ namespace DAL
 {
     public class DB_Context : DbContext
     {
+        static DB_Context()
+        {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             if (!options.IsConfigured)
@@ -129,6 +134,16 @@ namespace DAL
                 entity.Property(e => e.IdEspecializacion)
                       .HasColumnName("ID_ESPECIALIZACION");
 
+                // Nuevas propiedades
+                entity.Property(e => e.IdEmpresa)
+                      .HasColumnName("ID_EMPRESA");
+
+                entity.Property(e => e.IdProyecto)
+                      .HasColumnName("ID_PROYECTO");
+
+                entity.Property(e => e.IdEquipo)
+                      .HasColumnName("ID_EQUIPO");
+
                 entity.Property(e => e.Titulo)
                       .HasColumnName("TITULO")
                       .HasMaxLength(20)
@@ -159,6 +174,19 @@ namespace DAL
                 entity.HasOne(e => e.Especializacion)
                       .WithMany()
                       .HasForeignKey(e => e.IdEspecializacion);
+
+                // Nuevas relaciones
+                entity.HasOne(e => e.Empresa)
+                      .WithMany()
+                      .HasForeignKey(e => e.IdEmpresa);
+
+                entity.HasOne(e => e.Proyecto)
+                      .WithMany()
+                      .HasForeignKey(e => e.IdProyecto);
+
+                entity.HasOne(e => e.Equipo)
+                      .WithMany()
+                      .HasForeignKey(e => e.IdEquipo);
             });
 
             // =========================

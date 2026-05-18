@@ -69,21 +69,21 @@
                                Foreground="#111827"
                                Margin="6,10,0,20"/>
 
-                    <Button Style="{StaticResource SidebarButtonStyle}">
+                    <Button Style="{StaticResource SidebarButtonStyle}" Click="BtnSidebarEmpresa_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="⌂" FontSize="15" Width="24"/>
                             <TextBlock Text="Inicio" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Style="{StaticResource SidebarButtonStyle}" Background="#E8EEF9">
+                    <Button Style="{StaticResource SidebarButtonStyle}" Background="#E8EEF9" Click="BtnSidebarEmpresa_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="▣" FontSize="15" Width="24"/>
                             <TextBlock Text="Empresa" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Style="{StaticResource SidebarButtonStyle}">
+                    <Button Style="{StaticResource SidebarButtonStyle}" Click="BtnSidebarEmpresa_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="◫" FontSize="15" Width="24"/>
                             <TextBlock Text="Proyectos" VerticalAlignment="Center"/>
@@ -104,7 +104,7 @@
                         </StackPanel>
                     </Button>
 
-                    <Button Style="{StaticResource SidebarButtonStyle}">
+                    <Button Style="{StaticResource SidebarButtonStyle}" Click="BtnSidebarReportes_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="▤" FontSize="15" Width="24"/>
                             <TextBlock Text="Reportes" VerticalAlignment="Center"/>
@@ -184,200 +184,9 @@
             </Border>
 
             <!-- Body -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="panelEmpresa" Margin="22">
-                    <StackPanel x:Name="panelEquipos" Margin="22" Visibility="Collapsed">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                            <TextBlock x:Name="txtTituloEquipos"
-                   Text="Equipos"
-                   FontSize="28"
-                   FontWeight="Bold"
-                   Foreground="#111827"
-                   VerticalAlignment="Center"/>
-
-                            <Button Content="Volver"
-                Margin="16,0,0,0"
-                Width="90"
-                Height="36"
-                Click="BtnVolverEmpresa_Click"/>
-
-                            <Button Content="Nuevo equipo"
-                Margin="8,0,0,0"
-                Width="120"
-                Height="36"
-                Click="BtnNuevoEquipo_Click"/>
-
-                            <Button Content="Editar equipo"
-                Margin="8,0,0,0"
-                Width="120"
-                Height="36"
-                Click="BtnEditarEquipo_Click"/>
-
-                            <Button Content="Eliminar equipo"
-                Margin="8,0,0,0"
-                Width="120"
-                Height="36"
-                Click="BtnEliminarEquipo_Click"/>
-                        </StackPanel>
-
-                        <Border Background="#F8FAFC" CornerRadius="12" Padding="14" BorderBrush="#E5E7EB" BorderThickness="1" Margin="0,0,0,16">
-                            <StackPanel>
-                                <TextBlock Text="Lista de equipos del proyecto"
-                       Foreground="#111827"
-                       FontSize="18"
-                       FontWeight="SemiBold"
-                       Margin="0,0,0,12"/>
-
-                                <DataGrid x:Name="dgEquipos"
-                      AutoGenerateColumns="False"
-                      CanUserAddRows="False"
-                      IsReadOnly="True"
-                      Height="240"
-                      SelectionChanged="dgEquipos_SelectionChanged">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Equipo" Binding="{Binding Nombre}" Width="200"/>
-                                        <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*"/>
-                                        <DataGridTextColumn Header="Supervisor" Binding="{Binding Supervisor}" Width="180"/>
-                                        <DataGridTextColumn Header="Trabajadores" Binding="{Binding Trabajadores}" Width="110"/>
-                                        <DataGridTextColumn Header="Creación" Binding="{Binding FechaCreacion}" Width="110"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Background="#F8FAFC" CornerRadius="12" Padding="14" BorderBrush="#E5E7EB" BorderThickness="1">
-                            <TabControl>
-                                <TabItem Header="Tareas">
-                                    <StackPanel Margin="10">
-                                        <TextBlock Text="Aquí irán las tareas del equipo seleccionado."/>
-                                    </StackPanel>
-                                </TabItem>
-                                <TabItem Header="Archivos">
-                                    <StackPanel Margin="10">
-                                        <TextBlock Text="Aquí irán los archivos del equipo seleccionado."/>
-                                    </StackPanel>
-                                </TabItem>
-                                <TabItem Header="Estadísticas">
-                                    <StackPanel Margin="10">
-                                        <TextBlock Text="Aquí irán las estadísticas del equipo seleccionado."/>
-                                    </StackPanel>
-                                </TabItem>
-                                <TabItem Header="Entorno de trabajo">
-                                    <StackPanel Margin="10">
-                                        <TextBlock Text="Aquí irán el chat y la videollamada del equipo."/>
-                                    </StackPanel>
-                                </TabItem>
-                            </TabControl>
-                        </Border>
-                    </StackPanel>
-                    <Border Background="White" Margin="0,0,0,16">
-                        <StackPanel>
-                            <TextBlock x:Name="txtNombreEmpresa"
-                                       Text="Empresa"
-                                       Foreground="#111827"
-                                       FontSize="30"
-                                       FontWeight="Bold"/>
-
-                            <TextBlock x:Name="txtDescripcionEmpresa"
-                                       Text="Descripción"
-                                       Foreground="#6B7280"
-                                       FontSize="14"
-                                       Margin="0,6,0,0"/>
-
-                            <WrapPanel Margin="0,10,0,0">
-                                <TextBlock x:Name="txtNitEmpresa" Foreground="#111827" Margin="0,0,20,0"/>
-                                <TextBlock x:Name="txtCorreoEmpresa" Foreground="#111827" Margin="0,0,20,0"/>
-                                <TextBlock x:Name="txtTelefonoEmpresa" Foreground="#111827"/>
-                            </WrapPanel>
-                        </StackPanel>
-                    </Border>
-
-                    <UniformGrid Columns="4" Margin="0,0,0,18">
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel>
-                                <TextBlock Text="Proyectos activos" Foreground="#6B7280"/>
-                                <TextBlock x:Name="txtProyectosActivos" Text="0" Foreground="#111827" FontSize="28" FontWeight="Bold" Margin="0,8,0,0"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel>
-                                <TextBlock Text="Finalizados" Foreground="#6B7280"/>
-                                <TextBlock x:Name="txtProyectosFinalizados" Text="0" Foreground="#111827" FontSize="28" FontWeight="Bold" Margin="0,8,0,0"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel>
-                                <TextBlock Text="En pausa" Foreground="#6B7280"/>
-                                <TextBlock x:Name="txtProyectosPausados" Text="0" Foreground="#111827" FontSize="28" FontWeight="Bold" Margin="0,8,0,0"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource CardStyle}" Margin="0">
-                            <StackPanel>
-                                <TextBlock Text="Responsables asignados" Foreground="#6B7280"/>
-                                <TextBlock x:Name="txtResponsablesAsignados" Text="0" Foreground="#111827" FontSize="28" FontWeight="Bold" Margin="0,8,0,0"/>
-                            </StackPanel>
-                        </Border>
-                    </UniformGrid>
-
-                    <Border Background="#F8FAFC" CornerRadius="12" Padding="14" BorderBrush="#E5E7EB" BorderThickness="1">
-                        <StackPanel>
-                            <TextBlock Text="Proyectos" Foreground="#111827" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
-
-                            <DataGrid x:Name="dgProyectos"
-          AutoGenerateColumns="False"
-          CanUserAddRows="False"
-          IsReadOnly="True"
-          Background="White"
-          Foreground="#111827"
-          BorderThickness="0"
-          RowBackground="White"
-          AlternatingRowBackground="#F9FAFB"
-          GridLinesVisibility="Horizontal"
-          HeadersVisibility="Column"
-          ColumnHeaderHeight="40"
-          RowHeight="40"
-          SelectionMode="Single"
-          SelectionUnit="FullRow"
-          SelectionChanged="dgProyectos_SelectionChanged">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Proyecto" Binding="{Binding Nombre}" Width="220"/>
-                                    <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*"/>
-                                    <DataGridTextColumn Header="Supervisor" Binding="{Binding Supervisor}" Width="170"/>
-                                    <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="110"/>
-                                    <DataGridTextColumn Header="Inicio" Binding="{Binding FechaInicio}" Width="110"/>
-                                    <DataGridTextColumn Header="Fin" Binding="{Binding FechaFin}" Width="110"/>
-                                    <DataGridTextColumn Header="Progreso" Binding="{Binding Progreso}" Width="100"/>
-                                    <DataGridTemplateColumn Header="Acciones" Width="190">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                    <Button Content="Editar"
-                                                            Margin="0,0,8,0"
-                                                            Padding="10,4"
-                                                            Background="#DBEAFE"
-                                                            Foreground="#1D4ED8"
-                                                            BorderBrush="#BFDBFE"
-                                                            Click="BtnEditarFilaProyecto_Click"/>
-                                                    <Button Content="Eliminar"
-                                                            Padding="10,4"
-                                                            Background="#FEE2E2"
-                                                            Foreground="#B91C1C"
-                                                            BorderBrush="#FECACA"
-                                                            Click="BtnEliminarFilaProyecto_Click"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </StackPanel>
-                    </Border>
-
-                </StackPanel>
-            </ScrollViewer>
+            <Grid Grid.Row="1">
+                <ContentControl x:Name="MainContent" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+            </Grid>
         </Grid>
     </Grid>
 </Window>

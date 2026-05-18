@@ -133,27 +133,12 @@ namespace VISTA
 
                 if (_equipoEditando == null)
                 {
-                    // Crear nuevo equipo
-                    var nuevoEquipo = new Equipo
-                    {
-                        IdProyecto = _idProyecto,
-                        IdSupervisor = SesionActual.IdUsuario,
-                        Nombre = nombre,
-                        Descripcion = descripcion,
-                        Activo = 1,
-                        FechaCreacion = DateTime.Now
-                    };
-
-                    _equipoService.CrearEquipo(nuevoEquipo, idsUsuarios);
+                    _equipoService.GuardarEquipo(_idProyecto, null, nombre, descripcion, idsUsuarios);
                     MessageBox.Show("Equipo creado correctamente.");
                 }
                 else
                 {
-                    // Editar equipo existente
-                    _equipoEditando.Nombre = nombre;
-                    _equipoEditando.Descripcion = descripcion;
-
-                    _equipoService.EditarEquipo(_equipoEditando, idsUsuarios);
+                    _equipoService.GuardarEquipo(_idProyecto, _equipoEditando.IdEquipo, nombre, descripcion, idsUsuarios);
                     MessageBox.Show("Equipo actualizado correctamente.");
                 }
 

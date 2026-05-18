@@ -63,6 +63,52 @@ namespace BLL
         public RelacionJerarquica ObtenerSuperiorActual(int idUsuario)
             => _relacionRepo.GetSuperiorActual(idUsuario);
 
+        public class UsuarioVistaDto
+        {
+            public int IdUsuario { get; set; }
+            public string Nombre { get; set; } = string.Empty;
+            public string Apellido { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
+            public string RolDisplay { get; set; } = string.Empty;
+            public int NivelJerarquico { get; set; }
+            public string EstadoDisplay { get; set; } = string.Empty;
+            public string NombreSuperior { get; set; } = string.Empty;
+            public string FechaCreacion { get; set; } = string.Empty;
+            public int Activo { get; set; }
+        }
+
+        /// <summary>
+        /// Retorna todos los usuarios formateados para la vista de gestión.
+        /// </summary>
+        public List<UsuarioVistaDto> ObtenerUsuariosVista()
+        {
+            var usuarios = _repo.GetAllConInactivos();
+            
+            return usuarios.Select(u => {
+                string sup = "-";
+                var rel = _relacionRepo.GetSuperiorActual(u.IdUsuario);
+                if (rel != null)
+                {
+                    var j = usuarios.FirstOrDefault(x => x.IdUsuario == rel.IdJefe);
+                    if (j != null) sup = $"{j.Nombre} {j.Apellido}".Trim();
+                }
+
+                return new UsuarioVistaDto
+                {
+                    IdUsuario = u.IdUsuario,
+                    Nombre = u.Nombre,
+                    Apellido = u.Apellido,
+                    Email = u.Email,
+                    RolDisplay = u.Rol.ToString(),
+                    NivelJerarquico = u.NivelJerarquico,
+                    EstadoDisplay = u.Activo == 1 ? "Activo" : "Inactivo",
+                    NombreSuperior = sup,
+                    FechaCreacion = u.FechaCreacion.ToString("dd/MM/yyyy"),
+                    Activo = u.Activo ?? 0
+                };
+            }).ToList();
+        }
+
         /// <summary>
         /// Retorna la lista de posibles superiores (Admin + Jefes activos) para el ComboBox.
         /// </summary>
@@ -107,8 +153,11 @@ namespace BLL
         /// <summary>
         /// Crea el único Admin del sistema. Solo se debe llamar cuando ExisteAdmin() == false.
         /// </summary>
-        public void CrearPrimerAdmin(string nombre, string apellido, string email, string password)
+        public void CrearPrimerAdmin(string nombre, string apellido, string email, string password, string passwordConfirmacion)
         {
+            if (password != passwordConfirmacion)
+                throw new Exception("Las contraseñas no coinciden.");
+
             ValidarCamposBase(nombre, apellido, email, password);
 
             if (_repo.EmailExiste(email.Trim()))

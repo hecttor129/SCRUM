@@ -1,30 +1,21 @@
-using BLL;
 using ENTITY;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media.Animation;
+using VISTA.UserControls;
 
 namespace VISTA
 {
     public partial class MainWindow : Window
     {
         private bool _sidebarVisible = true;
+        
+        private DashboardEmpresaControl _empresaControl;
+        private DashboardProyectoControl _proyectoControl;
+        private DashboardEquipoControl _equipoControl;
+        private ReportesControl _reportesControl;
 
-        // ── Servicios BLL ────────────────────────────────────────────────────
-        private readonly EmpresaService _empresaService = new();
-        private readonly ProyectoService _proyectoService = new();
-        private readonly EquipoService _equipoService = new();
-        private readonly PermisosService _permisosService = new();
-
-        // ── Estado local ─────────────────────────────────────────────────────
-        private List<ProyectoDto> _proyectos = new();
-        private int _idEmpresaActual;
         private int? _idProyectoSeleccionado;
-        private List<EquipoDto> _equipos = new();
 
         public MainWindow()
         {
@@ -35,325 +26,125 @@ namespace VISTA
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             InicializarSidebar();
-            CargarPantallaEmpresa();
+            MostrarPantallaEmpresa();
         }
 
         private void InicializarSidebar()
         {
-            // Info del usuario logueado
             txtSidebarNombre.Text = SesionActual.NombreCompleto;
             txtSidebarRol.Text = SesionActual.Rol.ToString();
 
-            // Solo el administrador ve el botón de "Usuarios"
             if (SesionActual.Rol == ENTITY.ENUMS.RolUsuario.Admin)
             {
                 btnUsuarios.Visibility = Visibility.Visible;
             }
         }
 
-        // ── Empresa ──────────────────────────────────────────────────────────
-
-        private void CargarPantallaEmpresa()
+        private void MostrarPantallaEmpresa()
         {
-            try
+            _idProyectoSeleccionado = null;
+            if (_empresaControl == null)
             {
-                var empresa = _empresaService.ObtenerEmpresa();
-
-                if (empresa == null)
-                {
-                    MessageBox.Show("No hay empresa registrada.");
-                    dgProyectos.ItemsSource = null;
-                    _proyectos = new List<ProyectoDto>();
-                    return;
-                }
-
-                _idEmpresaActual = empresa.IdEmpresa;
-
-                txtNombreEmpresa.Text = string.IsNullOrWhiteSpace(empresa.Nombre) ? "Sin nombre" : empresa.Nombre;
-                txtDescripcionEmpresa.Text = string.IsNullOrWhiteSpace(empresa.Descripcion) ? "Sin descripción." : empresa.Descripcion;
-                txtNitEmpresa.Text = $"NIT: {(string.IsNullOrWhiteSpace(empresa.Nit) ? "-" : empresa.Nit)}";
-                txtCorreoEmpresa.Text = $"Correo: {(string.IsNullOrWhiteSpace(empresa.Correo) ? "-" : empresa.Correo)}";
-                txtTelefonoEmpresa.Text = $"Teléfono: {(string.IsNullOrWhiteSpace(empresa.Telefono) ? "-" : empresa.Telefono)}";
-
-                _proyectos = _proyectoService.ObtenerProyectosPorEmpresa(_idEmpresaActual);
-                dgProyectos.ItemsSource = _proyectos;
-
-                txtProyectosActivos.Text = _proyectos.Count(x => x.Estado.Equals("Activo", StringComparison.OrdinalIgnoreCase)).ToString();
-                txtProyectosFinalizados.Text = _proyectos.Count(x => x.Estado.Equals("Finalizado", StringComparison.OrdinalIgnoreCase)).ToString();
-                txtProyectosPausados.Text = _proyectos.Count(x => x.Estado.Equals("Pausado", StringComparison.OrdinalIgnoreCase)).ToString();
-                txtResponsablesAsignados.Text = _proyectos.Count(x => x.Supervisor != "Sin asignar").ToString();
+                _empresaControl = new DashboardEmpresaControl();
+                _empresaControl.GestionarProyectoRequested += (s, proyecto) => MostrarPantallaProyecto(proyecto.IdProyecto, _empresaControl.IdEmpresaActual);
             }
-            catch (Exception ex)
+            else 
             {
-                MessageBox.Show($"Error cargando empresa:\n{ex.Message}");
+                _empresaControl.CargarPantallaEmpresa();
             }
+            
+            MainContent.Content = _empresaControl;
         }
 
-        private void BtnEditarEmpresa_Click(object sender, RoutedEventArgs e)
+        private void MostrarPantallaProyecto(int idProyecto, int idEmpresa)
         {
-            MessageBox.Show("Aquí luego abrimos la ventana para editar la empresa.");
+            _idProyectoSeleccionado = idProyecto;
+            _proyectoControl = new DashboardProyectoControl(idProyecto, idEmpresa);
+            _proyectoControl.VolverEmpresaRequested += (s, e) => MostrarPantallaEmpresa();
+            _proyectoControl.GestionarEquipoRequested += (s, equipo) => MostrarPantallaEquipo(equipo);
+            
+            MainContent.Content = _proyectoControl;
         }
 
-        // ── Proyectos ────────────────────────────────────────────────────────
-
-        private void txtBuscarProyecto_TextChanged(object sender, TextChangedEventArgs e)
+        private void MostrarPantallaEquipo(EquipoDto equipo)
         {
-            string texto = txtBuscarProyecto.Text.Trim().ToLower();
-
-            if (string.IsNullOrWhiteSpace(texto))
-            {
-                dgProyectos.ItemsSource = _proyectos;
-                return;
-            }
-
-            var filtrados = _proyectos
-                .Where(p =>
-                    p.Nombre.ToLower().Contains(texto) ||
-                    p.Descripcion.ToLower().Contains(texto) ||
-                    p.Supervisor.ToLower().Contains(texto) ||
-                    p.Estado.ToLower().Contains(texto))
-                .ToList();
-
-            dgProyectos.ItemsSource = filtrados;
+            _equipoControl = new DashboardEquipoControl(equipo);
+            _equipoControl.VolverAlProyectoRequested += (s, e) => {
+                MainContent.Content = _proyectoControl;
+            };
+            
+            MainContent.Content = _equipoControl;
         }
 
-        private void BtnNuevoProyecto_Click(object sender, RoutedEventArgs e)
+        private void BtnSidebarEmpresa_Click(object sender, RoutedEventArgs e)
         {
-            AbrirFormularioProyecto(null);
+            MostrarPantallaEmpresa();
         }
-
-        private void BtnEditarProyecto_Click(object sender, RoutedEventArgs e)
-        {
-            var proyecto = ObtenerProyectoSeleccionado();
-            if (proyecto == null)
-            {
-                MessageBox.Show("Selecciona un proyecto para editar.");
-                return;
-            }
-            AbrirFormularioProyecto(proyecto.IdProyecto);
-        }
-
-        private void BtnEliminarProyecto_Click(object sender, RoutedEventArgs e)
-        {
-            var proyecto = ObtenerProyectoSeleccionado();
-            if (proyecto == null)
-            {
-                MessageBox.Show("Selecciona un proyecto para eliminar.");
-                return;
-            }
-            EliminarProyecto(proyecto.IdProyecto, proyecto.Nombre);
-        }
-
-        private void BtnEditarFilaProyecto_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button button && button.DataContext is ProyectoDto proyecto)
-                AbrirFormularioProyecto(proyecto.IdProyecto);
-        }
-
-        private void BtnEliminarFilaProyecto_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button button && button.DataContext is ProyectoDto proyecto)
-                EliminarProyecto(proyecto.IdProyecto, proyecto.Nombre);
-        }
-
-        private void dgProyectos_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            var proyecto = ObtenerProyectoSeleccionado();
-            if (proyecto != null)
-                AbrirFormularioProyecto(proyecto.IdProyecto);
-        }
-
-        private void dgProyectos_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (dgProyectos.SelectedItem is ProyectoDto proyecto)
-                _idProyectoSeleccionado = proyecto.IdProyecto;
-        }
-
-        private void AbrirFormularioProyecto(int? idProyecto)
-        {
-            try
-            {
-                if (_idEmpresaActual <= 0)
-                {
-                    MessageBox.Show("No se encontró una empresa válida.");
-                    return;
-                }
-
-                var ventana = new ProyectoFormWindow(_idEmpresaActual, idProyecto) { Owner = this };
-
-                if (ventana.ShowDialog() == true)
-                    CargarPantallaEmpresa();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error abriendo la ventana:\n" + ex.Message);
-            }
-        }
-
-        private void EliminarProyecto(int idProyecto, string nombreProyecto)
-        {
-            try
-            {
-                var confirmacion = MessageBox.Show(
-                    $"¿Deseas eliminar el proyecto \"{nombreProyecto}\"?",
-                    "Confirmar eliminación",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning);
-
-                if (confirmacion != MessageBoxResult.Yes) return;
-
-                _proyectoService.EliminarProyecto(idProyecto);
-                MessageBox.Show("Proyecto eliminado correctamente.");
-                CargarPantallaEmpresa();
-            }
-            catch (Microsoft.EntityFrameworkCore.DbUpdateException)
-            {
-                MessageBox.Show("No se puede eliminar el proyecto porque tiene registros relacionados en la base de datos.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error eliminando proyecto:\n" + ex.Message);
-            }
-        }
-
-        private ProyectoDto? ObtenerProyectoSeleccionado()
-        {
-            return dgProyectos.SelectedItem as ProyectoDto;
-        }
-
-        // ── Equipos ──────────────────────────────────────────────────────────
 
         private void BtnEquipoSidebar_Click(object sender, RoutedEventArgs e)
         {
             if (!_idProyectoSeleccionado.HasValue)
             {
-                MessageBox.Show("Primero selecciona un proyecto.");
+                MessageBox.Show("Primero selecciona o gestiona un proyecto desde la lista de la Empresa.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            CargarEquiposProyecto(_idProyectoSeleccionado.Value);
-            panelEmpresa.Visibility = Visibility.Collapsed;
-            panelEquipos.Visibility = Visibility.Visible;
-        }
-
-        private void BtnVolverEmpresa_Click(object sender, RoutedEventArgs e)
-        {
-            panelEquipos.Visibility = Visibility.Collapsed;
-            panelEmpresa.Visibility = Visibility.Visible;
-        }
-
-        private void CargarEquiposProyecto(int idProyecto)
-        {
-            try
+            if (_proyectoControl != null)
             {
-                var proyecto = _proyectoService.ObtenerPorId(idProyecto, _idEmpresaActual);
-
-                if (proyecto == null)
-                {
-                    MessageBox.Show("No se encontró el proyecto.");
-                    return;
-                }
-
-                txtTituloEquipos.Text = $"Equipos de {proyecto.Nombre}";
-                _equipos = _equipoService.ObtenerEquiposPorProyecto(idProyecto);
-                dgEquipos.ItemsSource = _equipos;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error cargando equipos:\n" + ex.Message);
+                MainContent.Content = _proyectoControl;
             }
         }
 
-        private void BtnNuevoEquipo_Click(object sender, RoutedEventArgs e)
+        private void BtnSidebarReportes_Click(object sender, RoutedEventArgs e)
         {
-            if (!_idProyectoSeleccionado.HasValue)
-            {
-                MessageBox.Show("Selecciona un proyecto.");
-                return;
-            }
+            if (_reportesControl == null)
+                _reportesControl = new ReportesControl();
+            
+            MainContent.Content = _reportesControl;
+        }
 
-            if (!_permisosService.PuedeGestionarEquipos(_idProyectoSeleccionado.Value))
+        // ── Top Bar Actions ───────────────────────────────────────────────────
+        
+        private void txtBuscarProyecto_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (MainContent.Content == _empresaControl)
             {
-                MessageBox.Show("No tienes permisos para crear equipos en este proyecto.");
-                return;
+                _empresaControl.FiltrarProyectos(txtBuscarProyecto.Text);
             }
+        }
 
-            var ventana = new EquipoFormWindow(_idProyectoSeleccionado.Value) { Owner = this };
+        private void BtnNuevoProyecto_Click(object sender, RoutedEventArgs e)
+        {
+            if (MainContent.Content == _empresaControl)
+                _empresaControl.AbrirFormularioProyecto(null);
+        }
+
+        private void BtnEditarProyecto_Click(object sender, RoutedEventArgs e)
+        {
+            if (MainContent.Content == _empresaControl)
+            {
+                var p = _empresaControl.ObtenerProyectoSeleccionado();
+                if (p != null) _empresaControl.AbrirFormularioProyecto(p.IdProyecto);
+                else MessageBox.Show("Selecciona un proyecto.");
+            }
+        }
+
+        private void BtnEliminarProyecto_Click(object sender, RoutedEventArgs e)
+        {
+            if (MainContent.Content == _empresaControl)
+                _empresaControl.EliminarProyectoConfirmado();
+        }
+        
+        private void BtnEditarEmpresa_Click(object sender, RoutedEventArgs e)
+        {
+            var ventana = new EmpresaFormWindow() { Owner = this };
             if (ventana.ShowDialog() == true)
-                CargarEquiposProyecto(_idProyectoSeleccionado.Value);
-        }
-
-        private void BtnEditarEquipo_Click(object sender, RoutedEventArgs e)
-        {
-            if (!_idProyectoSeleccionado.HasValue)
             {
-                MessageBox.Show("Selecciona un proyecto.");
-                return;
-            }
-
-            if (dgEquipos.SelectedItem is not EquipoDto equipo)
-            {
-                MessageBox.Show("Selecciona un equipo.");
-                return;
-            }
-
-            if (!_permisosService.PuedeGestionarEquipos(_idProyectoSeleccionado.Value))
-            {
-                MessageBox.Show("No tienes permisos para editar este equipo.");
-                return;
-            }
-
-            var ventana = new EquipoFormWindow(_idProyectoSeleccionado.Value, equipo.IdEquipo) { Owner = this };
-            if (ventana.ShowDialog() == true)
-                CargarEquiposProyecto(_idProyectoSeleccionado.Value);
-        }
-
-        private void BtnEliminarEquipo_Click(object sender, RoutedEventArgs e)
-        {
-            if (!_idProyectoSeleccionado.HasValue)
-            {
-                MessageBox.Show("Selecciona un proyecto.");
-                return;
-            }
-
-            if (dgEquipos.SelectedItem is not EquipoDto equipoDto)
-            {
-                MessageBox.Show("Selecciona un equipo.");
-                return;
-            }
-
-            if (!_permisosService.PuedeGestionarEquipos(_idProyectoSeleccionado.Value))
-            {
-                MessageBox.Show("No tienes permisos para eliminar este equipo.");
-                return;
-            }
-
-            var confirmacion = MessageBox.Show(
-                $"¿Deseas eliminar el equipo '{equipoDto.Nombre}'?",
-                "Confirmar",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (confirmacion != MessageBoxResult.Yes) return;
-
-            try
-            {
-                _equipoService.EliminarEquipo(equipoDto.IdEquipo);
-                CargarEquiposProyecto(_idProyectoSeleccionado.Value);
-                MessageBox.Show("Equipo eliminado correctamente.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error eliminando equipo:\n" + ex.Message);
+                _empresaControl?.CargarPantallaEmpresa();
             }
         }
 
-        private void dgEquipos_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // Aquí después puedes cargar tareas, archivos, estadísticas del equipo seleccionado
-        }
-
-        // ── Sidebar ──────────────────────────────────────────────────────────
+        // ── Animaciones y Navegación ───────────────────────────────────────────
 
         private void BtnHamburguesa_Click(object sender, RoutedEventArgs e)
         {

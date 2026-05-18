@@ -25,20 +25,41 @@ namespace BLL
         }
 
         /// <summary>
-        /// Actualiza los datos de la empresa.
+        /// Crea o actualiza los datos de la empresa.
         /// </summary>
-        public void EditarEmpresa(Empresa empresa)
+        public void GuardarEmpresa(int idEmpresa, string nombre, string descripcion, string nit, string telefono, string correo)
         {
-            if (string.IsNullOrWhiteSpace(empresa.Nombre))
+            if (string.IsNullOrWhiteSpace(nombre))
                 throw new System.Exception("El nombre de la empresa es obligatorio.");
 
-            if (empresa.Nombre.Length > 80)
+            if (nombre.Length > 80)
                 throw new System.Exception("El nombre no puede superar 80 caracteres.");
 
-            if (!string.IsNullOrWhiteSpace(empresa.Nit) && empresa.Nit.Length > 20)
+            if (!string.IsNullOrWhiteSpace(nit) && nit.Length > 20)
                 throw new System.Exception("El NIT no puede superar 20 caracteres.");
 
-            _repo.Update(empresa);
+            Empresa empresa;
+            if (idEmpresa == 0)
+            {
+                empresa = new Empresa
+                {
+                    Activo = 1,
+                    FechaCreacion = System.DateTime.UtcNow
+                };
+                _repo.Add(empresa);
+            }
+            else
+            {
+                empresa = _repo.GetFirst() ?? new Empresa();
+                _repo.Update(empresa);
+            }
+
+            empresa.Nombre = nombre;
+            empresa.Descripcion = descripcion;
+            empresa.Nit = nit;
+            empresa.Telefono = telefono;
+            empresa.Correo = correo;
+
             _repo.Save();
         }
     }

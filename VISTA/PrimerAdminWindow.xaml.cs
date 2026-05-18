@@ -18,19 +18,14 @@ namespace VISTA
         {
             txtError.Visibility = Visibility.Collapsed;
 
-            if (pwdPassword.Password != pwdConfirmar.Password)
-            {
-                MostrarError("Las contraseñas no coinciden.");
-                return;
-            }
-
             try
             {
                 _service.CrearPrimerAdmin(
                     txtNombre.Text, 
                     txtApellido.Text, 
                     txtEmail.Text, 
-                    pwdPassword.Password);
+                    pwdPassword.Password,
+                    pwdConfirmar.Password);
 
                 MessageBox.Show("Administrador creado exitosamente. Ahora puedes iniciar sesión.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 
@@ -39,7 +34,12 @@ namespace VISTA
             }
             catch (Exception ex)
             {
-                MostrarError(ex.Message);
+                string msg = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    msg += "\nDetalles: " + ex.InnerException.Message;
+                }
+                MostrarError(msg);
             }
         }
 

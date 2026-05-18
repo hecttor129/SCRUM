@@ -125,36 +125,12 @@ namespace VISTA
 
                 if (_proyectoEditando == null)
                 {
-                    // Crear
-                    var nuevoProyecto = new Proyecto
-                    {
-                        IdEmpresa = _idEmpresa,
-                        IdSupervisor = idSupervisor,
-                        Nombre = nombre,
-                        Descripcion = string.IsNullOrWhiteSpace(descripcion) ? null : descripcion,
-                        Estado = estado,
-                        FechaInicio = fechaInicio,
-                        FechaFin = fechaFin,
-                        Progreso = progreso,
-                        Activo = 1,
-                        FechaCreacion = DateTime.Now
-                    };
-
-                    _proyectoService.CrearProyecto(nuevoProyecto);
+                    _proyectoService.GuardarProyecto(_idEmpresa, null, nombre, descripcion, estado, fechaInicio, fechaFin, idSupervisor, progreso);
                     MessageBox.Show("Proyecto creado correctamente.");
                 }
                 else
                 {
-                    // Editar
-                    _proyectoEditando.IdSupervisor = idSupervisor;
-                    _proyectoEditando.Nombre = nombre;
-                    _proyectoEditando.Descripcion = string.IsNullOrWhiteSpace(descripcion) ? null : descripcion;
-                    _proyectoEditando.Estado = estado;
-                    _proyectoEditando.FechaInicio = fechaInicio;
-                    _proyectoEditando.FechaFin = fechaFin;
-                    _proyectoEditando.Progreso = progreso;
-
-                    _proyectoService.EditarProyecto(_proyectoEditando);
+                    _proyectoService.GuardarProyecto(_idEmpresa, _proyectoEditando.IdProyecto, nombre, descripcion, estado, fechaInicio, fechaFin, idSupervisor, progreso);
                     MessageBox.Show("Proyecto actualizado correctamente.");
                 }
 

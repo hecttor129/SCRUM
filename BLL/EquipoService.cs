@@ -129,37 +129,51 @@ namespace BLL
         }
 
         /// <summary>
-        /// Crea un nuevo equipo con sus miembros iniciales.
+        /// Crea o edita un equipo con sus miembros iniciales.
         /// </summary>
-        public void CrearEquipo(Equipo equipo, List<int> idsUsuarios)
+        public void GuardarEquipo(int idProyecto, int? idEquipo, string nombre, string descripcion, List<int> idsUsuarios)
         {
-            Validar(equipo, null);
-
-            if (_repo.ExisteNombre(equipo.IdProyecto, equipo.Nombre))
-                throw new Exception("Ya existe un equipo con ese nombre en este proyecto.");
-
-            _repo.Add(equipo);
-            _repo.Save();
-
-            if (idsUsuarios != null && idsUsuarios.Count > 0)
+            Equipo equipo;
+            if (idEquipo.HasValue && idEquipo.Value > 0)
             {
-                _repo.AgregarMiembros(equipo.IdEquipo, idsUsuarios);
-                _repo.Save();
+                equipo = _repo.GetById(idEquipo.Value) ?? throw new Exception("Equipo no encontrado.");
+                equipo.Nombre = nombre;
+                equipo.Descripcion = descripcion;
+
+                Validar(equipo, equipo.IdEquipo);
+
+                if (_repo.ExisteNombre(equipo.IdProyecto, equipo.Nombre, equipo.IdEquipo))
+                    throw new Exception("Ya existe un equipo con ese nombre en este proyecto.");
+
+                _repo.Update(equipo);
+                _repo.ReemplazarMiembros(equipo.IdEquipo, idsUsuarios ?? new List<int>());
             }
-        }
+            else
+            {
+                equipo = new Equipo
+                {
+                    IdProyecto = idProyecto,
+                    IdSupervisor = SesionActual.IdUsuario, // BLL conoce el contexto de sesión
+                    Nombre = nombre,
+                    Descripcion = descripcion,
+                    Activo = 1,
+                    FechaCreacion = DateTime.Now
+                };
 
-        /// <summary>
-        /// Edita un equipo existente y reemplaza sus miembros.
-        /// </summary>
-        public void EditarEquipo(Equipo equipo, List<int> idsUsuarios)
-        {
-            Validar(equipo, equipo.IdEquipo);
+                Validar(equipo, null);
 
-            if (_repo.ExisteNombre(equipo.IdProyecto, equipo.Nombre, equipo.IdEquipo))
-                throw new Exception("Ya existe un equipo con ese nombre en este proyecto.");
+                if (_repo.ExisteNombre(equipo.IdProyecto, equipo.Nombre))
+                    throw new Exception("Ya existe un equipo con ese nombre en este proyecto.");
 
-            _repo.Update(equipo);
-            _repo.ReemplazarMiembros(equipo.IdEquipo, idsUsuarios ?? new List<int>());
+                _repo.Add(equipo);
+                _repo.Save();
+
+                if (idsUsuarios != null && idsUsuarios.Count > 0)
+                {
+                    _repo.AgregarMiembros(equipo.IdEquipo, idsUsuarios);
+                }
+            }
+
             _repo.Save();
         }
 

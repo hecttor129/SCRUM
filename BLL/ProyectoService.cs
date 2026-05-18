@@ -102,22 +102,39 @@ namespace BLL
         }
 
         /// <summary>
-        /// Crea un nuevo proyecto aplicando validaciones de negocio.
+        /// Crea o actualiza un proyecto aplicando validaciones de negocio.
         /// </summary>
-        public void CrearProyecto(Proyecto proyecto)
+        public void GuardarProyecto(int idEmpresa, int? idProyecto, string nombre, string descripcion, string estado, DateTime? fechaInicio, DateTime? fechaFin, int? idSupervisor, decimal progreso)
         {
-            Validar(proyecto);
-            _repo.Add(proyecto);
-            _repo.Save();
-        }
+            Proyecto proyecto;
+            if (idProyecto.HasValue && idProyecto.Value > 0)
+            {
+                proyecto = _repo.GetById(idProyecto.Value) ?? throw new Exception("Proyecto no encontrado.");
+            }
+            else
+            {
+                proyecto = new Proyecto
+                {
+                    IdEmpresa = idEmpresa,
+                    Activo = 1,
+                    FechaCreacion = DateTime.Now
+                };
+                _repo.Add(proyecto);
+            }
 
-        /// <summary>
-        /// Edita un proyecto existente aplicando validaciones de negocio.
-        /// </summary>
-        public void EditarProyecto(Proyecto proyecto)
-        {
+            proyecto.Nombre = nombre;
+            proyecto.Descripcion = descripcion;
+            proyecto.Estado = estado;
+            proyecto.FechaInicio = fechaInicio;
+            proyecto.FechaFin = fechaFin;
+            proyecto.IdSupervisor = idSupervisor;
+            proyecto.Progreso = progreso;
+
             Validar(proyecto);
-            _repo.Update(proyecto);
+            
+            if (idProyecto.HasValue && idProyecto.Value > 0)
+                _repo.Update(proyecto);
+
             _repo.Save();
         }
 
