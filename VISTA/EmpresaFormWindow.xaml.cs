@@ -3,7 +3,7 @@ using ENTITY;
 using System;
 using System.Windows;
 using System.Windows.Input;
-
+//empresa form
 namespace VISTA
 {
     public partial class EmpresaFormWindow : Window
