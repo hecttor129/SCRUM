@@ -68,7 +68,7 @@ namespace BLL
                 Estado = string.IsNullOrWhiteSpace(p.Estado) ? "Sin estado" : p.Estado.Trim(),
                 FechaInicio = p.FechaInicio.HasValue ? p.FechaInicio.Value.ToString("dd/MM/yyyy") : "-",
                 FechaFin = p.FechaFin.HasValue ? p.FechaFin.Value.ToString("dd/MM/yyyy") : "-",
-                Progreso = $"{(p.Progreso ?? 0):0.##}%"
+                Progreso = $"{(p.Progreso.GetValueOrDefault()):0.##}%"
             }).ToList();
         }
 

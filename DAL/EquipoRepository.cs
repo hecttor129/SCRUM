@@ -42,7 +42,7 @@ namespace DAL
                 e.IdProyecto == idProyecto &&
                 e.Activo == 1 &&
                 e.Nombre.ToLower() == nombre.ToLower() &&
-                e.IdEquipo != (exceptoIdEquipo ?? 0));
+                (!exceptoIdEquipo.HasValue || e.IdEquipo != exceptoIdEquipo.Value));
         }
 
         public int ContarMiembros(int idEquipo)
