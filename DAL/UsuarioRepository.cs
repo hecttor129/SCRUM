@@ -90,7 +90,7 @@ namespace DAL
                 .AsNoTracking()
                 .Any(u =>
                     u.Email.ToLower() == email.ToLower() &&
-                    u.IdUsuario != (exceptoIdUsuario ?? 0));
+                    (!exceptoIdUsuario.HasValue || u.IdUsuario != exceptoIdUsuario.Value));
         }
 
         /// <summary>

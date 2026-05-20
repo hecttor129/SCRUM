@@ -66,7 +66,7 @@ namespace VISTA
 
             txtNombre.Text = _proyectoEditando.Nombre ?? string.Empty;
             txtDescripcion.Text = _proyectoEditando.Descripcion ?? string.Empty;
-            slProgreso.Value = Convert.ToDouble(_proyectoEditando.Progreso ?? 0);
+            slProgreso.Value = Convert.ToDouble(_proyectoEditando.Progreso.GetValueOrDefault());
 
             if (_proyectoEditando.FechaInicio.HasValue)
                 dpFechaInicio.SelectedDate = _proyectoEditando.FechaInicio.Value;
