@@ -21,7 +21,7 @@ namespace DAL
             if (!options.IsConfigured)
             {
                 options.UseNpgsql(
-                    "Host=localhost;Port=5432;Database=scrum_db;Username=scrum_user;Password=scrum123");
+                    "Host=aws-1-us-west-1.pooler.supabase.com;Port=5432;Database=postgres;Username=postgres.grwsichlpwrkvhpjvkgz;Password=WpVbk5bmei347YFn;SSL Mode=Require;Trust Server Certificate=true");
             }
         }
 

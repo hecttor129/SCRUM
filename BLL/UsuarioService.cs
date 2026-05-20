@@ -104,7 +104,7 @@ namespace BLL
                     EstadoDisplay = u.Activo == 1 ? "Activo" : "Inactivo",
                     NombreSuperior = sup,
                     FechaCreacion = u.FechaCreacion.ToString("dd/MM/yyyy"),
-                    Activo = u.Activo ?? 0
+                    Activo = u.Activo
                 };
             }).ToList();
         }
