@@ -66,7 +66,7 @@ namespace VISTA
             MainContent.Content = _proyectoControl;
         }
 
-        private void MostrarPantallaEquipo(EquipoDto equipo)
+        private void MostrarPantallaEquipo(BLL.EquipoDto equipo)
         {
             _equipoControl = new DashboardEquipoControl(equipo);
             _equipoControl.VolverAlProyectoRequested += (s, e) => {
