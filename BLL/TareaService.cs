@@ -1,6 +1,5 @@
 using DAL;
 using ENTITY;
-using ENTITY.ENUMS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
