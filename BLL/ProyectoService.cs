@@ -104,7 +104,7 @@ namespace BLL
         /// <summary>
         /// Crea o actualiza un proyecto aplicando validaciones de negocio.
         /// </summary>
-        public void GuardarProyecto(int idEmpresa, int? idProyecto, string nombre, string descripcion, string estado, DateTime? fechaInicio, DateTime? fechaFin, int? idSupervisor, decimal progreso)
+        public int GuardarProyecto(int idEmpresa, int? idProyecto, string nombre, string descripcion, string estado, DateTime? fechaInicio, DateTime? fechaFin, int? idSupervisor, decimal progreso)
         {
             Proyecto proyecto;
             if (idProyecto.HasValue && idProyecto.Value > 0)
@@ -136,6 +136,8 @@ namespace BLL
                 _repo.Update(proyecto);
 
             _repo.Save();
+
+            return proyecto.IdProyecto;
         }
 
         /// <summary>

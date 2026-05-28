@@ -19,6 +19,8 @@ namespace VISTA
         private readonly int _idEmpresa;
         private readonly int? _idProyecto;
         private Proyecto? _proyectoEditando;
+        private string _rutaHistorias = string.Empty;
+        private string _rutaRequerimientos = string.Empty;
 
         public ProyectoFormWindow(int idEmpresa, int? idProyecto = null)
         {
@@ -63,6 +65,9 @@ namespace VISTA
             txtSubtituloVentana.Text = "Modifica la información principal del proyecto.";
             txtModoVentana.Text = "Modo edición";
             btnGuardar.Content = "Guardar cambios";
+
+            // Ocultar sección de subir archivos iniciales al editar
+            spDocumentosCreacion.Visibility = Visibility.Collapsed;
 
             txtNombre.Text = _proyectoEditando.Nombre ?? string.Empty;
             txtDescripcion.Text = _proyectoEditando.Descripcion ?? string.Empty;
@@ -125,13 +130,28 @@ namespace VISTA
 
                 if (_proyectoEditando == null)
                 {
-                    _proyectoService.GuardarProyecto(_idEmpresa, null, nombre, descripcion, estado, fechaInicio, fechaFin, idSupervisor, progreso);
-                    MessageBox.Show("Proyecto creado correctamente.");
+                    // Validar documentos obligatorios
+                    if (string.IsNullOrWhiteSpace(_rutaHistorias) || string.IsNullOrWhiteSpace(_rutaRequerimientos))
+                    {
+                        MessageBox.Show("Debes seleccionar obligatoriamente las Historias de Usuario y la Hoja de Requerimientos para crear el proyecto.", "Campos Requeridos", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    int nuevoIdProyecto = _proyectoService.GuardarProyecto(_idEmpresa, null, nombre, descripcion, estado, fechaInicio, fechaFin, idSupervisor, progreso);
+
+                    // Subir los dos archivos iniciales obligatorios
+                    var archivoService = new ArchivoService();
+                    int idUsuarioLogueado = SesionActual.IdUsuario;
+
+                    archivoService.SubirArchivoProyecto(_rutaHistorias, nuevoIdProyecto, idUsuarioLogueado, "Historias de Usuario");
+                    archivoService.SubirArchivoProyecto(_rutaRequerimientos, nuevoIdProyecto, idUsuarioLogueado, "Hoja de Requerimientos");
+
+                    MessageBox.Show("Proyecto creado correctamente junto con sus documentos iniciales.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
                     _proyectoService.GuardarProyecto(_idEmpresa, _proyectoEditando.IdProyecto, nombre, descripcion, estado, fechaInicio, fechaFin, idSupervisor, progreso);
-                    MessageBox.Show("Proyecto actualizado correctamente.");
+                    MessageBox.Show("Proyecto actualizado correctamente.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
                 DialogResult = true;
@@ -229,6 +249,50 @@ namespace VISTA
             }
             bdPreviewSupervisor.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#123026"));
             txtPreviewSupervisor.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#86EFAC"));
+        }
+
+        private void BtnSubirHistorias_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var openFileDialog = new Microsoft.Win32.OpenFileDialog
+                {
+                    Title = "Seleccionar Historias de Usuario",
+                    Filter = "Todos los archivos (*.*)|*.*|Documentos PDF (*.pdf)|*.pdf|Documentos Word (*.docx;*.doc)|*.docx;*.doc|Hojas de cálculo Excel (*.xlsx;*.xls)|*.xlsx;*.xls"
+                };
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    _rutaHistorias = openFileDialog.FileName;
+                    txtRutaHistorias.Text = System.IO.Path.GetFileName(_rutaHistorias);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al seleccionar Historias de Usuario:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void BtnSubirRequerimientos_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var openFileDialog = new Microsoft.Win32.OpenFileDialog
+                {
+                    Title = "Seleccionar Hoja de Requerimientos",
+                    Filter = "Todos los archivos (*.*)|*.*|Documentos PDF (*.pdf)|*.pdf|Documentos Word (*.docx;*.doc)|*.docx;*.doc|Hojas de cálculo Excel (*.xlsx;*.xls)|*.xlsx;*.xls"
+                };
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    _rutaRequerimientos = openFileDialog.FileName;
+                    txtRutaRequerimientos.Text = System.IO.Path.GetFileName(_rutaRequerimientos);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al seleccionar Hoja de Requerimientos:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(DB_Context))]
-    partial class DB_ContextModelSnapshot : ModelSnapshot
+    [Migration("20260528054519_AddModuloArchivos")]
+    partial class AddModuloArchivos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,13 +45,9 @@ namespace DAL.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("FECHA_SUBIDA");
 
-                    b.Property<int?>("IdEquipo")
+                    b.Property<int>("IdEquipo")
                         .HasColumnType("integer")
                         .HasColumnName("ID_EQUIPO");
-
-                    b.Property<int?>("IdProyecto")
-                        .HasColumnType("integer")
-                        .HasColumnName("ID_PROYECTO");
 
                     b.Property<int>("IdUsuarioSubidoPor")
                         .HasColumnType("integer")
@@ -73,8 +72,6 @@ namespace DAL.Migrations
                     b.HasKey("IdArchivo");
 
                     b.HasIndex("IdEquipo");
-
-                    b.HasIndex("IdProyecto");
 
                     b.HasIndex("IdUsuarioSubidoPor");
 
@@ -798,11 +795,9 @@ namespace DAL.Migrations
                 {
                     b.HasOne("ENTITY.Equipo", "Equipo")
                         .WithMany()
-                        .HasForeignKey("IdEquipo");
-
-                    b.HasOne("ENTITY.Proyecto", "Proyecto")
-                        .WithMany()
-                        .HasForeignKey("IdProyecto");
+                        .HasForeignKey("IdEquipo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ENTITY.Usuario", "UsuarioSubidoPor")
                         .WithMany()
@@ -811,8 +806,6 @@ namespace DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Equipo");
-
-                    b.Navigation("Proyecto");
 
                     b.Navigation("UsuarioSubidoPor");
                 });

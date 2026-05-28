@@ -40,6 +40,7 @@ namespace DAL
         public DbSet<Proyecto> Proyectos { get; set; }
         public DbSet<Equipo> Equipos { get; set; }
         public DbSet<EquipoUsuario> EquipoUsuarios { get; set; }
+        public DbSet<Archivo> Archivos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -703,6 +704,66 @@ namespace DAL
                 entity.HasOne<Usuario>()
                       .WithMany()
                       .HasForeignKey(e => e.IdUsuario)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // =========================
+            // ARCHIVOS
+            // =========================
+            modelBuilder.Entity<Archivo>(entity =>
+            {
+                entity.ToTable("ARCHIVOS");
+
+                entity.HasKey(e => e.IdArchivo);
+
+                entity.Property(e => e.IdArchivo)
+                      .HasColumnName("ID_ARCHIVO");
+
+                entity.Property(e => e.NombreOriginal)
+                      .HasColumnName("NOMBRE_ORIGINAL")
+                      .HasMaxLength(255)
+                      .IsRequired();
+
+                entity.Property(e => e.NombreFisico)
+                      .HasColumnName("NOMBRE_FISICO")
+                      .HasMaxLength(255)
+                      .IsRequired();
+
+                entity.Property(e => e.Extension)
+                      .HasColumnName("EXTENSION")
+                      .HasMaxLength(10)
+                      .IsRequired();
+
+                entity.Property(e => e.TamanoKB)
+                      .HasColumnName("TAMANO_KB");
+
+                entity.Property(e => e.FechaSubida)
+                      .HasColumnName("FECHA_SUBIDA");
+
+                entity.Property(e => e.IdEquipo)
+                      .HasColumnName("ID_EQUIPO")
+                      .IsRequired(false);
+
+                entity.Property(e => e.IdProyecto)
+                      .HasColumnName("ID_PROYECTO")
+                      .IsRequired(false);
+
+                entity.Property(e => e.IdUsuarioSubidoPor)
+                      .HasColumnName("ID_USUARIO_SUBIDO_POR");
+
+                entity.HasOne(e => e.Equipo)
+                      .WithMany()
+                      .HasForeignKey(e => e.IdEquipo)
+                      .IsRequired(false);
+
+                entity.HasOne(e => e.Proyecto)
+                      .WithMany()
+                      .HasForeignKey(e => e.IdProyecto)
+                      .IsRequired(false);
+
+                entity.HasOne(e => e.UsuarioSubidoPor)
+                      .WithMany()
+                      .HasForeignKey(e => e.IdUsuarioSubidoPor)
                       .OnDelete(DeleteBehavior.Restrict);
             });
 

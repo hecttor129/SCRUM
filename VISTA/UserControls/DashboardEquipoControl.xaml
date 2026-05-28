@@ -34,7 +34,7 @@
             </StackPanel>
 
             <Border Background="#F8FAFC" CornerRadius="12" Padding="14" BorderBrush="#E5E7EB" BorderThickness="1">
-                <TabControl MinHeight="400">
+                <TabControl MinHeight="400" x:Name="tabControlPrincipal" SelectionChanged="TabControlPrincipal_SelectionChanged">
                     <TabItem Header="Tareas">
                         <StackPanel Margin="10">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
@@ -70,9 +70,38 @@
                             </DataGrid>
                         </StackPanel>
                     </TabItem>
-                    <TabItem Header="Archivos">
+                    <TabItem Header="Archivos" x:Name="tabItemArchivos">
                         <StackPanel Margin="10">
-                            <TextBlock Text="Aquí irán los archivos del equipo seleccionado."/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="Archivos compartidos en el equipo" FontSize="16" FontWeight="Bold" Foreground="#111827" VerticalAlignment="Center"/>
+                                <Button Content="Subir Archivo" Margin="14,0,6,0" Padding="12,6" Background="#2563EB" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand" Click="BtnSubirArchivo_Click"/>
+                                <Button Content="Descargar / Abrir" Margin="0,0,6,0" Padding="12,6" Background="#F3F4F6" Foreground="#1F2937" BorderBrush="#D1D5DB" BorderThickness="1" Cursor="Hand" Click="BtnDescargarArchivo_Click"/>
+                                <Button Content="Eliminar Archivo" Padding="12,6" Background="#EF4444" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand" Click="BtnEliminarArchivo_Click"/>
+                            </StackPanel>
+                            <DataGrid x:Name="dgArchivos"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      IsReadOnly="True"
+                                      Height="250"
+                                      Background="White"
+                                      Foreground="#111827"
+                                      BorderThickness="1"
+                                      BorderBrush="#E5E7EB"
+                                      RowBackground="White"
+                                      AlternatingRowBackground="#F9FAFB"
+                                      GridLinesVisibility="Horizontal"
+                                      HeadersVisibility="Column"
+                                      ColumnHeaderHeight="40"
+                                      RowHeight="40"
+                                      MouseDoubleClick="DgArchivos_MouseDoubleClick">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Nombre" Binding="{Binding NombreOriginal}" Width="*"/>
+                                    <DataGridTextColumn Header="Extensión" Binding="{Binding Extension}" Width="100"/>
+                                    <DataGridTextColumn Header="Tamaño" Binding="{Binding Tamano}" Width="120"/>
+                                    <DataGridTextColumn Header="Fecha de Subida" Binding="{Binding FechaSubida}" Width="150"/>
+                                    <DataGridTextColumn Header="Subido Por" Binding="{Binding SubidoPor}" Width="150"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="Estadísticas">
