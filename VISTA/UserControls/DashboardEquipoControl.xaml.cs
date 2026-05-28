@@ -9,7 +9,7 @@ namespace VISTA.UserControls
     public partial class DashboardEquipoControl : UserControl
     {
         private readonly int _idEquipo;
-        private readonly TareaService _tareaService = new();
+        private TareaService _tareaService = new();
 
         public event EventHandler VolverAlProyectoRequested;
 
@@ -30,6 +30,7 @@ namespace VISTA.UserControls
         {
             try
             {
+                _tareaService = new TareaService();
                 var tareas = _tareaService.ObtenerTareasPorEquipo(_idEquipo);
                 dgTareas.ItemsSource = tareas;
             }
@@ -42,6 +43,57 @@ namespace VISTA.UserControls
         private void BtnVolverProyecto_Click(object sender, RoutedEventArgs e)
         {
             VolverAlProyectoRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void BtnNuevaTarea_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new TareaFormWindow(null, null, _idEquipo);
+            win.Owner = Window.GetWindow(this);
+            if (win.ShowDialog() == true)
+            {
+                CargarTareas();
+            }
+        }
+
+        private void BtnEditarTarea_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgTareas.SelectedItem is not TareaDto seleccionada)
+            {
+                MessageBox.Show("Selecciona una tarea de la lista para editar.");
+                return;
+            }
+
+            var win = new TareaFormWindow(null, null, _idEquipo, seleccionada.IdTarea);
+            win.Owner = Window.GetWindow(this);
+            if (win.ShowDialog() == true)
+            {
+                CargarTareas();
+            }
+        }
+
+        private void BtnEliminarTarea_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgTareas.SelectedItem is not TareaDto seleccionada)
+            {
+                MessageBox.Show("Selecciona una tarea de la lista para eliminar.");
+                return;
+            }
+
+            var res = MessageBox.Show($"¿Estás seguro de que deseas eliminar la tarea '{seleccionada.Titulo}'?", "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (res == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    _tareaService.EliminarTarea(seleccionada.IdTarea);
+                    // Reevaluar las dependencias
+                    _tareaService.ReevaluarDisponibilidadTareas(null, null, _idEquipo);
+                    CargarTareas();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al eliminar la tarea:\n" + ex.Message);
+                }
+            }
         }
     }
 }

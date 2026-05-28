@@ -107,31 +107,51 @@ namespace BLL
         }
 
         /// <summary>
-        /// Busca un usuario activo y con rol Empleado por su correo.
-        /// Retorna null si no existe.
+        /// Retorna todos los Jefes y Empleados activos para mostrarlos en el buscador.
         /// </summary>
-        public MiembroDto BuscarEmpleadoPorCorreo(string correo)
+        public List<MiembroDto> ObtenerCandidatosEquipo()
         {
-            var usuario = _usuarioRepo.GetAll()
-                .FirstOrDefault(u =>
-                    u.Email.ToLower() == correo.ToLower() &&
-                    u.Activo == 1 &&
-                    u.Rol == ENTITY.ENUMS.RolUsuario.Empleado);
-
-            if (usuario == null) return null;
-
-            return new MiembroDto
-            {
-                IdUsuario = usuario.IdUsuario,
-                NombreCompleto = $"{usuario.Nombre} {usuario.Apellido}".Trim(),
-                Correo = usuario.Email
-            };
+            return _usuarioRepo.GetAll()
+                .Where(u => u.Activo == 1 && u.Rol != ENTITY.ENUMS.RolUsuario.Admin)
+                .Select(u => new MiembroDto
+                {
+                    IdUsuario = u.IdUsuario,
+                    NombreCompleto = $"{u.Nombre} {u.Apellido}".Trim(),
+                    Correo = u.Email
+                })
+                .OrderBy(m => m.NombreCompleto)
+                .ToList();
         }
 
         /// <summary>
-        /// Crea o edita un equipo con sus miembros iniciales.
+        /// Retorna los supervisores válidos (Admin y Jefes activos).
         /// </summary>
-        public void GuardarEquipo(int idProyecto, int? idEquipo, string nombre, string descripcion, List<int> idsUsuarios)
+        public List<MiembroDto> ObtenerSupervisoresEquipo()
+        {
+            return _usuarioRepo.GetSupervisoresDisponibles()
+                .Select(u => new MiembroDto
+                {
+                    IdUsuario = u.IdUsuario,
+                    NombreCompleto = $"{u.Nombre} {u.Apellido}".Trim(),
+                    Correo = u.Email
+                })
+                .ToList();
+        }
+
+        /// <summary>
+        /// Retorna el nombre completo del supervisor.
+        /// </summary>
+        public string ObtenerNombreSupervisor(int idSupervisor)
+        {
+            var supervisor = _usuarioRepo.GetById(idSupervisor);
+            if (supervisor == null) return "Sin supervisor";
+            return $"{supervisor.Nombre} {supervisor.Apellido}".Trim();
+        }
+
+        /// <summary>
+        /// Crea o edita un equipo con sus miembros iniciales y supervisor.
+        /// </summary>
+        public void GuardarEquipo(int idProyecto, int? idEquipo, string nombre, string descripcion, List<int> idsUsuarios, int idSupervisor)
         {
             Equipo equipo;
             if (idEquipo.HasValue && idEquipo.Value > 0)
@@ -139,6 +159,7 @@ namespace BLL
                 equipo = _repo.GetById(idEquipo.Value) ?? throw new Exception("Equipo no encontrado.");
                 equipo.Nombre = nombre;
                 equipo.Descripcion = descripcion;
+                equipo.IdSupervisor = idSupervisor;
 
                 Validar(equipo, equipo.IdEquipo);
 
@@ -153,7 +174,7 @@ namespace BLL
                 equipo = new Equipo
                 {
                     IdProyecto = idProyecto,
-                    IdSupervisor = SesionActual.IdUsuario, // BLL conoce el contexto de sesión
+                    IdSupervisor = idSupervisor,
                     Nombre = nombre,
                     Descripcion = descripcion,
                     Activo = 1,

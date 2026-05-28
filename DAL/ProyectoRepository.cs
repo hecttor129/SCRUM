@@ -23,7 +23,6 @@ namespace DAL
         public Proyecto GetById(int id)
         {
             return _context.Proyectos
-                .AsNoTracking()
                 .FirstOrDefault(p => p.IdProyecto == id);
         }
 

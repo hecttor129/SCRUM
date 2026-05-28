@@ -39,6 +39,9 @@
                         <StackPanel Margin="10">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                                 <TextBlock Text="Lista de Tareas del Equipo" FontSize="16" FontWeight="Bold" Foreground="#111827" VerticalAlignment="Center"/>
+                                <Button Content="Nueva Tarea" Margin="14,0,6,0" Padding="12,6" Background="#2563EB" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand" Click="BtnNuevaTarea_Click"/>
+                                <Button Content="Editar Tarea" Margin="0,0,6,0" Padding="12,6" Background="#F3F4F6" Foreground="#1F2937" BorderBrush="#D1D5DB" BorderThickness="1" Cursor="Hand" Click="BtnEditarTarea_Click"/>
+                                <Button Content="Eliminar Tarea" Padding="12,6" Background="#EF4444" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand" Click="BtnEliminarTarea_Click"/>
                             </StackPanel>
                             <DataGrid x:Name="dgTareas"
                                       AutoGenerateColumns="False"
@@ -61,6 +64,8 @@
                                     <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="100"/>
                                     <DataGridTextColumn Header="Prioridad" Binding="{Binding Prioridad}" Width="80"/>
                                     <DataGridTextColumn Header="Límite" Binding="{Binding FechaLimite}" Width="100"/>
+                                    <DataGridTextColumn Header="Disponible" Binding="{Binding DisponibleDisplay}" Width="90"/>
+                                    <DataGridTextColumn Header="Dependencias" Binding="{Binding DependenciasDisplay}" Width="160"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>

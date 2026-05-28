@@ -30,10 +30,16 @@ namespace VISTA
 
         private void EquipoFormWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            txtSupervisor.Text = SesionActual.NombreCompleto;
+            cbSupervisor.ItemsSource = _equipoService.ObtenerSupervisoresEquipo();
+            cbTrabajador.ItemsSource = _equipoService.ObtenerCandidatosEquipo();
 
             if (_idEquipo.HasValue)
                 CargarEquipo(_idEquipo.Value);
+            else
+            {
+                if (cbSupervisor.ItemsSource is List<MiembroDto> supervisores)
+                    cbSupervisor.SelectedItem = supervisores.FirstOrDefault(s => s.IdUsuario == SesionActual.IdUsuario);
+            }
 
             RefrescarVista();
         }
@@ -58,11 +64,12 @@ namespace VISTA
             txtNombre.Text = _equipoEditando.Nombre;
             txtDescripcion.Text = _equipoEditando.Descripcion ?? "";
 
-            // Cargar nombre del supervisor vía servicio
+            if (cbSupervisor.ItemsSource is List<MiembroDto> supervisores)
+            {
+                cbSupervisor.SelectedItem = supervisores.FirstOrDefault(s => s.IdUsuario == _equipoEditando.IdSupervisor);
+            }
+
             var miembrosEquipo = _equipoService.ObtenerMiembros(idEquipo);
-            // El supervisor se muestra desde SesionActual al crear; al editar lo cargamos del equipo
-            // Para el supervisor usamos el EquipoDto cargado en la pantalla principal
-            // txtSupervisor ya fue asignado en Loaded; aquí mantenemos ese comportamiento
 
             _miembros.Clear();
             _miembros.AddRange(miembrosEquipo);
@@ -74,20 +81,9 @@ namespace VISTA
 
         private void BtnAgregarCorreo_Click(object sender, RoutedEventArgs e)
         {
-            string correo = txtCorreoTrabajador.Text.Trim().ToLower();
-
-            if (string.IsNullOrWhiteSpace(correo))
+            if (cbTrabajador.SelectedItem is not MiembroDto miembro)
             {
-                MessageBox.Show("Escribe el correo del trabajador.");
-                txtCorreoTrabajador.Focus();
-                return;
-            }
-
-            var miembro = _equipoService.BuscarEmpleadoPorCorreo(correo);
-
-            if (miembro == null)
-            {
-                MessageBox.Show("No existe un trabajador activo con ese correo.");
+                MessageBox.Show("Selecciona un trabajador de la lista.");
                 return;
             }
 
@@ -98,7 +94,7 @@ namespace VISTA
             }
 
             _miembros.Add(miembro);
-            txtCorreoTrabajador.Clear();
+            cbTrabajador.SelectedItem = null;
             RefrescarVista();
         }
 
@@ -131,14 +127,18 @@ namespace VISTA
 
                 var idsUsuarios = _miembros.Select(m => m.IdUsuario).ToList();
 
+                int idSupervisor = SesionActual.IdUsuario;
+                if (cbSupervisor.SelectedItem is MiembroDto sup)
+                    idSupervisor = sup.IdUsuario;
+
                 if (_equipoEditando == null)
                 {
-                    _equipoService.GuardarEquipo(_idProyecto, null, nombre, descripcion, idsUsuarios);
+                    _equipoService.GuardarEquipo(_idProyecto, null, nombre, descripcion, idsUsuarios, idSupervisor);
                     MessageBox.Show("Equipo creado correctamente.");
                 }
                 else
                 {
-                    _equipoService.GuardarEquipo(_idProyecto, _equipoEditando.IdEquipo, nombre, descripcion, idsUsuarios);
+                    _equipoService.GuardarEquipo(_idProyecto, _equipoEditando.IdEquipo, nombre, descripcion, idsUsuarios, idSupervisor);
                     MessageBox.Show("Equipo actualizado correctamente.");
                 }
 
@@ -164,7 +164,10 @@ namespace VISTA
                 ? "Sin nombre"
                 : txtNombre.Text.Trim();
 
-            txtResumenSupervisor.Text = txtSupervisor.Text;
+            txtResumenSupervisor.Text = cbSupervisor.SelectedItem is MiembroDto sup
+                ? sup.NombreCompleto
+                : "Sin asignar";
+
             txtCantidadMiembros.Text = _miembros.Count.ToString();
         }
     }

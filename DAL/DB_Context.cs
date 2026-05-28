@@ -27,7 +27,6 @@ namespace DAL
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<RelacionJerarquica> RelacionesJerarquicas { get; set; }
-        public DbSet<Especializacion> Especializaciones { get; set; }
         public DbSet<Tarea> Tareas { get; set; }
         public DbSet<Periodo> Periodos { get; set; }
         public DbSet<ReglaAsignacion> ReglasAsignacion { get; set; }
@@ -37,7 +36,6 @@ namespace DAL
         public DbSet<Disponibilidad> Disponibilidades { get; set; }
         public DbSet<Notificacion> Notificaciones { get; set; }
         public DbSet<MetricaUsuario> MetricasUsuario { get; set; }
-        public DbSet<UsuarioEspecializacion> UsuarioEspecializaciones { get; set; }
         public DbSet<Empresa> Empresas { get; set; }
         public DbSet<Proyecto> Proyectos { get; set; }
         public DbSet<Equipo> Equipos { get; set; }
@@ -95,29 +93,14 @@ namespace DAL
 
                 entity.Property(e => e.FechaCreacion)
                       .HasColumnName("FECHA_CREACION");
+
+                // Colección de especialidades almacenada como array text[] en PostgreSQL
+                entity.Property(e => e.Especializaciones)
+                      .HasColumnName("ESPECIALIZACIONES");
             });
 
-            // =========================
-            // ESPECIALIZACIONES
-            // =========================
-            modelBuilder.Entity<Especializacion>(entity =>
-            {
-                entity.ToTable("ESPECIALIZACIONES");
-
-                entity.HasKey(e => e.IdEspecializacion);
-
-                entity.Property(e => e.IdEspecializacion)
-                      .HasColumnName("ID_ESPECIALIZACION");
-
-                entity.Property(e => e.NombreEspecializacion)
-                      .HasColumnName("NOMBRE_ESPECIALIZACION")
-                      .HasMaxLength(15)
-                      .IsRequired();
-
-                entity.Property(e => e.Descripcion)
-                      .HasColumnName("DESCRIPCION")
-                      .HasColumnType("text");
-            });
+            // (Tabla ESPECIALIZACIONES eliminada – las especialidades se guardan
+            //  como array text[] en la columna ESPECIALIZACIONES de USUARIOS)
 
             // =========================
             // TAREAS
@@ -131,10 +114,10 @@ namespace DAL
                 entity.Property(e => e.IdTarea)
                       .HasColumnName("ID_TAREA");
 
-                entity.Property(e => e.IdEspecializacion)
-                      .HasColumnName("ID_ESPECIALIZACION");
+                entity.Property(e => e.EspecializacionRequerida)
+                      .HasColumnName("ESPECIALIZACION_REQUERIDA")
+                      .HasMaxLength(50);
 
-                // Nuevas propiedades
                 entity.Property(e => e.IdEmpresa)
                       .HasColumnName("ID_EMPRESA");
 
@@ -171,11 +154,12 @@ namespace DAL
                 entity.Property(e => e.FechaCreacion)
                       .HasColumnName("FECHA_CREACION");
 
-                entity.HasOne(e => e.Especializacion)
-                      .WithMany()
-                      .HasForeignKey(e => e.IdEspecializacion);
+                entity.Property(e => e.Disponible)
+                      .HasColumnName("DISPONIBLE");
 
-                // Nuevas relaciones
+                entity.Property(e => e.Dependencias)
+                      .HasColumnName("DEPENDENCIAS");
+
                 entity.HasOne(e => e.Empresa)
                       .WithMany()
                       .HasForeignKey(e => e.IdEmpresa);
@@ -255,21 +239,8 @@ namespace DAL
                       .HasForeignKey(e => e.IdPeriodo);
             });
 
-            // =========================
-            // USUARIO_ESPECIALIZACION
-            // =========================
-            modelBuilder.Entity<UsuarioEspecializacion>(entity =>
-            {
-                entity.ToTable("USUARIO_ESPECIALIZACION");
-
-                entity.HasKey(e => new { e.IdUsuario, e.IdEspecializacion });
-
-                entity.Property(e => e.IdUsuario)
-                      .HasColumnName("ID_USUARIO");
-
-                entity.Property(e => e.IdEspecializacion)
-                      .HasColumnName("ID_ESPECIALIZACION");
-            });
+            // (Tabla USUARIO_ESPECIALIZACION eliminada – las especialidades se guardan
+            //  como array text[] en la columna ESPECIALIZACIONES de USUARIOS)
 
 
             // =========================

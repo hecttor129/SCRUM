@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(DB_Context))]
-    partial class DB_ContextModelSnapshot : ModelSnapshot
+    [Migration("20260528030941_EspecializacionesComoArray")]
+    partial class EspecializacionesComoArray
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -597,19 +600,10 @@ namespace DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdTarea"));
 
-                    b.Property<List<int>>("Dependencias")
-                        .IsRequired()
-                        .HasColumnType("integer[]")
-                        .HasColumnName("DEPENDENCIAS");
-
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("DESCRIPCION");
-
-                    b.Property<bool>("Disponible")
-                        .HasColumnType("boolean")
-                        .HasColumnName("DISPONIBLE");
 
                     b.Property<string>("EspecializacionRequerida")
                         .IsRequired()

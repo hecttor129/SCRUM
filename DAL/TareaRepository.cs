@@ -31,6 +31,11 @@ namespace DAL
 
         public void Update(Tarea entity)
         {
+            var tracked = _context.Tareas.Local.FirstOrDefault(t => t.IdTarea == entity.IdTarea);
+            if (tracked != null)
+            {
+                _context.Entry(tracked).State = Microsoft.EntityFrameworkCore.EntityState.Detached;
+            }
             _context.Tareas.Update(entity);
         }
 

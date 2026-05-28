@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static ENTITY.ENUMS;
 
 namespace ENTITY
@@ -11,9 +8,12 @@ namespace ENTITY
     {
         public int IdTarea { get; set; }
 
-        public int IdEspecializacion { get; set; }
+        /// <summary>
+        /// Especialización requerida para esta tarea (texto libre, ej. "Frontend", "C#").
+        /// </summary>
+        public string EspecializacionRequerida { get; set; } = string.Empty;
 
-        // Nuevas llaves foráneas opcionales para la jerarquía de tareas
+        // Llaves foráneas opcionales para la jerarquía de tareas
         public int? IdEmpresa { get; set; }
         public int? IdProyecto { get; set; }
         public int? IdEquipo { get; set; }
@@ -33,10 +33,14 @@ namespace ENTITY
 
         public DateTime FechaCreacion { get; set; }
 
-        public Especializacion Especializacion { get; set; }
-        
         public Empresa Empresa { get; set; }
         public Proyecto Proyecto { get; set; }
         public Equipo Equipo { get; set; }
+        // Nueva propiedad: indica si la tarea está disponible para trabajar
+        public bool Disponible { get; set; } = false;
+
+        // Nueva propiedad: lista de IDs de tareas de las que depende esta tarea
+        public List<int> Dependencias { get; set; } = new List<int>();
+
     }
 }

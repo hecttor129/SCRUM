@@ -23,7 +23,6 @@ namespace DAL
         public Equipo GetById(int id)
         {
             return _context.Equipos
-                .AsNoTracking()
                 .FirstOrDefault(e => e.IdEquipo == id && e.Activo == 1);
         }
 

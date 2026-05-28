@@ -88,7 +88,7 @@ namespace BLL
         /// </summary>
         public List<UsuarioComboItem> ObtenerSupervisoresDisponibles()
         {
-            var usuarios = _usuarioRepo.GetAll()
+            var usuarios = _usuarioRepo.GetSupervisoresDisponibles()
                 .Select(u => new UsuarioComboItem
                 {
                     IdUsuario = u.IdUsuario,

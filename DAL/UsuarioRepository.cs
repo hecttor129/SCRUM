@@ -119,13 +119,14 @@ namespace DAL
         /// <summary>
         /// Retorna usuarios que pueden ser superiores: Admin + Jefes activos.
         /// </summary>
-        public List<Usuario> GetSupervisoresDisponibles()
+        public List<Usuario> GetSupervisoresDisponibles(int? exceptoIdUsuario = null)
         {
             return _context.Usuarios
                 .AsNoTracking()
                 .Where(u =>
                     (u.Rol == RolUsuario.Admin || u.Rol == RolUsuario.Jefe) &&
-                    u.Activo == 1)
+                    u.Activo == 1 &&
+                    (!exceptoIdUsuario.HasValue || u.IdUsuario != exceptoIdUsuario.Value))
                 .OrderBy(u => u.NivelJerarquico)
                 .ThenBy(u => u.Nombre)
                 .ToList();

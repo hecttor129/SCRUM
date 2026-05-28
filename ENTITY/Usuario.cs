@@ -1,8 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static ENTITY.ENUMS;
 
 namespace ENTITY
@@ -19,7 +16,7 @@ namespace ENTITY
 
         public string password { get; set; }   // hash SHA-256 (64 chars)
 
-        public RolUsuario Rol { get; set; }           
+        public RolUsuario Rol { get; set; }
         //enum
 
         public int NivelJerarquico { get; set; }
@@ -30,5 +27,9 @@ namespace ENTITY
 
         public DateTime FechaCreacion { get; set; }
 
+        /// <summary>
+        /// Colección de especialidades del usuario (almacenada como text[] en PostgreSQL).
+        /// </summary>
+        public List<string> Especializaciones { get; set; } = new List<string>();
     }
 }

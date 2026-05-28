@@ -17,10 +17,6 @@ namespace VISTA
             InitializeComponent();
             _service = new UsuarioService();
             Loaded += UsuariosWindow_Loaded;
-            
-            // Add a simple bool-to-visibility converter implicitly
-            if (!Resources.Contains("BooleanToVisibilityConverter"))
-                Resources.Add("BooleanToVisibilityConverter", new BooleanToVisibilityConverter());
         }
 
         private void UsuariosWindow_Loaded(object sender, RoutedEventArgs e)
@@ -43,6 +39,8 @@ namespace VISTA
 
         private void AplicarFiltro()
         {
+            if (dgUsuarios == null || txtBuscar == null) return;
+
             string b = txtBuscar.Text.Trim().ToLower();
             if (b == "" || b == "buscar por nombre o correo...")
             {

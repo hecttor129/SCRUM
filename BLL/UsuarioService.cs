@@ -75,6 +75,11 @@ namespace BLL
             public string NombreSuperior { get; set; } = string.Empty;
             public string FechaCreacion { get; set; } = string.Empty;
             public int Activo { get; set; }
+            public decimal HorasSemanalesDisponibles { get; set; }
+
+            public bool EsAdmin => RolDisplay == "Admin";
+            public bool PuedeDesactivar => Activo == 1 && !EsAdmin;
+            public bool PuedeReactivar => Activo == 0 && !EsAdmin;
         }
 
         /// <summary>
@@ -84,6 +89,13 @@ namespace BLL
         {
             var usuarios = _repo.GetAllConInactivos();
             
+            // Obtener todas las disponibilidades para calcular horas semanales
+            using var ctx = new DB_Context();
+            var disponibilidades = ctx.Disponibilidades.ToList();
+            var horasPorUsuario = disponibilidades
+                .GroupBy(d => d.IdUsuario)
+                .ToDictionary(g => g.Key, g => g.Sum(d => d.CapacidadPorDia ?? 0m));
+
             return usuarios.Select(u => {
                 string sup = "-";
                 var rel = _relacionRepo.GetSuperiorActual(u.IdUsuario);
@@ -104,7 +116,10 @@ namespace BLL
                     EstadoDisplay = u.Activo == 1 ? "Activo" : "Inactivo",
                     NombreSuperior = sup,
                     FechaCreacion = u.FechaCreacion.ToString("dd/MM/yyyy"),
-                    Activo = u.Activo
+                    Activo = u.Activo,
+                    HorasSemanalesDisponibles = horasPorUsuario.ContainsKey(u.IdUsuario) 
+                                                ? horasPorUsuario[u.IdUsuario] 
+                                                : 0m
                 };
             }).ToList();
         }
@@ -112,9 +127,9 @@ namespace BLL
         /// <summary>
         /// Retorna la lista de posibles superiores (Admin + Jefes activos) para el ComboBox.
         /// </summary>
-        public List<UsuarioSuperiorItem> ObtenerSupervisoresDisponibles()
+        public List<UsuarioSuperiorItem> ObtenerSupervisoresDisponibles(int? exceptoIdUsuario = null)
         {
-            return _repo.GetSupervisoresDisponibles()
+            return _repo.GetSupervisoresDisponibles(exceptoIdUsuario)
                 .Select(u => new UsuarioSuperiorItem
                 {
                     IdUsuario       = u.IdUsuario,
@@ -122,6 +137,58 @@ namespace BLL
                     NivelJerarquico = u.NivelJerarquico
                 })
                 .ToList();
+        }
+
+        /// <summary>
+        /// Retorna todas las especialidades únicas registradas en el sistema (para el ComboBox sugerido).
+        /// </summary>
+        public List<string> ObtenerTodasLasEspecialidades()
+        {
+            return _repo.GetAllConInactivos()
+                .SelectMany(u => u.Especializaciones ?? new List<string>())
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(s => s)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Retorna los registros de disponibilidad semanal de un usuario (días 0-6 con horas por día).
+        /// </summary>
+        public List<Disponibilidad> ObtenerDisponibilidadUsuario(int idUsuario)
+        {
+            using var ctx = new DB_Context();
+            return ctx.Disponibilidades
+                      .Where(d => d.IdUsuario == idUsuario)
+                      .OrderBy(d => d.DiaSemana)
+                      .ToList();
+        }
+
+        /// <summary>
+        /// Reemplaza todos los registros de disponibilidad del usuario con los valores nuevos.
+        /// horasPorDia: clave = DiaSemana (0=Dom … 6=Sáb), valor = horas diarias.
+        /// </summary>
+        private void GuardarDisponibilidadUsuario(int idUsuario, Dictionary<int, decimal> horasPorDia)
+        {
+            using var ctx = new DB_Context();
+            // Eliminar registros existentes
+            var existentes = ctx.Disponibilidades
+                               .Where(d => d.IdUsuario == idUsuario)
+                               .ToList();
+            ctx.Disponibilidades.RemoveRange(existentes);
+
+            // Insertar los 7 días (0-6)
+            for (int dia = 0; dia <= 6; dia++)
+            {
+                decimal horas = horasPorDia.TryGetValue(dia, out decimal h) ? h : 0m;
+                ctx.Disponibilidades.Add(new Disponibilidad
+                {
+                    IdUsuario      = idUsuario,
+                    DiaSemana      = dia,
+                    CapacidadPorDia = horas
+                });
+            }
+            ctx.SaveChanges();
         }
 
         // ── Autenticación ────────────────────────────────────────────────────
@@ -185,7 +252,9 @@ namespace BLL
         /// </summary>
         public void CrearUsuario(
             string nombre, string apellido, string email,
-            string password, RolUsuario rol, int idSuperior)
+            string password, RolUsuario rol, int idSuperior,
+            List<string> especializaciones = null,
+            Dictionary<int, decimal> horasPorDia = null)
         {
             ValidarCamposBase(nombre, apellido, email, password);
 
@@ -201,20 +270,25 @@ namespace BLL
 
             var nuevo = new Usuario
             {
-                Nombre          = nombre.Trim(),
-                Apellido        = apellido.Trim(),
-                Email           = email.Trim().ToLower(),
-                password        = HashPassword(password),
-                Rol             = rol,
-                NivelJerarquico = superior.NivelJerarquico + 1,
-                Activo          = 1,
-                FechaCreacion   = DateTime.Now
+                Nombre            = nombre.Trim(),
+                Apellido          = apellido.Trim(),
+                Email             = email.Trim().ToLower(),
+                password          = HashPassword(password),
+                Rol               = rol,
+                NivelJerarquico   = superior.NivelJerarquico + 1,
+                Activo            = 1,
+                FechaCreacion     = DateTime.Now,
+                Especializaciones = especializaciones ?? new List<string>()
             };
 
             _repo.Add(nuevo);
             _repo.Save();
 
             _relacionRepo.Crear(idSuperior, nuevo.IdUsuario);
+
+            // Persistir disponibilidad semanal si se proporcionó
+            if (horasPorDia != null && horasPorDia.Count > 0)
+                GuardarDisponibilidadUsuario(nuevo.IdUsuario, horasPorDia);
         }
 
         // ── Edición ──────────────────────────────────────────────────────────
@@ -224,7 +298,9 @@ namespace BLL
         /// </summary>
         public void EditarUsuario(
             int idUsuario, string nombre, string apellido,
-            string email, RolUsuario rol, decimal? salario, int idSuperior)
+            string email, RolUsuario rol, decimal? salario, int idSuperior,
+            List<string> especializaciones = null,
+            Dictionary<int, decimal> horasPorDia = null)
         {
             var usuario = _repo.GetById(idUsuario)
                 ?? throw new Exception("Usuario no encontrado.");
@@ -243,12 +319,13 @@ namespace BLL
             var superior = _repo.GetById(idSuperior)
                 ?? throw new Exception("El superior seleccionado no existe.");
 
-            usuario.Nombre          = nombre.Trim();
-            usuario.Apellido        = apellido.Trim();
-            usuario.Email           = email.Trim().ToLower();
-            usuario.Rol             = rol;
-            usuario.NivelJerarquico = superior.NivelJerarquico + 1;
-            usuario.Salario         = salario;
+            usuario.Nombre            = nombre.Trim();
+            usuario.Apellido          = apellido.Trim();
+            usuario.Email             = email.Trim().ToLower();
+            usuario.Rol               = rol;
+            usuario.NivelJerarquico   = superior.NivelJerarquico + 1;
+            usuario.Salario           = salario;
+            usuario.Especializaciones = especializaciones ?? usuario.Especializaciones;
 
             _repo.Update(usuario);
             _repo.Save();
@@ -260,6 +337,10 @@ namespace BLL
                 _relacionRepo.CerrarRelacion(idUsuario);
                 _relacionRepo.Crear(idSuperior, idUsuario);
             }
+
+            // Actualizar disponibilidad semanal si se proporcionó
+            if (horasPorDia != null && horasPorDia.Count > 0)
+                GuardarDisponibilidadUsuario(idUsuario, horasPorDia);
         }
 
         /// <summary>
