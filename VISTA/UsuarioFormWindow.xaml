@@ -1,9 +1,9 @@
 <Window x:Class="VISTA.UsuarioFormWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Usuario" Height="680" Width="820"
+        Title="Usuario" Height="760" Width="920"
         WindowStartupLocation="CenterScreen" Background="#F8F9FA"
-        ResizeMode="NoResize">
+        ResizeMode="CanResizeWithGrip" MinHeight="700" MinWidth="820">
 
     <Window.Resources>
         <Style x:Key="LabelStyle" TargetType="TextBlock">
@@ -51,149 +51,151 @@
                        Margin="25,0,0,0"/>
         </Border>
 
-        <!-- Cuerpo: dos columnas -->
-        <Grid Grid.Row="1" Margin="20,15,20,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="15"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <!-- Cuerpo: dos columnas con scrollviewer para evitar recortes -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid Margin="20,15,20,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- ===== COLUMNA IZQUIERDA: Datos básicos ===== -->
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="Datos del Usuario" Style="{StaticResource LabelStyle}"
-                           FontSize="14" Foreground="#1E3A5F" Margin="0,0,0,12"/>
+                <!-- ===== COLUMNA IZQUIERDA: Datos básicos ===== -->
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Datos del Usuario" Style="{StaticResource LabelStyle}"
+                               FontSize="14" Foreground="#1E3A5F" Margin="0,0,0,12"/>
 
-                <TextBlock Text="Nombre" Style="{StaticResource LabelStyle}"/>
-                <TextBox x:Name="txtNombre" Style="{StaticResource InputStyle}"/>
+                    <TextBlock Text="Nombre" Style="{StaticResource LabelStyle}"/>
+                    <TextBox x:Name="txtNombre" Style="{StaticResource InputStyle}"/>
 
-                <TextBlock Text="Apellido" Style="{StaticResource LabelStyle}"/>
-                <TextBox x:Name="txtApellido" Style="{StaticResource InputStyle}"/>
+                    <TextBlock Text="Apellido" Style="{StaticResource LabelStyle}"/>
+                    <TextBox x:Name="txtApellido" Style="{StaticResource InputStyle}"/>
 
-                <TextBlock Text="Correo electrónico" Style="{StaticResource LabelStyle}"/>
-                <TextBox x:Name="txtEmail" Style="{StaticResource InputStyle}"/>
+                    <TextBlock Text="Correo electrónico" Style="{StaticResource LabelStyle}"/>
+                    <TextBox x:Name="txtEmail" Style="{StaticResource InputStyle}"/>
 
-                <TextBlock Text="Contraseña" Style="{StaticResource LabelStyle}"/>
-                <PasswordBox x:Name="pwdPassword" Height="34" Padding="8,0"
-                             VerticalContentAlignment="Center" BorderBrush="#D1D5DB"
-                             BorderThickness="1" Background="White" Margin="0,0,0,2"/>
-                <TextBlock x:Name="txtHintPwd" Text="(Dejar vacío para no cambiar la contraseña)"
-                           FontSize="11" Foreground="#6B7280" Visibility="Collapsed"
-                           Margin="0,0,0,10"/>
+                    <TextBlock Text="Contraseña" Style="{StaticResource LabelStyle}"/>
+                    <PasswordBox x:Name="pwdPassword" Height="34" Padding="8,0"
+                                 VerticalContentAlignment="Center" BorderBrush="#D1D5DB"
+                                 BorderThickness="1" Background="White" Margin="0,0,0,2"/>
+                    <TextBlock x:Name="txtHintPwd" Text="(Dejar vacío para no cambiar la contraseña)"
+                               FontSize="11" Foreground="#6B7280" Visibility="Collapsed"
+                               Margin="0,0,0,10"/>
 
-                <TextBlock Text="Rol" Style="{StaticResource LabelStyle}"/>
-                <ComboBox x:Name="cbRol" Style="{StaticResource ComboStyle}">
-                    <ComboBoxItem Content="Jefe"/>
-                    <ComboBoxItem Content="Empleado"/>
-                </ComboBox>
+                    <TextBlock Text="Rol" Style="{StaticResource LabelStyle}"/>
+                    <ComboBox x:Name="cbRol" Style="{StaticResource ComboStyle}">
+                        <ComboBoxItem Content="Jefe"/>
+                        <ComboBoxItem Content="Empleado"/>
+                    </ComboBox>
 
-                <TextBlock Text="Superior directo" Style="{StaticResource LabelStyle}"/>
-                <ComboBox x:Name="cbSuperior" DisplayMemberPath="NombreConNivel"
-                          Style="{StaticResource ComboStyle}"
-                          SelectionChanged="CbSuperior_SelectionChanged"/>
-                <TextBlock x:Name="txtNivelCalculado" Text="Nivel jerárquico asignado: -"
-                           FontSize="12" Foreground="#059669" FontWeight="SemiBold"
-                           Margin="0,0,0,10"/>
+                    <TextBlock Text="Superior directo" Style="{StaticResource LabelStyle}"/>
+                    <ComboBox x:Name="cbSuperior" DisplayMemberPath="NombreConNivel"
+                              Style="{StaticResource ComboStyle}"
+                              SelectionChanged="CbSuperior_SelectionChanged"/>
+                    <TextBlock x:Name="txtNivelCalculado" Text="Nivel jerárquico asignado: -"
+                               FontSize="12" Foreground="#059669" FontWeight="SemiBold"
+                               Margin="0,0,0,10"/>
 
-                <TextBlock Text="Salario (opcional)" Style="{StaticResource LabelStyle}"/>
-                <TextBox x:Name="txtSalario" Style="{StaticResource InputStyle}"/>
+                    <TextBlock Text="Salario (opcional)" Style="{StaticResource LabelStyle}"/>
+                    <TextBox x:Name="txtSalario" Style="{StaticResource InputStyle}"/>
 
-                <TextBlock x:Name="txtError" Foreground="#EF4444" TextWrapping="Wrap"
-                           Margin="0,5,0,0" Visibility="Collapsed"/>
-            </StackPanel>
+                    <TextBlock x:Name="txtError" Foreground="#EF4444" TextWrapping="Wrap"
+                               Margin="0,5,0,0" Visibility="Collapsed"/>
+                </StackPanel>
 
-            <!-- ===== COLUMNA DERECHA: Habilidades y Disponibilidad ===== -->
-            <StackPanel Grid.Column="2">
+                <!-- ===== COLUMNA DERECHA: Habilidades y Disponibilidad ===== -->
+                <StackPanel Grid.Column="2">
 
-                <!-- SECCIÓN: Especializaciones -->
-                <TextBlock Text="Especialidades" Style="{StaticResource LabelStyle}"
-                           FontSize="14" Foreground="#1E3A5F" Margin="0,0,0,12"/>
+                    <!-- SECCIÓN: Especializaciones -->
+                    <TextBlock Text="Especialidades" Style="{StaticResource LabelStyle}"
+                               FontSize="14" Foreground="#1E3A5F" Margin="0,0,0,12"/>
 
-                <TextBlock Text="Buscar o escribir especialidad" Style="{StaticResource LabelStyle}"/>
-                <Grid Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="8"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <ComboBox x:Name="cbEspecialidad" Grid.Column="0"
-                              IsEditable="True" Height="34" BorderBrush="#D1D5DB"
-                              VerticalContentAlignment="Center"
-                              KeyDown="CbEspecialidad_KeyDown"/>
-                    <Button Grid.Column="2" Content="+ Agregar" Height="34"
-                            Padding="12,0" Background="#2563EB" Foreground="White"
-                            BorderThickness="0" FontWeight="SemiBold" Cursor="Hand"
-                            Click="BtnAgregarEspecialidad_Click"/>
-                </Grid>
+                    <TextBlock Text="Buscar o escribir especialidad" Style="{StaticResource LabelStyle}"/>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="cbEspecialidad" Grid.Column="0"
+                                  IsEditable="True" Height="34" BorderBrush="#D1D5DB"
+                                  VerticalContentAlignment="Center"
+                                  KeyDown="CbEspecialidad_KeyDown"/>
+                        <Button Grid.Column="2" Content="+ Agregar" Height="34"
+                                Padding="12,0" Background="#2563EB" Foreground="White"
+                                BorderThickness="0" FontWeight="SemiBold" Cursor="Hand"
+                                Click="BtnAgregarEspecialidad_Click"/>
+                    </Grid>
 
-                <!-- Lista de tags de especialidades -->
-                <Border BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="6"
-                        MinHeight="80" MaxHeight="130" Background="White" Padding="8">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <WrapPanel x:Name="wrapEspecialidades" Orientation="Horizontal"/>
-                    </ScrollViewer>
-                </Border>
-                <TextBlock Text="Haz clic en una especialidad para eliminarla."
-                           FontSize="11" Foreground="#9CA3AF" Margin="0,4,0,16"/>
+                    <!-- Lista de tags de especialidades -->
+                    <Border BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="6"
+                            MinHeight="80" MaxHeight="130" Background="White" Padding="8">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <WrapPanel x:Name="wrapEspecialidades" Orientation="Horizontal"/>
+                        </ScrollViewer>
+                    </Border>
+                    <TextBlock Text="Haz clic en una especialidad para eliminarla."
+                               FontSize="11" Foreground="#9CA3AF" Margin="0,4,0,16"/>
 
-                <!-- SECCIÓN: Disponibilidad Semanal -->
-                <TextBlock Text="Disponibilidad Semanal" Style="{StaticResource LabelStyle}"
-                           FontSize="14" Foreground="#1E3A5F" Margin="0,0,0,12"/>
-                <TextBlock Text="Horas de trabajo disponibles por día:"
-                           Style="{StaticResource LabelStyle}" Margin="0,0,0,8"/>
+                    <!-- SECCIÓN: Disponibilidad Semanal -->
+                    <TextBlock Text="Disponibilidad Semanal" Style="{StaticResource LabelStyle}"
+                               FontSize="14" Foreground="#1E3A5F" Margin="0,0,0,12"/>
+                    <TextBlock Text="Horas de trabajo disponibles por día:"
+                               Style="{StaticResource LabelStyle}" Margin="0,0,0,8"/>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                    <!-- Etiquetas de días -->
-                    <TextBlock Grid.Column="0" Grid.Row="0" Text="Dom" TextAlignment="Center"
-                               FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,4,4"/>
-                    <TextBlock Grid.Column="1" Grid.Row="0" Text="Lun" TextAlignment="Center"
-                               FontSize="11" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,4,4"/>
-                    <TextBlock Grid.Column="2" Grid.Row="0" Text="Mar" TextAlignment="Center"
-                               FontSize="11" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,4,4"/>
-                    <TextBlock Grid.Column="3" Grid.Row="0" Text="Mié" TextAlignment="Center"
-                               FontSize="11" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,4,4"/>
-                    <TextBlock Grid.Column="4" Grid.Row="0" Text="Jue" TextAlignment="Center"
-                               FontSize="11" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,4,4"/>
-                    <TextBlock Grid.Column="5" Grid.Row="0" Text="Vie" TextAlignment="Center"
-                               FontSize="11" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,4,4"/>
-                    <TextBlock Grid.Column="6" Grid.Row="0" Text="Sáb" TextAlignment="Center"
-                               FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,0,4"/>
+                        <!-- Etiquetas de días -->
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Dom" TextAlignment="Center"
+                                   FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,4,4"/>
+                        <TextBlock Grid.Column="1" Grid.Row="0" Text="Lun" TextAlignment="Center"
+                                   FontSize="11" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,4,4"/>
+                        <TextBlock Grid.Column="2" Grid.Row="0" Text="Mar" TextAlignment="Center"
+                                   FontSize="11" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,4,4"/>
+                        <TextBlock Grid.Column="3" Grid.Row="0" Text="Mié" TextAlignment="Center"
+                                   FontSize="11" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,4,4"/>
+                        <TextBlock Grid.Column="4" Grid.Row="0" Text="Jue" TextAlignment="Center"
+                                   FontSize="11" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,4,4"/>
+                        <TextBlock Grid.Column="5" Grid.Row="0" Text="Vie" TextAlignment="Center"
+                                   FontSize="11" FontWeight="SemiBold" Foreground="#374151" Margin="0,0,4,4"/>
+                        <TextBlock Grid.Column="6" Grid.Row="0" Text="Sáb" TextAlignment="Center"
+                                   FontSize="11" FontWeight="SemiBold" Foreground="#6B7280" Margin="0,0,0,4"/>
 
-                    <!-- Inputs de horas (DiaSemana 0=Dom … 6=Sáb) -->
-                    <TextBox x:Name="txtHrsDom" Grid.Column="0" Grid.Row="1" Text="0"
-                             Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
-                    <TextBox x:Name="txtHrsLun" Grid.Column="1" Grid.Row="1" Text="8"
-                             Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
-                    <TextBox x:Name="txtHrsMar" Grid.Column="2" Grid.Row="1" Text="8"
-                             Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
-                    <TextBox x:Name="txtHrsMie" Grid.Column="3" Grid.Row="1" Text="8"
-                             Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
-                    <TextBox x:Name="txtHrsJue" Grid.Column="4" Grid.Row="1" Text="8"
-                             Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
-                    <TextBox x:Name="txtHrsVie" Grid.Column="5" Grid.Row="1" Text="8"
-                             Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
-                    <TextBox x:Name="txtHrsSab" Grid.Column="6" Grid.Row="1" Text="0"
-                             Style="{StaticResource HoraBoxStyle}" Margin="0,0,0,0"/>
-                </Grid>
+                        <!-- Inputs de horas (DiaSemana 0=Dom … 6=Sáb) -->
+                        <TextBox x:Name="txtHrsDom" Grid.Column="0" Grid.Row="1" Text="0"
+                                 Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
+                        <TextBox x:Name="txtHrsLun" Grid.Column="1" Grid.Row="1" Text="8"
+                                 Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
+                        <TextBox x:Name="txtHrsMar" Grid.Column="2" Grid.Row="1" Text="8"
+                                 Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
+                        <TextBox x:Name="txtHrsMie" Grid.Column="3" Grid.Row="1" Text="8"
+                                 Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
+                        <TextBox x:Name="txtHrsJue" Grid.Column="4" Grid.Row="1" Text="8"
+                                 Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
+                        <TextBox x:Name="txtHrsVie" Grid.Column="5" Grid.Row="1" Text="8"
+                                 Style="{StaticResource HoraBoxStyle}" Margin="0,0,4,0"/>
+                        <TextBox x:Name="txtHrsSab" Grid.Column="6" Grid.Row="1" Text="0"
+                                 Style="{StaticResource HoraBoxStyle}" Margin="0,0,0,0"/>
+                    </Grid>
 
-                <TextBlock Text="Valores de 0 a 24 horas por día."
-                           FontSize="11" Foreground="#9CA3AF" Margin="0,6,0,0"/>
-            </StackPanel>
-        </Grid>
+                    <TextBlock Text="Valores de 0 a 24 horas por día."
+                               FontSize="11" Foreground="#9CA3AF" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
 
         <!-- Footer: botones -->
         <Border Grid.Row="2" Background="#F3F4F6" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0">

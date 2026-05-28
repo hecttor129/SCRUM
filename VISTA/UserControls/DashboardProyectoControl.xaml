@@ -1,166 +1,148 @@
 <UserControl x:Class="VISTA.UserControls.DashboardProyectoControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="800">
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1100"
+             Background="#F4F6F9">
+
     <Grid>
-        <StackPanel Margin="22">
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                <TextBlock x:Name="txtTituloEquipos"
-                           Text="Equipos del Proyecto"
-                           FontSize="28"
-                           FontWeight="Bold"
-                           Foreground="#111827"
-                           VerticalAlignment="Center"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                <Button Content="Volver a Empresa"
-                        Margin="16,0,0,0"
-                        Height="36"
-                        Padding="16,0"
-                        Background="#FFFFFF"
-                        Foreground="#374151"
-                        BorderBrush="#D1D5DB"
-                        BorderThickness="1"
-                        Cursor="Hand"
-                        Click="BtnVolverEmpresa_Click">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="6"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
+        <!-- Cabecera -->
+        <Border Grid.Row="0" Background="White" BorderBrush="#DDE1E9" BorderThickness="0,0,0,1" Padding="24,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                <Button Content="Nuevo equipo"
-                        Margin="8,0,0,0"
-                        Width="120"
-                        Height="36"
-                        Background="#FFFFFF"
-                        Foreground="#374151"
-                        BorderBrush="#D1D5DB"
-                        BorderThickness="1"
-                        Cursor="Hand"
-                        Click="BtnNuevoEquipo_Click">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="6"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock x:Name="txtTituloEquipos"
+                               Text="Equipos del Proyecto"
+                               FontSize="22" FontWeight="Bold" Foreground="#111827"/>
+                    <TextBlock Text="Equipos asignados a este proyecto"
+                               FontSize="13" Foreground="#6B7280" Margin="0,2,0,0"/>
+                </StackPanel>
 
-                <Button Content="Editar equipo"
-                        Margin="8,0,0,0"
-                        Width="120"
-                        Height="36"
-                        Click="BtnEditarEquipo_Click"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="+ Nuevo equipo"
+                            Height="36" Padding="14,0"
+                            Background="#1A56DB" Foreground="White"
+                            FontWeight="SemiBold" FontSize="13"
+                            BorderThickness="0" Cursor="Hand"
+                            Click="BtnNuevoEquipo_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
 
-                <Button Content="Eliminar equipo"
-                        Margin="8,0,0,0"
-                        Width="120"
-                        Height="36"
-                        Click="BtnEliminarEquipo_Click"/>
-            </StackPanel>
-
-            <Border Background="#F8FAFC" CornerRadius="12" Padding="14" BorderBrush="#E5E7EB" BorderThickness="1" Margin="0,0,0,16">
-                <TabControl MinHeight="360" x:Name="tabControlProyecto" SelectionChanged="TabControlProyecto_SelectionChanged">
-                    <TabControl.Resources>
-                        <Style TargetType="TabItem">
-                            <Setter Property="Padding" Value="16,8"/>
-                            <Setter Property="FontSize" Value="14"/>
+        <!-- TabControl: Equipos | Archivos Generales -->
+        <TabControl Grid.Row="1" x:Name="tabControlProyecto"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    SelectionChanged="TabControlProyecto_SelectionChanged">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Padding" Value="18,10"/>
+                    <Setter Property="FontSize" Value="13"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Foreground" Value="#6B7280"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="#1A56DB"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
-                        </Style>
-                    </TabControl.Resources>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TabControl.Resources>
 
-                    <!-- Pestaña 1: Equipos -->
-                    <TabItem Header="Equipos">
-                        <StackPanel Margin="10">
-                            <TextBlock Text="Lista de equipos asignados"
-                                       Foreground="#111827"
-                                       FontSize="18"
-                                       FontWeight="SemiBold"
-                                       Margin="0,0,0,12"/>
+            <!-- Tab 1: Equipos -->
+            <TabItem Header="Equipos">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <WrapPanel x:Name="panelEquipoCards"
+                               Orientation="Horizontal"
+                               Margin="24,20,24,20"/>
+                </ScrollViewer>
+            </TabItem>
 
-                            <DataGrid x:Name="dgEquipos"
-                                      AutoGenerateColumns="False"
-                                      CanUserAddRows="False"
-                                      IsReadOnly="True"
-                                      Height="240"
-                                      Background="White"
-                                      Foreground="#111827"
-                                      BorderThickness="0"
-                                      RowBackground="White"
-                                      AlternatingRowBackground="#F9FAFB"
-                                      GridLinesVisibility="Horizontal"
-                                      HeadersVisibility="Column"
-                                      ColumnHeaderHeight="40"
-                                      RowHeight="40"
-                                      SelectionMode="Single"
-                                      SelectionUnit="FullRow">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Equipo" Binding="{Binding Nombre}" Width="200"/>
-                                    <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*"/>
-                                    <DataGridTextColumn Header="Supervisor" Binding="{Binding Supervisor}" Width="150"/>
-                                    <DataGridTextColumn Header="Trabajadores" Binding="{Binding Trabajadores}" Width="90"/>
-                                    <DataGridTemplateColumn Header="Acciones" Width="120">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                    <Button Content="Gestionar"
-                                                            Padding="10,4"
-                                                            Background="#DBEAFE"
-                                                            Foreground="#1D4ED8"
-                                                            BorderBrush="#BFDBFE"
-                                                            Cursor="Hand"
-                                                            Click="BtnGestionarEquipo_Click"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </StackPanel>
-                    </TabItem>
+            <!-- Tab 2: Archivos Generales -->
+            <TabItem Header="Archivos Generales" x:Name="tabItemArchivosGenerales">
+                <Grid Margin="24,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                    <!-- Pestaña 2: Archivos Generales del Proyecto y sus Equipos -->
-                    <TabItem Header="Archivos Generales" x:Name="tabItemArchivosGenerales">
-                        <StackPanel Margin="10">
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                <TextBlock Text="Archivos del proyecto y de sus equipos" FontSize="16" FontWeight="Bold" Foreground="#111827" VerticalAlignment="Center"/>
-                                <Button Content="Subir a Proyecto" Margin="14,0,6,0" Padding="12,6" Background="#2563EB" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand" Click="BtnSubirArchivoProyecto_Click"/>
-                                <Button Content="Descargar / Abrir" Margin="0,0,6,0" Padding="12,6" Background="#F3F4F6" Foreground="#1F2937" BorderBrush="#D1D5DB" BorderThickness="1" Cursor="Hand" Click="BtnDescargarArchivoProyecto_Click"/>
-                                <Button Content="Eliminar Archivo" Padding="12,6" Background="#EF4444" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand" Click="BtnEliminarArchivoProyecto_Click"/>
-                            </StackPanel>
+                    <!-- Acciones archivos -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                        <TextBlock Text="Archivos del proyecto y sus equipos"
+                                   FontSize="15" FontWeight="SemiBold"
+                                   Foreground="#111827" VerticalAlignment="Center"
+                                   Margin="0,0,16,0"/>
+                        <Button Content="↑ Subir a Proyecto"
+                                Height="34" Padding="14,0"
+                                Background="#1A56DB" Foreground="White"
+                                FontWeight="SemiBold" BorderThickness="0"
+                                FontSize="12" Cursor="Hand" Margin="0,0,8,0"
+                                Click="BtnSubirArchivoProyecto_Click"/>
+                        <Button Content="↓ Descargar / Abrir"
+                                Height="34" Padding="14,0"
+                                Background="White" Foreground="#374151"
+                                BorderBrush="#DDE1E9" BorderThickness="1"
+                                FontSize="12" Cursor="Hand" Margin="0,0,8,0"
+                                Click="BtnDescargarArchivoProyecto_Click"/>
+                        <Button Content="🗑 Eliminar"
+                                Height="34" Padding="14,0"
+                                Background="White" Foreground="#B91C1C"
+                                BorderBrush="#FECACA" BorderThickness="1"
+                                FontSize="12" Cursor="Hand"
+                                Click="BtnEliminarArchivoProyecto_Click"/>
+                    </StackPanel>
 
-                            <DataGrid x:Name="dgArchivosProyecto"
-                                      AutoGenerateColumns="False"
-                                      CanUserAddRows="False"
-                                      IsReadOnly="True"
-                                      Height="240"
-                                      Background="White"
-                                      Foreground="#111827"
-                                      BorderThickness="1"
-                                      BorderBrush="#E5E7EB"
-                                      RowBackground="White"
-                                      AlternatingRowBackground="#F9FAFB"
-                                      GridLinesVisibility="Horizontal"
-                                      HeadersVisibility="Column"
-                                      ColumnHeaderHeight="40"
-                                      RowHeight="40"
-                                      MouseDoubleClick="DgArchivosProyecto_MouseDoubleClick">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Nombre" Binding="{Binding NombreOriginal}" Width="*"/>
-                                    <DataGridTextColumn Header="Extensión" Binding="{Binding Extension}" Width="80"/>
-                                    <DataGridTextColumn Header="Tamaño" Binding="{Binding Tamano}" Width="100"/>
-                                    <DataGridTextColumn Header="Origen" Binding="{Binding Origen}" Width="160"/>
-                                    <DataGridTextColumn Header="Fecha de Subida" Binding="{Binding FechaSubida}" Width="140"/>
-                                    <DataGridTextColumn Header="Subido Por" Binding="{Binding SubidoPor}" Width="140"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </StackPanel>
-                    </TabItem>
-                </TabControl>
-            </Border>
-        </StackPanel>
+                    <!-- DataGrid archivos -->
+                    <Border Grid.Row="1" Background="White" BorderBrush="#DDE1E9"
+                            BorderThickness="1" CornerRadius="6">
+                        <DataGrid x:Name="dgArchivosProyecto"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="True"
+                                  Background="White"
+                                  RowBackground="White"
+                                  AlternatingRowBackground="#F9FAFB"
+                                  GridLinesVisibility="Horizontal"
+                                  HeadersVisibility="Column"
+                                  BorderThickness="0"
+                                  ColumnHeaderHeight="38"
+                                  RowHeight="40"
+                                  MouseDoubleClick="DgArchivosProyecto_MouseDoubleClick">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background"  Value="#F8FAFC"/>
+                                    <Setter Property="Foreground"  Value="#374151"/>
+                                    <Setter Property="FontWeight"  Value="SemiBold"/>
+                                    <Setter Property="FontSize"    Value="12"/>
+                                    <Setter Property="Padding"     Value="12,0"/>
+                                    <Setter Property="BorderBrush" Value="#DDE1E9"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Nombre"         Binding="{Binding NombreOriginal}" Width="*"/>
+                                <DataGridTextColumn Header="Tipo"           Binding="{Binding Extension}"     Width="80"/>
+                                <DataGridTextColumn Header="Tamaño"         Binding="{Binding Tamano}"        Width="100"/>
+                                <DataGridTextColumn Header="Origen"         Binding="{Binding Origen}"        Width="160"/>
+                                <DataGridTextColumn Header="Fecha de Subida" Binding="{Binding FechaSubida}"  Width="140"/>
+                                <DataGridTextColumn Header="Subido Por"     Binding="{Binding SubidoPor}"     Width="150"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>

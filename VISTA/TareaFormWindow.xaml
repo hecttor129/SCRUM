@@ -3,185 +3,350 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Tarea"
         Height="680"
-        Width="950"
+        Width="960"
         WindowStartupLocation="CenterOwner"
-        Background="#0F172A">
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize">
 
-        <!-- Cabecera -->
-        <StackPanel Margin="0,0,0,14">
-            <TextBlock x:Name="txtTituloVentana"
-                       Text="Nueva Tarea"
-                       Foreground="White"
-                       FontSize="26"
-                       FontWeight="Bold"/>
-            <TextBlock x:Name="txtSubtituloVentana"
-                       Text="Completa los detalles de la tarea y gestiona sus dependencias."
-                       Foreground="#94A3B8"
-                       FontSize="13"
-                       Margin="0,6,0,0"/>
-        </StackPanel>
+    <Window.Resources>
+        <SolidColorBrush x:Key="WindowBackground" Color="#F4F6F9"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="InputBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="BorderBrushDark" Color="#DDE1E9"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#111827"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#6B7280"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#1A56DB"/>
+        <SolidColorBrush x:Key="AccentStrongBrush" Color="#1A56DB"/>
 
-        <!-- Contenido Central: Dos Columnas -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.2*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
+        <DropShadowEffect x:Key="WindowShadow"
+                           BlurRadius="15"
+                           ShadowDepth="0"
+                           Opacity="0.15"/>
 
-            <!-- Columna Izquierda: Datos Básicos -->
-            <Border Grid.Column="0"
-                    Background="#111827"
-                    CornerRadius="12"
-                    Padding="18"
-                    Margin="0,0,14,0">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Text="Título de la Tarea" Foreground="White" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                        <TextBox x:Name="txtTitulo" Height="36" Margin="0,0,0,14" VerticalContentAlignment="Center" Padding="8,0"/>
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
 
-                        <TextBlock Text="Descripción" Foreground="White" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                        <TextBox x:Name="txtDescripcion"
-                                 Height="80"
-                                 AcceptsReturn="True"
-                                 TextWrapping="Wrap"
-                                 Margin="0,0,0,14"
-                                 Padding="8"
-                                 VerticalScrollBarVisibility="Auto"/>
+        <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="CaretBrush" Value="#111827"/>
+            <Setter Property="Background" Value="{StaticResource InputBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDark}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
 
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="14"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
+        <Style x:Key="InputComboStyle" TargetType="ComboBox">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="Background" Value="{StaticResource InputBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDark}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,0"/>
+        </Style>
 
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="Prioridad" Foreground="White" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                <ComboBox x:Name="cbPrioridad" Height="36" Margin="0,0,0,14" VerticalContentAlignment="Center">
-                                    <ComboBoxItem Content="1 - Muy Baja"/>
-                                    <ComboBoxItem Content="2 - Baja"/>
-                                    <ComboBoxItem Content="3 - Media"/>
-                                    <ComboBoxItem Content="4 - Alta"/>
-                                    <ComboBoxItem Content="5 - Muy Alta"/>
-                                </ComboBox>
-                            </StackPanel>
+        <Style x:Key="InputDatePickerStyle" TargetType="DatePicker">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="Background" Value="{StaticResource InputBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDark}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
 
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="Estado" Foreground="White" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                <ComboBox x:Name="cbEstado" Height="36" Margin="0,0,0,14" VerticalContentAlignment="Center">
-                                    <ComboBoxItem Content="Pendiente"/>
-                                    <ComboBoxItem Content="EnProgreso"/>
-                                    <ComboBoxItem Content="Completada"/>
-                                    <ComboBoxItem Content="Cancelada"/>
-                                </ComboBox>
-                            </StackPanel>
-                        </Grid>
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="14"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="Fecha Inicio" Foreground="White" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                <DatePicker x:Name="dpFechaInicio" Height="36" Margin="0,0,0,14" VerticalContentAlignment="Center"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="Fecha Límite" Foreground="White" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                <DatePicker x:Name="dpFechaLimite" Height="36" Margin="0,0,0,14" VerticalContentAlignment="Center"/>
-                            </StackPanel>
-                        </Grid>
-
-                        <TextBlock Text="Especialización Requerida" Foreground="White" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                        <TextBox x:Name="txtEspecializacion" Height="36" Margin="0,0,0,14" VerticalContentAlignment="Center" Padding="8,0"/>
-
-                        <!-- Estado de disponibilidad (Lectura) -->
-                        <Border Background="#1F2937" CornerRadius="8" Padding="12" Margin="0,6,0,0">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <CheckBox x:Name="chkDisponible" IsEnabled="False" IsChecked="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                <StackPanel>
-                                    <TextBlock Text="Tarea Disponible" Foreground="White" FontWeight="Bold" FontSize="14"/>
-                                    <TextBlock Text="La tarea se puede trabajar (no tiene dependencias pendientes)." Foreground="#94A3B8" FontSize="11"/>
-                                </StackPanel>
-                            </StackPanel>
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentStrongBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDark}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="WindowActionButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Margin="15"
+            CornerRadius="8"
+            Background="{StaticResource WindowBackground}"
+            BorderBrush="#DDE1E9"
+            BorderThickness="1"
+            Effect="{StaticResource WindowShadow}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="56"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Top bar -->
+            <Border Grid.Row="0"
+                    Background="#1E3A5F"
+                    CornerRadius="7,7,0,0"
+                    MouseLeftButtonDown="TopBar_MouseLeftButtonDown">
+                <Grid Margin="20,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Tarea"
+                                   VerticalAlignment="Center"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   Foreground="White"/>
                     </StackPanel>
-                </ScrollViewer>
-            </Border>
 
-            <!-- Columna Derecha: Dependencias -->
-            <Border Grid.Column="1"
-                    Background="#111827"
-                    CornerRadius="12"
-                    Padding="18">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Grid.Row="0" Text="Dependencias de la Tarea" Foreground="White" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-
-                    <StackPanel Grid.Row="1" Margin="0,0,0,12">
-                        <TextBlock Text="Seleccionar tarea para depender de ella" Foreground="#94A3B8" Margin="0,0,0,6"/>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="8"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <ComboBox x:Name="cbDependencia" Grid.Column="0" Height="36"
-                                      DisplayMemberPath="Titulo" SelectedValuePath="IdTarea"
-                                      IsEditable="True" IsTextSearchEnabled="True" VerticalContentAlignment="Center"/>
-                            <Button Grid.Column="2" Content="Agregar" Width="80" Height="36" FontWeight="Bold" Click="BtnAgregarDep_Click"/>
-                        </Grid>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="✕"
+                                Style="{StaticResource WindowActionButtonStyle}"
+                                Click="BtnCancelar_Click"/>
                     </StackPanel>
-
-                    <ListBox Grid.Row="2" x:Name="lstDependencias" Background="#1F2937" Foreground="White" BorderThickness="0">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Titulo}" Padding="6" FontSize="13"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-
-                    <Button Grid.Row="3" Content="Quitar Dependencia Seleccionada" Height="34" Margin="0,10,0,0"
-                            Background="#374151" Foreground="White" BorderThickness="0" FontWeight="SemiBold"
-                            Click="BtnQuitarDep_Click"/>
                 </Grid>
             </Border>
-        </Grid>
 
-        <!-- Botones de Acción inferior -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
-            <Button Content="Cancelar"
-                    Width="110"
-                    Height="36"
-                    Margin="0,0,10,0"
-                    Background="Transparent"
-                    Foreground="White"
-                    BorderBrush="#374151"
-                    BorderThickness="1"
-                    Click="BtnCancelar_Click"/>
-            <Button Content="Guardar"
-                    Width="110"
-                    Height="36"
-                    Background="#2563EB"
-                    Foreground="White"
-                    BorderThickness="0"
-                    FontWeight="SemiBold"
-                    Click="BtnGuardar_Click"/>
-        </StackPanel>
-    </Grid>
+            <Grid Grid.Row="1" Margin="24,20,24,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="22"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Columna Izquierda: Datos Básicos -->
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="0,0,0,14">
+                        <TextBlock x:Name="txtTituloVentana"
+                                   Text="Nueva Tarea"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   FontSize="22"
+                                   FontWeight="Bold"/>
+                        <TextBlock x:Name="txtSubtituloVentana"
+                                   Text="Completa los detalles de la tarea y gestiona sus dependencias."
+                                   Foreground="{StaticResource TextSecondary}"
+                                   FontSize="13"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <Border Grid.Row="1"
+                            Background="{StaticResource CardBrush}"
+                            BorderBrush="{StaticResource BorderBrushDark}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="20">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel>
+                                <TextBlock Text="Título de la Tarea" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="txtTitulo" Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,14"/>
+
+                                <TextBlock Text="Descripción" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="txtDescripcion"
+                                         Height="80"
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         Style="{StaticResource InputTextBoxStyle}"
+                                         Padding="10,8"
+                                         Margin="0,0,0,14"
+                                         VerticalScrollBarVisibility="Auto"/>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="14"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Prioridad" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="cbPrioridad" Style="{StaticResource InputComboStyle}" Margin="0,0,0,14">
+                                            <ComboBoxItem Content="1 - Muy Baja"/>
+                                            <ComboBoxItem Content="2 - Baja"/>
+                                            <ComboBoxItem Content="3 - Media"/>
+                                            <ComboBoxItem Content="4 - Alta"/>
+                                            <ComboBoxItem Content="5 - Muy Alta"/>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Estado" Style="{StaticResource LabelStyle}"/>
+                                        <ComboBox x:Name="cbEstado" Style="{StaticResource InputComboStyle}" Margin="0,0,0,14">
+                                            <ComboBoxItem Content="Pendiente"/>
+                                            <ComboBoxItem Content="EnProgreso"/>
+                                            <ComboBoxItem Content="Completada"/>
+                                            <ComboBoxItem Content="Cancelada"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="14"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Fecha Inicio" Style="{StaticResource LabelStyle}"/>
+                                        <DatePicker x:Name="dpFechaInicio" Style="{StaticResource InputDatePickerStyle}" Margin="0,0,0,14"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Fecha Límite" Style="{StaticResource LabelStyle}"/>
+                                        <DatePicker x:Name="dpFechaLimite" Style="{StaticResource InputDatePickerStyle}" Margin="0,0,0,14"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Text="Especialización Requerida" Style="{StaticResource LabelStyle}"/>
+                                <TextBox x:Name="txtEspecializacion" Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,14"/>
+
+                                <!-- Estado de disponibilidad (Lectura) -->
+                                <Border Background="#EFF6FF" CornerRadius="4" Padding="12" Margin="0,6,0,0" BorderBrush="#BFDBFE" BorderThickness="1">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <CheckBox x:Name="chkDisponible" IsEnabled="False" IsChecked="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <StackPanel>
+                                            <TextBlock Text="Tarea Disponible" Foreground="#1D4ED8" FontWeight="Bold" FontSize="13"/>
+                                            <TextBlock Text="La tarea se puede trabajar (no tiene dependencias pendientes)." Foreground="#1E4ED8" FontSize="11" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+
+                <!-- Columna Derecha: Dependencias -->
+                <Border Grid.Column="2"
+                        Background="{StaticResource CardBrush}"
+                        BorderBrush="{StaticResource BorderBrushDark}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="20"
+                        Margin="0,68,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Dependencias de la Tarea" Foreground="{StaticResource TextPrimary}" FontSize="15" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                        <StackPanel Grid.Row="1" Margin="0,0,0,14">
+                            <TextBlock Text="Seleccionar tarea para depender de ella" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6" FontSize="12" FontWeight="SemiBold"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ComboBox x:Name="cbDependencia" Grid.Column="0" Style="{StaticResource InputComboStyle}"
+                                          DisplayMemberPath="Titulo" SelectedValuePath="IdTarea"
+                                          IsEditable="True" IsTextSearchEnabled="True"/>
+                                <Button Grid.Column="2" Content="Agregar" Height="38" Padding="14,0" Style="{StaticResource PrimaryButtonStyle}" Click="BtnAgregarDep_Click"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <Border Grid.Row="2" BorderBrush="{StaticResource BorderBrushDark}" BorderThickness="1" CornerRadius="4" Background="White" Margin="0,0,0,10">
+                            <ListBox x:Name="lstDependencias" Background="White" BorderThickness="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Titulo}" Padding="8,6" FontSize="13" Foreground="{StaticResource TextPrimary}"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+
+                        <Button Grid.Row="3" Content="Quitar Dependencia Seleccionada" Height="34"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Click="BtnQuitarDep_Click"/>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Botones de Acción inferior -->
+            <Border Grid.Row="2"
+                    Background="#F1F3F5"
+                    BorderBrush="#DDE1E9"
+                    BorderThickness="0,1,0,0"
+                    CornerRadius="0,0,7,7">
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Margin="20,12,20,12">
+                    <Button Content="Cancelar"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Click="BtnCancelar_Click"/>
+                    <Button Content="Guardar"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Margin="10,0,0,0"
+                            Click="BtnGuardar_Click"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
 </Window>

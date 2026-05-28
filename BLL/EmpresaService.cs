@@ -46,19 +46,23 @@ namespace BLL
                     Activo = 1,
                     FechaCreacion = System.DateTime.UtcNow
                 };
+                empresa.Nombre = nombre;
+                empresa.Descripcion = descripcion;
+                empresa.Nit = nit;
+                empresa.Telefono = telefono;
+                empresa.Correo = correo;
                 _repo.Add(empresa);
             }
             else
             {
                 empresa = _repo.GetFirst() ?? new Empresa();
+                empresa.Nombre = nombre;
+                empresa.Descripcion = descripcion;
+                empresa.Nit = nit;
+                empresa.Telefono = telefono;
+                empresa.Correo = correo;
                 _repo.Update(empresa);
             }
-
-            empresa.Nombre = nombre;
-            empresa.Descripcion = descripcion;
-            empresa.Nit = nit;
-            empresa.Telefono = telefono;
-            empresa.Correo = correo;
 
             _repo.Save();
         }

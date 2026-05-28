@@ -14,23 +14,6 @@
                            FontWeight="Bold"
                            Foreground="#111827"
                            VerticalAlignment="Center"/>
-
-                <Button Content="Volver al Proyecto"
-                        Margin="16,0,0,0"
-                        Height="36"
-                        Padding="16,0"
-                        Background="#FFFFFF"
-                        Foreground="#374151"
-                        BorderBrush="#D1D5DB"
-                        BorderThickness="1"
-                        Cursor="Hand"
-                        Click="BtnVolverProyecto_Click">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="6"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
             </StackPanel>
 
             <Border Background="#F8FAFC" CornerRadius="12" Padding="14" BorderBrush="#E5E7EB" BorderThickness="1">

@@ -155,6 +155,26 @@ namespace VISTA
 
         private void BtnCancelar_Click(object sender, RoutedEventArgs e) => Close();
 
+        private void TopBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+                DragMove();
+        }
+
+        private void TxtNombre_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            txtResumenNombre.Text = string.IsNullOrWhiteSpace(txtNombre.Text)
+                ? "Sin nombre"
+                : txtNombre.Text.Trim();
+        }
+
+        private void CbSupervisor_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            txtResumenSupervisor.Text = cbSupervisor.SelectedItem is MiembroDto sup
+                ? sup.NombreCompleto
+                : "Sin asignar";
+        }
+
         private void RefrescarVista()
         {
             dgMiembros.ItemsSource = null;

@@ -1,4 +1,4 @@
-<UserControl x:Class="VISTA.UserControls.ReportesControl"
+<UserControl x:Class="VISTA.UserControls.PeriodoControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,11 +11,11 @@
             <Border Background="White" CornerRadius="8" Padding="48,36"
                     BorderBrush="#DDE1E9" BorderThickness="1">
                 <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="📊" FontSize="52" HorizontalAlignment="Center" Foreground="Black"/>
-                    <TextBlock Text="Reportes" FontSize="22" FontWeight="Bold"
-                               Foreground="#000000" Margin="0,12,0,6" HorizontalAlignment="Center"/>
-                    <TextBlock Text="El módulo de reportes analíticos estará disponible próximamente."
-                               Foreground="#000000" FontSize="13" HorizontalAlignment="Center"
+                    <TextBlock Text="🗓" FontSize="52" HorizontalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="Periodos" FontSize="22" FontWeight="Bold"
+                               Foreground="#111827" Margin="0,12,0,6" HorizontalAlignment="Center"/>
+                    <TextBlock Text="El módulo de gestión de periodos estará disponible próximamente."
+                               Foreground="#6B7280" FontSize="13" HorizontalAlignment="Center"
                                TextWrapping="Wrap" MaxWidth="320" TextAlignment="Center"/>
                 </StackPanel>
             </Border>

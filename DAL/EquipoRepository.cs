@@ -123,6 +123,18 @@ namespace DAL
             }
         }
 
+        public List<(Equipo Equipo, int IdProyecto, string NombreProyecto)> GetByEmpresa(int idEmpresa)
+        {
+            return (from e in _context.Equipos
+                    join p in _context.Proyectos on e.IdProyecto equals p.IdProyecto
+                    where p.IdEmpresa == idEmpresa && e.Activo == 1 && p.Activo == 1
+                    orderby p.Nombre, e.Nombre
+                    select new { e, p.IdProyecto, NombreProyecto = p.Nombre })
+                   .AsEnumerable()
+                   .Select(x => (x.e, x.IdProyecto, x.NombreProyecto))
+                   .ToList();
+        }
+
         public void Save()
         {
             _context.SaveChanges();

@@ -110,30 +110,42 @@ namespace BLL
             if (idProyecto.HasValue && idProyecto.Value > 0)
             {
                 proyecto = _repo.GetById(idProyecto.Value) ?? throw new Exception("Proyecto no encontrado.");
+
+                proyecto.Nombre = nombre;
+                proyecto.Descripcion = descripcion;
+                proyecto.Estado = estado;
+                proyecto.FechaInicio = fechaInicio;
+                proyecto.FechaFin = fechaFin;
+                proyecto.IdSupervisor = idSupervisor;
+                proyecto.Progreso = progreso;
+
+                // Validar antes de persistir
+                Validar(proyecto);
+                _repo.Update(proyecto);
             }
             else
             {
+                // Construir y validar ANTES de agregar al contexto de EF
+                // para evitar que entidades inválidas queden trackeadas
                 proyecto = new Proyecto
                 {
                     IdEmpresa = idEmpresa,
                     Activo = 1,
-                    FechaCreacion = DateTime.Now
+                    FechaCreacion = DateTime.Now,
+                    Nombre = nombre,
+                    Descripcion = descripcion,
+                    Estado = estado,
+                    FechaInicio = fechaInicio,
+                    FechaFin = fechaFin,
+                    IdSupervisor = idSupervisor,
+                    Progreso = progreso
                 };
+
+                // Si Validar() lanza excepción, Add() nunca se ejecuta
+                // y el contexto de EF queda limpio
+                Validar(proyecto);
                 _repo.Add(proyecto);
             }
-
-            proyecto.Nombre = nombre;
-            proyecto.Descripcion = descripcion;
-            proyecto.Estado = estado;
-            proyecto.FechaInicio = fechaInicio;
-            proyecto.FechaFin = fechaFin;
-            proyecto.IdSupervisor = idSupervisor;
-            proyecto.Progreso = progreso;
-
-            Validar(proyecto);
-            
-            if (idProyecto.HasValue && idProyecto.Value > 0)
-                _repo.Update(proyecto);
 
             _repo.Save();
 

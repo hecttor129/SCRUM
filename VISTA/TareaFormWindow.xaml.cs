@@ -198,6 +198,12 @@ namespace VISTA
             RefrescarDependenciasVisuales();
         }
 
+        private void TopBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+                DragMove();
+        }
+
         private void BtnCancelar_Click(object sender, RoutedEventArgs e)
         {
             Close();

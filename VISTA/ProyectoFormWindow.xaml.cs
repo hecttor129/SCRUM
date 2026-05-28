@@ -130,23 +130,19 @@ namespace VISTA
 
                 if (_proyectoEditando == null)
                 {
-                    // Validar documentos obligatorios
-                    if (string.IsNullOrWhiteSpace(_rutaHistorias) || string.IsNullOrWhiteSpace(_rutaRequerimientos))
-                    {
-                        MessageBox.Show("Debes seleccionar obligatoriamente las Historias de Usuario y la Hoja de Requerimientos para crear el proyecto.", "Campos Requeridos", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
-                    }
-
+                    // Creación de nuevo proyecto sin requerir archivos obligatorios
                     int nuevoIdProyecto = _proyectoService.GuardarProyecto(_idEmpresa, null, nombre, descripcion, estado, fechaInicio, fechaFin, idSupervisor, progreso);
 
-                    // Subir los dos archivos iniciales obligatorios
+                    // Subir archivos solo si se seleccionaron
                     var archivoService = new ArchivoService();
                     int idUsuarioLogueado = SesionActual.IdUsuario;
 
-                    archivoService.SubirArchivoProyecto(_rutaHistorias, nuevoIdProyecto, idUsuarioLogueado, "Historias de Usuario");
-                    archivoService.SubirArchivoProyecto(_rutaRequerimientos, nuevoIdProyecto, idUsuarioLogueado, "Hoja de Requerimientos");
+                    if (!string.IsNullOrWhiteSpace(_rutaHistorias))
+                        archivoService.SubirArchivoProyecto(_rutaHistorias, nuevoIdProyecto, idUsuarioLogueado, "Historias de Usuario");
+                    if (!string.IsNullOrWhiteSpace(_rutaRequerimientos))
+                        archivoService.SubirArchivoProyecto(_rutaRequerimientos, nuevoIdProyecto, idUsuarioLogueado, "Hoja de Requerimientos");
 
-                    MessageBox.Show("Proyecto creado correctamente junto con sus documentos iniciales.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Proyecto creado correctamente.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {

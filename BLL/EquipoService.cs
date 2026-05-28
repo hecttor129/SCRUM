@@ -12,6 +12,8 @@ namespace BLL
     public class EquipoDto
     {
         public int IdEquipo { get; set; }
+        public int IdProyecto { get; set; }
+        public string NombreProyecto { get; set; } = string.Empty;
         public string Nombre { get; set; } = string.Empty;
         public string Descripcion { get; set; } = string.Empty;
         public string Supervisor { get; set; } = string.Empty;
@@ -65,6 +67,7 @@ namespace BLL
             return equipos.Select(e => new EquipoDto
             {
                 IdEquipo = e.IdEquipo,
+                IdProyecto = idProyecto,
                 Nombre = e.Nombre,
                 Descripcion = string.IsNullOrWhiteSpace(e.Descripcion) ? "-" : e.Descripcion,
                 Supervisor = supervisores.ContainsKey(e.IdSupervisor)
@@ -73,6 +76,42 @@ namespace BLL
                 Trabajadores = _repo.ContarMiembros(e.IdEquipo),
                 FechaCreacion = e.FechaCreacion.HasValue
                     ? e.FechaCreacion.Value.ToString("dd/MM/yyyy")
+                    : "-"
+            }).ToList();
+        }
+
+        /// <summary>
+        /// Retorna todos los equipos activos de una empresa (de todos sus proyectos).
+        /// </summary>
+        public List<EquipoDto> ObtenerEquiposPorEmpresa(int idEmpresa)
+        {
+            var resultados = _repo.GetByEmpresa(idEmpresa);
+
+            var idsSupervisores = resultados
+                .Select(r => r.Equipo.IdSupervisor)
+                .Distinct()
+                .ToList();
+
+            var supervisores = _usuarioRepo
+                .GetByIds(idsSupervisores)
+                .ToDictionary(
+                    u => u.IdUsuario,
+                    u => $"{u.Nombre} {u.Apellido}".Trim()
+                );
+
+            return resultados.Select(r => new EquipoDto
+            {
+                IdEquipo = r.Equipo.IdEquipo,
+                IdProyecto = r.IdProyecto,
+                NombreProyecto = r.NombreProyecto,
+                Nombre = r.Equipo.Nombre,
+                Descripcion = string.IsNullOrWhiteSpace(r.Equipo.Descripcion) ? "-" : r.Equipo.Descripcion,
+                Supervisor = supervisores.ContainsKey(r.Equipo.IdSupervisor)
+                    ? supervisores[r.Equipo.IdSupervisor]
+                    : "Sin supervisor",
+                Trabajadores = _repo.ContarMiembros(r.Equipo.IdEquipo),
+                FechaCreacion = r.Equipo.FechaCreacion.HasValue
+                    ? r.Equipo.FechaCreacion.Value.ToString("dd/MM/yyyy")
                     : "-"
             }).ToList();
         }

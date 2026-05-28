@@ -1,6 +1,8 @@
+using BLL;
 using ENTITY;
 using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using VISTA.UserControls;
 
@@ -9,13 +11,17 @@ namespace VISTA
     public partial class MainWindow : Window
     {
         private bool _sidebarVisible = true;
-        
-        private DashboardEmpresaControl _empresaControl;
-        private DashboardProyectoControl _proyectoControl;
-        private DashboardEquipoControl _equipoControl;
-        private ReportesControl _reportesControl;
+        private bool _inicializado    = false;  // evita que SelectionChanged actúe antes del Loaded
 
-        private int? _idProyectoSeleccionado;
+        private DashboardProyectoControl _proyectoControl;
+        private DashboardEquipoControl   _equipoControl;
+
+        private int? _idProyectoActivo;
+        private int  _idEmpresaActiva;
+
+        // ── Visibilidad barra de retroceso ────────────────────────────────
+        private void MostrarVolver(bool visible)
+            => barraVolver.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
 
         public MainWindow()
         {
@@ -25,158 +31,210 @@ namespace VISTA
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            InicializarSidebar();
-            MostrarPantallaEmpresa();
-        }
-
-        private void InicializarSidebar()
-        {
             txtSidebarNombre.Text = SesionActual.NombreCompleto;
-            txtSidebarRol.Text = SesionActual.Rol.ToString();
+            txtSidebarRol.Text    = SesionActual.Rol.ToString();
 
             if (SesionActual.Rol == ENTITY.ENUMS.RolUsuario.Admin)
             {
-                btnUsuarios.Visibility = Visibility.Visible;
+                tabUsuarios.Visibility     = Visibility.Visible;
+                btnMenuUsuarios.Visibility = Visibility.Visible;
             }
-        }
 
-        private void MostrarPantallaEmpresa()
-        {
-            _idProyectoSeleccionado = null;
-            if (_empresaControl == null)
+            ctrlProyectos.GestionarProyectoRequested    += OnGestionarProyecto;
+            ctrlEquiposGeneral.GestionarEquipoRequested += OnGestionarEquipoDesdeGeneral;
+
+            // Primer arranque: solicitar creación de empresa si no existe
+            var empSvc  = new EmpresaService();
+            var empresa = empSvc.ObtenerEmpresa();
+            if (empresa == null)
             {
-                _empresaControl = new DashboardEmpresaControl();
-                _empresaControl.GestionarProyectoRequested += (s, proyecto) => MostrarPantallaProyecto(proyecto.IdProyecto, _empresaControl.IdEmpresaActual);
+                MessageBox.Show(
+                    "No se encontró ninguna empresa registrada.\nPor favor configure los datos de la empresa.",
+                    "Configuración Inicial", MessageBoxButton.OK, MessageBoxImage.Information);
+                var ventana = new EmpresaFormWindow { Owner = this };
+                if (ventana.ShowDialog() == true)
+                    empresa = empSvc.ObtenerEmpresa();
             }
-            else 
+
+            if (empresa != null)
             {
-                _empresaControl.CargarPantallaEmpresa();
+                _idEmpresaActiva = empresa.IdEmpresa;
+                ctrlEmpresa.CargarPantallaEmpresa();
+                ctrlProyectos.CargarProyectos();
             }
-            
-            MainContent.Content = _empresaControl;
+
+            _inicializado = true;
         }
 
-        private void MostrarPantallaProyecto(int idProyecto, int idEmpresa)
+        // ── Selección de tabs ──────────────────────────────────────────────
+
+        private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _idProyectoSeleccionado = idProyecto;
-            _proyectoControl = new DashboardProyectoControl(idProyecto, idEmpresa);
-            _proyectoControl.VolverEmpresaRequested += (s, e) => MostrarPantallaEmpresa();
-            _proyectoControl.GestionarEquipoRequested += (s, equipo) => MostrarPantallaEquipo(equipo);
-            
-            MainContent.Content = _proyectoControl;
+            if (!_inicializado) return;
+            if (e.AddedItems.Count == 0 || e.AddedItems[0] is not TabItem) return;
+            e.Handled = true;
+
+            switch (MainTabControl.SelectedIndex)
+            {
+                case 0: btnMenuEmpresa.IsChecked   = true; break;
+                case 1: btnMenuProyectos.IsChecked = true; break;
+                case 2: btnMenuEquipo.IsChecked    = true; break;
+                case 3: btnMenuUsuarios.IsChecked  = true; break;
+                case 4: btnMenuReportes.IsChecked  = true; break;
+                case 5: btnMenuPeriodo.IsChecked   = true; break;
+            }
+
+            if (MainTabControl.SelectedItem is TabItem tab)
+            {
+                switch (tab.Header?.ToString())
+                {
+                    case "Empresa":   ctrlEmpresa.CargarPantallaEmpresa();   break;
+                    case "Usuarios":  ctrlUsuarios.CargarUsuarios();          break;
+                    case "Equipo":    ctrlEquiposGeneral.CargarEquipos();     break;
+                }
+            }
         }
 
-        private void MostrarPantallaEquipo(BLL.EquipoDto equipo)
+        private void NavegarATab(int index)
+        {
+            if (index == 1)
+                RestaurarProyectos();
+            else if (index == 2)
+                RestaurarEquipos();
+
+            MainTabControl.SelectedIndex = index;
+        }
+
+        private void BtnMenuEmpresa_Click(object sender, RoutedEventArgs e)   => NavegarATab(0);
+        private void BtnMenuProyectos_Click(object sender, RoutedEventArgs e) => NavegarATab(1);
+        private void BtnMenuEquipo_Click(object sender, RoutedEventArgs e)    => NavegarATab(2);
+        private void BtnMenuUsuarios_Click(object sender, RoutedEventArgs e)  => NavegarATab(3);
+        private void BtnMenuReportes_Click(object sender, RoutedEventArgs e)  => NavegarATab(4);
+        private void BtnMenuPeriodo_Click(object sender, RoutedEventArgs e)   => NavegarATab(5);
+
+        // ── Helpers de restauración ────────────────────────────────────────
+
+        private void RestaurarProyectos()
+        {
+            gridProyectos.Children.Clear();
+            gridProyectos.Children.Add(ctrlProyectos);
+            ctrlProyectos.CargarProyectos();
+            MostrarVolver(false);
+            _idProyectoActivo = null;
+        }
+
+        private void RestaurarEquipos()
+        {
+            gridEquipo.Children.Clear();
+            gridEquipo.Children.Add(ctrlEquiposGeneral);
+            ctrlEquiposGeneral.CargarEquipos();
+            MostrarVolver(false);
+        }
+
+        // ── Navegación a Proyecto ──────────────────────────────────────────
+
+        private void OnGestionarProyecto(object sender, ProyectoDto proyecto)
+        {
+            _idProyectoActivo = proyecto.IdProyecto;
+
+            _proyectoControl = new DashboardProyectoControl(proyecto.IdProyecto, _idEmpresaActiva);
+            _proyectoControl.GestionarEquipoRequested += OnGestionarEquipo;
+
+            gridProyectos.Children.Clear();
+            gridProyectos.Children.Add(_proyectoControl);
+            MostrarVolver(true);
+        }
+
+        private void OnVolverAProyectos(object sender, EventArgs e) => RestaurarProyectos();
+
+        // ── Navegación a Equipo ────────────────────────────────────────────
+
+        private void OnGestionarEquipo(object sender, EquipoDto equipo)
+            => MostrarDashboardEquipo(equipo, desdeProjeto: true);
+
+        private void OnGestionarEquipoDesdeGeneral(object sender, EquipoDto equipo)
+        {
+            _idProyectoActivo = equipo.IdProyecto;
+
+            if (_proyectoControl == null || _proyectoControl.IdProyecto != equipo.IdProyecto)
+            {
+                _proyectoControl = new DashboardProyectoControl(equipo.IdProyecto, _idEmpresaActiva);
+                _proyectoControl.GestionarEquipoRequested += OnGestionarEquipo;
+            }
+
+            MostrarDashboardEquipo(equipo, desdeProjeto: false);
+        }
+
+        private void MostrarDashboardEquipo(EquipoDto equipo, bool desdeProjeto)
         {
             _equipoControl = new DashboardEquipoControl(equipo);
-            _equipoControl.VolverAlProyectoRequested += (s, e) => {
-                MainContent.Content = _proyectoControl;
-            };
-            
-            MainContent.Content = _equipoControl;
-        }
 
-        private void BtnSidebarEmpresa_Click(object sender, RoutedEventArgs e)
-        {
-            MostrarPantallaEmpresa();
-        }
-
-        private void BtnEquipoSidebar_Click(object sender, RoutedEventArgs e)
-        {
-            if (!_idProyectoSeleccionado.HasValue)
+            if (desdeProjeto)
             {
-                MessageBox.Show("Primero selecciona o gestiona un proyecto desde la lista de la Empresa.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
+                gridProyectos.Children.Clear();
+                gridProyectos.Children.Add(_equipoControl);
+            }
+            else
+            {
+                gridEquipo.Children.Clear();
+                gridEquipo.Children.Add(_equipoControl);
             }
 
+            MostrarVolver(true);
+        }
+
+        private void OnVolverAProyecto()
+        {
             if (_proyectoControl != null)
             {
-                MainContent.Content = _proyectoControl;
+                gridProyectos.Children.Clear();
+                gridProyectos.Children.Add(_proyectoControl);
             }
+            MostrarVolver(true);
         }
 
-        private void BtnSidebarReportes_Click(object sender, RoutedEventArgs e)
-        {
-            if (_reportesControl == null)
-                _reportesControl = new ReportesControl();
-            
-            MainContent.Content = _reportesControl;
-        }
+        // ── Botón ← Volver ────────────────────────────────────────────────
 
-        // ── Top Bar Actions ───────────────────────────────────────────────────
-        
-        private void txtBuscarProyecto_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void BtnVolverPrincipal_Click(object sender, RoutedEventArgs e)
         {
-            if (MainContent.Content == _empresaControl)
+            int index = MainTabControl.SelectedIndex;
+
+            if (index == 1) // Tab Proyectos
             {
-                _empresaControl.FiltrarProyectos(txtBuscarProyecto.Text);
+                if (gridProyectos.Children.Count > 0)
+                {
+                    var current = gridProyectos.Children[0];
+                    if (current is DashboardEquipoControl)
+                        OnVolverAProyecto();
+                    else if (current is DashboardProyectoControl)
+                        RestaurarProyectos();
+                }
             }
-        }
-
-        private void BtnNuevoProyecto_Click(object sender, RoutedEventArgs e)
-        {
-            if (MainContent.Content == _empresaControl)
-                _empresaControl.AbrirFormularioProyecto(null);
-        }
-
-        private void BtnEditarProyecto_Click(object sender, RoutedEventArgs e)
-        {
-            if (MainContent.Content == _empresaControl)
+            else if (index == 2) // Tab Equipo
             {
-                var p = _empresaControl.ObtenerProyectoSeleccionado();
-                if (p != null) _empresaControl.AbrirFormularioProyecto(p.IdProyecto);
-                else MessageBox.Show("Selecciona un proyecto.");
+                if (gridEquipo.Children.Count > 0 && gridEquipo.Children[0] is DashboardEquipoControl)
+                    RestaurarEquipos();
             }
         }
 
-        private void BtnEliminarProyecto_Click(object sender, RoutedEventArgs e)
-        {
-            if (MainContent.Content == _empresaControl)
-                _empresaControl.EliminarProyectoConfirmado();
-        }
-        
-        private void BtnEditarEmpresa_Click(object sender, RoutedEventArgs e)
-        {
-            var ventana = new EmpresaFormWindow() { Owner = this };
-            if (ventana.ShowDialog() == true)
-            {
-                _empresaControl?.CargarPantallaEmpresa();
-            }
-        }
-
-        // ── Animaciones y Navegación ───────────────────────────────────────────
+        // ── Hamburguesa ───────────────────────────────────────────────────
 
         private void BtnHamburguesa_Click(object sender, RoutedEventArgs e)
         {
-            const double abierto = 230;
-            const double cerrado = 0;
+            double destino  = _sidebarVisible ? 0   : 220;
+            double opacidad = _sidebarVisible ? 0.0 : 1.0;
 
-            double destinoAncho = _sidebarVisible ? cerrado : abierto;
-            double destinoOpacidad = _sidebarVisible ? 0 : 1;
-
-            var animWidth = new DoubleAnimation
-            {
-                To = destinoAncho,
-                Duration = TimeSpan.FromMilliseconds(220),
-                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
-            };
-
-            var animOpacity = new DoubleAnimation
-            {
-                To = destinoOpacidad,
-                Duration = TimeSpan.FromMilliseconds(180)
-            };
-
-            SidebarContainer.BeginAnimation(WidthProperty, animWidth);
-            SidebarContainer.BeginAnimation(OpacityProperty, animOpacity);
+            SidebarContainer.BeginAnimation(WidthProperty,
+                new DoubleAnimation
+                {
+                    To             = destino,
+                    Duration       = TimeSpan.FromMilliseconds(200),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
+                });
+            SidebarContainer.BeginAnimation(OpacityProperty,
+                new DoubleAnimation { To = opacidad, Duration = TimeSpan.FromMilliseconds(160) });
 
             _sidebarVisible = !_sidebarVisible;
-        }
-
-        private void BtnUsuarios_Click(object sender, RoutedEventArgs e)
-        {
-            var ventana = new UsuariosWindow() { Owner = this };
-            ventana.ShowDialog();
         }
     }
 }
