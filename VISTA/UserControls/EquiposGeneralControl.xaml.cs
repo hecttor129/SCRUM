@@ -75,8 +75,8 @@ namespace VISTA.UserControls
             {
                 Width = 260,
                 Margin = new Thickness(0, 0, 16, 16),
-                Background = Brushes.White,
-                BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DDE1E9")),
+                Background = (Brush)FindResource("BgCard"),
+                BorderBrush = (Brush)FindResource("BorderColor"),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(6),
                 Cursor = Cursors.Hand,
@@ -89,13 +89,13 @@ namespace VISTA.UserControls
 
             // Ícono + Nombre del equipo
             var rowNombre = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 4) };
-            rowNombre.Children.Add(new TextBlock { Text = "👥 ", FontSize = 16, VerticalAlignment = VerticalAlignment.Center });
+            rowNombre.Children.Add(new TextBlock { Text = "👥 ", FontSize = 16, Foreground = (Brush)FindResource("TextSecondary"), VerticalAlignment = VerticalAlignment.Center });
             rowNombre.Children.Add(new TextBlock
             {
                 Text = eq.Nombre,
                 FontSize = 14,
                 FontWeight = FontWeights.SemiBold,
-                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#111827")),
+                Foreground = (Brush)FindResource("TextPrimary"),
                 VerticalAlignment = VerticalAlignment.Center,
                 TextWrapping = TextWrapping.Wrap
             });
@@ -104,7 +104,7 @@ namespace VISTA.UserControls
             // Proyecto al que pertenece
             var proyectoBadge = new Border
             {
-                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EFF6FF")),
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E3A8A")),
                 CornerRadius = new CornerRadius(4),
                 Padding = new Thickness(8, 3, 8, 3),
                 Margin = new Thickness(0, 4, 0, 10),
@@ -114,7 +114,7 @@ namespace VISTA.UserControls
             {
                 Text = $"📁 {eq.NombreProyecto}",
                 FontSize = 11,
-                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1D4ED8")),
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#93C5FD")),
                 FontWeight = FontWeights.SemiBold
             };
             stack.Children.Add(proyectoBadge);
@@ -122,30 +122,30 @@ namespace VISTA.UserControls
             // Separator
             stack.Children.Add(new Border
             {
-                BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F0F2F5")),
+                BorderBrush = (Brush)FindResource("BorderColor"),
                 BorderThickness = new Thickness(0, 1, 0, 0),
                 Margin = new Thickness(0, 0, 0, 10)
             });
 
             // Supervisor
             var rowSup = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 6) };
-            rowSup.Children.Add(new TextBlock { Text = "👤 ", FontSize = 12 });
+            rowSup.Children.Add(new TextBlock { Text = "👤 ", FontSize = 12, Foreground = (Brush)FindResource("TextSecondary") });
             rowSup.Children.Add(new TextBlock
             {
                 Text = eq.Supervisor,
                 FontSize = 12,
-                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#374151"))
+                Foreground = (Brush)FindResource("TextPrimary")
             });
             stack.Children.Add(rowSup);
 
             // Miembros
             var rowMiembros = new StackPanel { Orientation = Orientation.Horizontal };
-            rowMiembros.Children.Add(new TextBlock { Text = "🧑‍💼 ", FontSize = 12 });
+            rowMiembros.Children.Add(new TextBlock { Text = "🧑‍💼 ", FontSize = 12, Foreground = (Brush)FindResource("TextSecondary") });
             rowMiembros.Children.Add(new TextBlock
             {
                 Text = $"{eq.Trabajadores} miembro{(eq.Trabajadores != 1 ? "s" : "")}",
                 FontSize = 12,
-                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#374151"))
+                Foreground = (Brush)FindResource("TextPrimary")
             });
             stack.Children.Add(rowMiembros);
 

@@ -11,66 +11,17 @@
         ResizeMode="NoResize">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="WindowBackground" Color="#F4F6F9"/>
-        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="InputBrush" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="BorderBrushDark" Color="#DDE1E9"/>
-        <SolidColorBrush x:Key="TextPrimary" Color="#111827"/>
-        <SolidColorBrush x:Key="TextSecondary" Color="#6B7280"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="#1A56DB"/>
-        <SolidColorBrush x:Key="AccentStrongBrush" Color="#1A56DB"/>
+        <DropShadowEffect x:Key="WindowShadow" BlurRadius="15" ShadowDepth="0" Opacity="0.5"/>
 
-        <DropShadowEffect x:Key="WindowShadow"
-                           BlurRadius="15"
-                           ShadowDepth="0"
-                           Opacity="0.15"/>
-
-        <Style x:Key="LabelStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Margin" Value="0,0,0,8"/>
-            <Setter Property="FontSize" Value="13"/>
-        </Style>
-
-        <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
-            <Setter Property="Height" Value="38"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Padding" Value="10,0"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-            <Setter Property="CaretBrush" Value="#111827"/>
-            <Setter Property="Background" Value="{StaticResource InputBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDark}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-
-        <Style x:Key="InputComboStyle" TargetType="ComboBox">
-            <Setter Property="Height" Value="38"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-            <Setter Property="Background" Value="{StaticResource InputBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDark}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="10,0"/>
-        </Style>
-
-        <Style x:Key="InputDatePickerStyle" TargetType="DatePicker">
-            <Setter Property="Height" Value="38"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-            <Setter Property="Background" Value="{StaticResource InputBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDark}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-
-        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource AccentStrongBrush}"/>
-            <Setter Property="Foreground" Value="White"/>
+        <Style x:Key="WindowActionButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="20,10"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="12"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -81,55 +32,12 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <Style x:Key="SecondaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="Foreground" Value="#374151"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushDark}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="20,10"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="WindowActionButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="28"/>
-            <Setter Property="Height" Value="28"/>
-            <Setter Property="Margin" Value="8,0,0,0"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
 
     <Border Margin="15"
             CornerRadius="8"
-            Background="{StaticResource WindowBackground}"
-            BorderBrush="#DDE1E9"
+            Background="{StaticResource BgPrimary}"
+            BorderBrush="{StaticResource BorderColor}"
             BorderThickness="1"
             Effect="{StaticResource WindowShadow}">
         <Grid>
@@ -141,8 +49,10 @@
 
             <!-- Top bar -->
             <Border Grid.Row="0"
-                    Background="#1E3A5F"
+                    Background="{StaticResource BgSecondary}"
                     CornerRadius="7,7,0,0"
+                    BorderBrush="{StaticResource BorderColor}"
+                    BorderThickness="0,0,0,1"
                     MouseLeftButtonDown="TopBar_MouseLeftButtonDown">
                 <Grid Margin="20,0">
                     <Grid.ColumnDefinitions>
@@ -155,7 +65,7 @@
                                    VerticalAlignment="Center"
                                    FontSize="15"
                                    FontWeight="Bold"
-                                   Foreground="White"/>
+                                   Foreground="{StaticResource TextPrimary}"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -183,33 +93,26 @@
                     <StackPanel Grid.Row="0" Margin="0,0,0,14">
                         <TextBlock x:Name="txtTituloVentana"
                                    Text="Nueva Tarea"
-                                   Foreground="{StaticResource TextPrimary}"
-                                   FontSize="22"
-                                   FontWeight="Bold"/>
+                                   Style="{StaticResource TitleStyle}"/>
                         <TextBlock x:Name="txtSubtituloVentana"
                                    Text="Completa los detalles de la tarea y gestiona sus dependencias."
-                                   Foreground="{StaticResource TextSecondary}"
-                                   FontSize="13"
+                                   Style="{StaticResource TextSecondaryStyle}"
                                    Margin="0,4,0,0"/>
                     </StackPanel>
 
                     <Border Grid.Row="1"
-                            Background="{StaticResource CardBrush}"
-                            BorderBrush="{StaticResource BorderBrushDark}"
-                            BorderThickness="1"
-                            CornerRadius="6"
+                            Style="{StaticResource CardStyle}"
                             Padding="20">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
-                                <TextBlock Text="Título de la Tarea" Style="{StaticResource LabelStyle}"/>
-                                <TextBox x:Name="txtTitulo" Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,14"/>
+                                <TextBlock Text="Título de la Tarea" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                <TextBox x:Name="txtTitulo" Margin="0,0,0,14"/>
 
-                                <TextBlock Text="Descripción" Style="{StaticResource LabelStyle}"/>
+                                <TextBlock Text="Descripción" FontWeight="SemiBold" Margin="0,0,0,8"/>
                                 <TextBox x:Name="txtDescripcion"
                                          Height="80"
                                          AcceptsReturn="True"
                                          TextWrapping="Wrap"
-                                         Style="{StaticResource InputTextBoxStyle}"
                                          Padding="10,8"
                                          Margin="0,0,0,14"
                                          VerticalScrollBarVisibility="Auto"/>
@@ -222,8 +125,8 @@
                                     </Grid.ColumnDefinitions>
 
                                     <StackPanel Grid.Column="0">
-                                        <TextBlock Text="Prioridad" Style="{StaticResource LabelStyle}"/>
-                                        <ComboBox x:Name="cbPrioridad" Style="{StaticResource InputComboStyle}" Margin="0,0,0,14">
+                                        <TextBlock Text="Prioridad" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <ComboBox x:Name="cbPrioridad" Margin="0,0,0,14">
                                             <ComboBoxItem Content="1 - Muy Baja"/>
                                             <ComboBoxItem Content="2 - Baja"/>
                                             <ComboBoxItem Content="3 - Media"/>
@@ -233,8 +136,8 @@
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="2">
-                                        <TextBlock Text="Estado" Style="{StaticResource LabelStyle}"/>
-                                        <ComboBox x:Name="cbEstado" Style="{StaticResource InputComboStyle}" Margin="0,0,0,14">
+                                        <TextBlock Text="Estado" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <ComboBox x:Name="cbEstado" Margin="0,0,0,14">
                                             <ComboBoxItem Content="Pendiente"/>
                                             <ComboBoxItem Content="EnProgreso"/>
                                             <ComboBoxItem Content="Completada"/>
@@ -251,26 +154,26 @@
                                     </Grid.ColumnDefinitions>
 
                                     <StackPanel Grid.Column="0">
-                                        <TextBlock Text="Fecha Inicio" Style="{StaticResource LabelStyle}"/>
-                                        <DatePicker x:Name="dpFechaInicio" Style="{StaticResource InputDatePickerStyle}" Margin="0,0,0,14"/>
+                                        <TextBlock Text="Fecha Inicio" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <DatePicker x:Name="dpFechaInicio" Margin="0,0,0,14"/>
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="2">
-                                        <TextBlock Text="Fecha Límite" Style="{StaticResource LabelStyle}"/>
-                                        <DatePicker x:Name="dpFechaLimite" Style="{StaticResource InputDatePickerStyle}" Margin="0,0,0,14"/>
+                                        <TextBlock Text="Fecha Límite" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                        <DatePicker x:Name="dpFechaLimite" Margin="0,0,0,14"/>
                                     </StackPanel>
                                 </Grid>
 
-                                <TextBlock Text="Especialización Requerida" Style="{StaticResource LabelStyle}"/>
-                                <TextBox x:Name="txtEspecializacion" Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,14"/>
+                                <TextBlock Text="Especialización Requerida" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                <TextBox x:Name="txtEspecializacion" Margin="0,0,0,14"/>
 
                                 <!-- Estado de disponibilidad (Lectura) -->
-                                <Border Background="#EFF6FF" CornerRadius="4" Padding="12" Margin="0,6,0,0" BorderBrush="#BFDBFE" BorderThickness="1">
+                                <Border Background="{StaticResource BgSecondary}" CornerRadius="4" Padding="12" Margin="0,6,0,0" BorderBrush="{StaticResource AccentPrimary}" BorderThickness="1">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <CheckBox x:Name="chkDisponible" IsEnabled="False" IsChecked="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                         <StackPanel>
-                                            <TextBlock Text="Tarea Disponible" Foreground="#1D4ED8" FontWeight="Bold" FontSize="13"/>
-                                            <TextBlock Text="La tarea se puede trabajar (no tiene dependencias pendientes)." Foreground="#1E4ED8" FontSize="11" Margin="0,2,0,0"/>
+                                            <TextBlock Text="Tarea Disponible" Foreground="{StaticResource AccentPrimary}" FontWeight="Bold" FontSize="13"/>
+                                            <TextBlock Text="La tarea se puede trabajar (no tiene dependencias pendientes)." Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,2,0,0"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>
@@ -281,10 +184,7 @@
 
                 <!-- Columna Derecha: Dependencias -->
                 <Border Grid.Column="2"
-                        Background="{StaticResource CardBrush}"
-                        BorderBrush="{StaticResource BorderBrushDark}"
-                        BorderThickness="1"
-                        CornerRadius="6"
+                        Style="{StaticResource CardStyle}"
                         Padding="20"
                         Margin="0,68,0,0">
                     <Grid>
@@ -305,15 +205,15 @@
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <ComboBox x:Name="cbDependencia" Grid.Column="0" Style="{StaticResource InputComboStyle}"
+                                <ComboBox x:Name="cbDependencia" Grid.Column="0"
                                           DisplayMemberPath="Titulo" SelectedValuePath="IdTarea"
                                           IsEditable="True" IsTextSearchEnabled="True"/>
                                 <Button Grid.Column="2" Content="Agregar" Height="38" Padding="14,0" Style="{StaticResource PrimaryButtonStyle}" Click="BtnAgregarDep_Click"/>
                             </Grid>
                         </StackPanel>
 
-                        <Border Grid.Row="2" BorderBrush="{StaticResource BorderBrushDark}" BorderThickness="1" CornerRadius="4" Background="White" Margin="0,0,0,10">
-                            <ListBox x:Name="lstDependencias" Background="White" BorderThickness="0">
+                        <Border Grid.Row="2" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="4" Background="{StaticResource BgSecondary}" Margin="0,0,0,10">
+                            <ListBox x:Name="lstDependencias" Background="Transparent" BorderThickness="0">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Titulo}" Padding="8,6" FontSize="13" Foreground="{StaticResource TextPrimary}"/>
@@ -331,8 +231,8 @@
 
             <!-- Botones de Acción inferior -->
             <Border Grid.Row="2"
-                    Background="#F1F3F5"
-                    BorderBrush="#DDE1E9"
+                    Background="{StaticResource BgSecondary}"
+                    BorderBrush="{StaticResource BorderColor}"
                     BorderThickness="0,1,0,0"
                     CornerRadius="0,0,7,7">
                 <StackPanel Orientation="Horizontal"

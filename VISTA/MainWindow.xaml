@@ -11,7 +11,7 @@
         <!-- Tab item empresarial -->
         <Style x:Key="TabNavStyle" TargetType="TabItem">
             <Setter Property="Background"      Value="Transparent"/>
-            <Setter Property="Foreground"      Value="#6B7280"/>
+            <Setter Property="Foreground"      Value="{StaticResource TextSecondary}"/>
             <Setter Property="FontSize"        Value="14"/>
             <Setter Property="FontWeight"      Value="Normal"/>
             <Setter Property="Padding"         Value="20,0"/>
@@ -32,12 +32,12 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="tabBorder" Property="BorderBrush" Value="#1A56DB"/>
-                                <Setter Property="Foreground" Value="#1A56DB"/>
+                                <Setter TargetName="tabBorder" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentPrimary}"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="#111827"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -49,7 +49,7 @@
         <Style x:Key="MenuRadioButtonStyle" TargetType="RadioButton">
             <Setter Property="GroupName" Value="MenuNavigation"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Height" Value="44"/>
             <Setter Property="Margin" Value="12,4,12,4"/>
@@ -61,25 +61,51 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6">
                             <Grid>
-                                <!-- Left indicator bar -->
-                                <Border x:Name="indicator" Width="4" Height="20" Background="#1A56DB" CornerRadius="2" HorizontalAlignment="Left" Visibility="Collapsed"/>
-                                <ContentPresenter Margin="12,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                <!-- Hover background for smooth fade -->
+                                <Border x:Name="hoverBorder" Background="#1E293B" Opacity="0" CornerRadius="6"/>
+                                
+                                <Border Padding="{TemplateBinding Padding}">
+                                    <Grid>
+                                        <!-- Left indicator bar -->
+                                        <Border x:Name="indicator" Width="4" Height="20" Background="{StaticResource AccentPrimary}" CornerRadius="2" HorizontalAlignment="Left" Visibility="Collapsed"/>
+                                        <ContentPresenter Margin="12,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#EFF6FF"/>
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource BgCard}"/>
                                 <Setter TargetName="indicator" Property="Visibility" Value="Visible"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                             </Trigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="IsMouseOver" Value="True"/>
                                     <Condition Property="IsChecked" Value="False"/>
                                 </MultiTrigger.Conditions>
-                                <Setter TargetName="border" Property="Background" Value="#F3F4F6"/>
+                                <MultiTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverBorder" 
+                                                             Storyboard.TargetProperty="Opacity" 
+                                                             To="1" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.EnterActions>
+                                <MultiTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverBorder" 
+                                                             Storyboard.TargetProperty="Opacity" 
+                                                             To="0" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.ExitActions>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                             </MultiTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -99,8 +125,8 @@
         <Border Grid.Column="0"
                 x:Name="SidebarContainer"
                 Width="220"
-                Background="White"
-                BorderBrush="#DDE1E9"
+                Background="{StaticResource BgSecondary}"
+                BorderBrush="{StaticResource BorderColor}"
                 BorderThickness="0,0,1,0"
                 ClipToBounds="True">
             <Grid Margin="0">
@@ -111,10 +137,10 @@
                 </Grid.RowDefinitions>
 
                 <!-- Logo -->
-                <Border Grid.Row="0" BorderBrush="#DDE1E9" BorderThickness="0,0,0,1" Padding="25,0">
+                <Border Grid.Row="0" BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1" Padding="25,0">
                     <TextBlock Text="ScrumBoard"
                                FontSize="18" FontWeight="Bold"
-                               Foreground="#1E3A5F"
+                               Foreground="{StaticResource TextPrimary}"
                                VerticalAlignment="Center"/>
                 </Border>
 
@@ -154,17 +180,129 @@
                 </StackPanel>
 
                 <!-- Info sesión -->
-                <Border Grid.Row="2" BorderBrush="#DDE1E9" BorderThickness="0,1,0,0" Padding="20,14">
-                    <StackPanel>
-                        <TextBlock x:Name="txtSidebarNombre"
-                                   Text="Usuario"
-                                   FontSize="13" FontWeight="SemiBold"
-                                   Foreground="#111827"/>
-                        <TextBlock x:Name="txtSidebarRol"
-                                   Text="Rol"
-                                   FontSize="11" Foreground="#6B7280"
-                                   Margin="0,2,0,0"/>
-                    </StackPanel>
+                <Border Grid.Row="2" BorderBrush="{StaticResource BorderColor}" BorderThickness="0,1,0,0" Background="Transparent">
+                    <Grid>
+                        <ToggleButton x:Name="btnPerfilDropdown"
+                                      Background="Transparent"
+                                      BorderThickness="0"
+                                      Cursor="Hand"
+                                      HorizontalContentAlignment="Stretch"
+                                      Padding="16,14">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border Background="{TemplateBinding Background}">
+                                        <ContentPresenter/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource BgCard}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource BgCard}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                            
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Avatar Circular -->
+                                <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18" Background="{StaticResource AccentPrimary}" Margin="0,0,12,0">
+                                    <TextBlock x:Name="txtAvatarInicial" Text="U" FontSize="16" FontWeight="SemiBold" Foreground="#0F172A" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- Info Usuario -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock x:Name="txtSidebarNombre"
+                                               Text="Usuario"
+                                               FontSize="13" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimary}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock x:Name="txtSidebarRol"
+                                               Text="Rol"
+                                               FontSize="11" Foreground="{StaticResource TextSecondary}"
+                                               Margin="0,2,0,0"/>
+                                </StackPanel>
+
+                                <!-- Icono Desplegable -->
+                                <Path Grid.Column="2" Data="M6 9L12 15L18 9" 
+                                      Stroke="{StaticResource TextSecondary}" StrokeThickness="2" 
+                                      StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Width="12" Height="12" Stretch="Uniform" VerticalAlignment="Center"/>
+                            </Grid>
+                        </ToggleButton>
+
+                        <!-- Popup del menú -->
+                        <Popup x:Name="popPerfil"
+                               IsOpen="{Binding IsChecked, ElementName=btnPerfilDropdown, Mode=TwoWay}"
+                               PlacementTarget="{Binding ElementName=btnPerfilDropdown}"
+                               Placement="Top"
+                               StaysOpen="False"
+                               PopupAnimation="Slide"
+                               AllowsTransparency="True"
+                               VerticalOffset="-8"
+                               HorizontalOffset="8">
+                            <Border Background="{StaticResource BgCard}" 
+                                    BorderBrush="{StaticResource BorderColor}" 
+                                    BorderThickness="1" 
+                                    CornerRadius="6" 
+                                    Padding="4"
+                                    Width="204"
+                                    Margin="0,0,0,8">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#000000" Opacity="0.5" BlurRadius="10" ShadowDepth="4"/>
+                                </Border.Effect>
+                                
+                                <StackPanel>
+                                    <!-- Botón de Cerrar Sesión Moderno -->
+                                    <Button x:Name="btnCerrarSesion"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Cursor="Hand"
+                                            Click="BtnCerrarSesion_Click"
+                                            Padding="12,8"
+                                            HorizontalContentAlignment="Left">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#3F1414"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter Property="Background" Value="#5C1B1B"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                        
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Data="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9" 
+                                                  Stroke="{StaticResource AccentError}" 
+                                                  StrokeThickness="2" 
+                                                  StrokeLineJoin="Round" 
+                                                  StrokeStartLineCap="Round" 
+                                                  StrokeEndLineCap="Round"
+                                                  Width="16" Height="16"
+                                                  Stretch="Uniform"
+                                                  VerticalAlignment="Center"/>
+                                            <TextBlock Text="Cerrar sesión" 
+                                                       Foreground="{StaticResource AccentError}" 
+                                                       FontWeight="Medium" 
+                                                       Margin="12,0,0,0"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+                    </Grid>
                 </Border>
             </Grid>
         </Border>
@@ -178,8 +316,8 @@
 
             <!-- Barra superior unificada (siempre visible para albergar la hamburguesa y el botón volver) -->
             <Border Grid.Row="0"
-                    Background="White"
-                    BorderBrush="#DDE1E9"
+                    Background="{StaticResource BgPrimary}"
+                    BorderBrush="{StaticResource BorderColor}"
                     BorderThickness="0,0,0,1"
                     Height="48">
                 <Grid Margin="12,0">
@@ -195,7 +333,7 @@
                             Width="36" Height="36"
                             FontSize="16"
                             Background="Transparent"
-                            Foreground="#374151"
+                            Foreground="{StaticResource TextPrimary}"
                             BorderThickness="0"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
@@ -212,10 +350,8 @@
                         <Button x:Name="btnVolverPrincipal"
                                 Content="← Volver"
                                 Height="32" Padding="14,0"
-                                Background="White"
-                                Foreground="#374151"
-                                BorderBrush="#DDE1E9" BorderThickness="1"
-                                FontSize="13" Cursor="Hand"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                FontSize="13"
                                 Click="BtnVolverPrincipal_Click"/>
                     </StackPanel>
                 </Grid>

@@ -100,8 +100,8 @@ namespace VISTA.UserControls
             {
                 Width = 280,
                 Margin = new Thickness(0, 0, 16, 16),
-                Background = Brushes.White,
-                BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DDE1E9")),
+                Background = (Brush)FindResource("BgCard"),
+                BorderBrush = (Brush)FindResource("BorderColor"),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(6),
                 Cursor = Cursors.Hand,
@@ -127,7 +127,7 @@ namespace VISTA.UserControls
                 Text = p.Nombre,
                 FontSize = 14,
                 FontWeight = FontWeights.SemiBold,
-                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#111827")),
+                Foreground = (Brush)FindResource("TextPrimary"),
                 TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(0, 0, 8, 0)
             };
@@ -158,7 +158,7 @@ namespace VISTA.UserControls
             {
                 Text = p.Descripcion.Length > 60 ? p.Descripcion[..60] + "…" : p.Descripcion,
                 FontSize = 12,
-                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6B7280")),
+                Foreground = (Brush)FindResource("TextSecondary"),
                 Margin = new Thickness(0, 8, 0, 0),
                 TextWrapping = TextWrapping.Wrap
             });
@@ -166,30 +166,30 @@ namespace VISTA.UserControls
             // Separator
             stack.Children.Add(new Border
             {
-                BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F0F2F5")),
+                BorderBrush = (Brush)FindResource("BorderColor"),
                 BorderThickness = new Thickness(0, 1, 0, 0),
                 Margin = new Thickness(0, 12, 0, 12)
             });
 
             // Supervisor
             var rowSup = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 6) };
-            rowSup.Children.Add(new TextBlock { Text = "👤 ", FontSize = 12 });
+            rowSup.Children.Add(new TextBlock { Text = "👤 ", FontSize = 12, Foreground = (Brush)FindResource("TextSecondary") });
             rowSup.Children.Add(new TextBlock
             {
                 Text = p.Supervisor,
                 FontSize = 12,
-                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#374151"))
+                Foreground = (Brush)FindResource("TextPrimary")
             });
             stack.Children.Add(rowSup);
 
             // Fechas
             var rowFechas = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 6) };
-            rowFechas.Children.Add(new TextBlock { Text = "📅 ", FontSize = 12 });
+            rowFechas.Children.Add(new TextBlock { Text = "📅 ", FontSize = 12, Foreground = (Brush)FindResource("TextSecondary") });
             rowFechas.Children.Add(new TextBlock
             {
                 Text = $"{p.FechaInicio}  →  {p.FechaFin}",
                 FontSize = 12,
-                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#374151"))
+                Foreground = (Brush)FindResource("TextPrimary")
             });
             stack.Children.Add(rowFechas);
 
@@ -198,7 +198,7 @@ namespace VISTA.UserControls
             {
                 Text = $"Progreso: {p.Progreso}",
                 FontSize = 12,
-                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#374151")),
+                Foreground = (Brush)FindResource("TextPrimary"),
                 Margin = new Thickness(0, 0, 0, 12)
             });
 
@@ -209,11 +209,22 @@ namespace VISTA.UserControls
 
             var btnEditar = new Button
             {
-                Content = "✏",
+                Content = new System.Windows.Shapes.Path
+                {
+                    Data = Geometry.Parse("M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7 M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"),
+                    Stroke = (Brush)FindResource("AccentPrimary"),
+                    StrokeThickness = 1.8,
+                    StrokeStartLineCap = PenLineCap.Round,
+                    StrokeEndLineCap = PenLineCap.Round,
+                    StrokeLineJoin = PenLineJoin.Round,
+                    Width = 14, Height = 14,
+                    Stretch = Stretch.Uniform
+                },
                 ToolTip = "Editar proyecto",
                 Width = 30, Height = 30,
+                Padding = new Thickness(0),
                 Background = Brushes.Transparent,
-                BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DDE1E9")),
+                BorderBrush = (Brush)FindResource("BorderColor"),
                 BorderThickness = new Thickness(1),
                 Cursor = Cursors.Hand,
                 Margin = new Thickness(0, 0, 6, 0),
@@ -223,11 +234,22 @@ namespace VISTA.UserControls
 
             var btnEliminar = new Button
             {
-                Content = "🗑",
+                Content = new System.Windows.Shapes.Path
+                {
+                    Data = Geometry.Parse("M3 6h18 M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6 M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2 M10 11v6 M14 11v6"),
+                    Stroke = (Brush)FindResource("AccentError"),
+                    StrokeThickness = 1.8,
+                    StrokeStartLineCap = PenLineCap.Round,
+                    StrokeEndLineCap = PenLineCap.Round,
+                    StrokeLineJoin = PenLineJoin.Round,
+                    Width = 14, Height = 14,
+                    Stretch = Stretch.Uniform
+                },
                 ToolTip = "Eliminar proyecto",
                 Width = 30, Height = 30,
+                Padding = new Thickness(0),
                 Background = Brushes.Transparent,
-                BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FECACA")),
+                BorderBrush = (Brush)FindResource("BorderColor"),
                 BorderThickness = new Thickness(1),
                 Cursor = Cursors.Hand,
                 Tag = p

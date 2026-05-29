@@ -319,6 +319,9 @@ namespace VISTA
             txtError.Visibility = Visibility.Visible;
         }
 
+        private void TopBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+            => DragMove();
+
         private void BtnCancelar_Click(object sender, RoutedEventArgs e) => Close();
     }
 }

@@ -33,6 +33,11 @@ namespace VISTA
         {
             txtSidebarNombre.Text = SesionActual.NombreCompleto;
             txtSidebarRol.Text    = SesionActual.Rol.ToString();
+            
+            if (!string.IsNullOrWhiteSpace(SesionActual.NombreCompleto))
+            {
+                txtAvatarInicial.Text = SesionActual.NombreCompleto.Substring(0, 1).ToUpper();
+            }
 
             if (SesionActual.Rol == ENTITY.ENUMS.RolUsuario.Admin)
             {
@@ -235,6 +240,27 @@ namespace VISTA
                 new DoubleAnimation { To = opacidad, Duration = TimeSpan.FromMilliseconds(160) });
 
             _sidebarVisible = !_sidebarVisible;
+        }
+
+        // ── Cerrar Sesión ─────────────────────────────────────────────────
+
+        private void BtnCerrarSesion_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("¿Está seguro que desea cerrar sesión?", "Cerrar Sesión", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                // Limpiar la sesión actual
+                SesionActual.IdUsuario = 0;
+                SesionActual.NombreCompleto = string.Empty;
+                SesionActual.Rol = ENTITY.ENUMS.RolUsuario.Empleado;
+
+                // Mostrar la ventana de Login
+                LoginWindow login = new LoginWindow();
+                login.Show();
+
+                // Cerrar la ventana principal
+                this.Close();
+            }
         }
     }
 }

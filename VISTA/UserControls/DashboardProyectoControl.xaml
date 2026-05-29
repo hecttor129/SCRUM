@@ -5,7 +5,75 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1100"
-             Background="#F4F6F9">
+             Background="{StaticResource BgPrimary}">
+
+    <UserControl.Resources>
+        <Style x:Key="DarkTabItemStyle" TargetType="TabItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="18,12"/>
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="tabBorder"
+                                Background="Transparent"
+                                BorderThickness="0,0,0,2"
+                                BorderBrush="Transparent"
+                                Padding="{TemplateBinding Padding}"
+                                SnapsToDevicePixels="True">
+                            <Grid>
+                                <!-- Smooth hover pill background -->
+                                <Border x:Name="hoverPill" 
+                                        Background="#1E293B" 
+                                        Opacity="0" 
+                                        CornerRadius="4" 
+                                        Margin="-8,-4"/>
+                                        
+                                <ContentPresenter x:Name="contentPresenter"
+                                                  ContentSource="Header"
+                                                  Focusable="False"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  SnapsToDevicePixels="True"
+                                                  RecognizesAccessKey="True"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="tabBorder" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentPrimary}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverPill" 
+                                                             Storyboard.TargetProperty="Opacity" 
+                                                             To="0.6" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverPill" 
+                                                             Storyboard.TargetProperty="Opacity" 
+                                                             To="0" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -14,7 +82,11 @@
         </Grid.RowDefinitions>
 
         <!-- Cabecera -->
-        <Border Grid.Row="0" Background="White" BorderBrush="#DDE1E9" BorderThickness="0,0,0,1" Padding="24,16">
+        <Border Grid.Row="0"
+                Background="{StaticResource BgSecondary}"
+                BorderBrush="{StaticResource BorderColor}"
+                BorderThickness="0,0,0,1"
+                Padding="28,18">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -24,17 +96,17 @@
                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
                     <TextBlock x:Name="txtTituloEquipos"
                                Text="Equipos del Proyecto"
-                               FontSize="22" FontWeight="Bold" Foreground="#111827"/>
+                               FontSize="22" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"/>
                     <TextBlock Text="Equipos asignados a este proyecto"
-                               FontSize="13" Foreground="#6B7280" Margin="0,2,0,0"/>
+                               FontSize="13"
+                               Foreground="{StaticResource TextSecondary}"
+                               Margin="0,4,0,0"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <Button Content="+ Nuevo equipo"
                             Height="36" Padding="14,0"
-                            Background="#1A56DB" Foreground="White"
-                            FontWeight="SemiBold" FontSize="13"
-                            BorderThickness="0" Cursor="Hand"
                             Click="BtnNuevoEquipo_Click"/>
                 </StackPanel>
             </Grid>
@@ -42,23 +114,11 @@
 
         <!-- TabControl: Equipos | Archivos Generales -->
         <TabControl Grid.Row="1" x:Name="tabControlProyecto"
-                    Background="Transparent"
+                    Background="{StaticResource BgPrimary}"
                     BorderThickness="0"
                     SelectionChanged="TabControlProyecto_SelectionChanged">
             <TabControl.Resources>
-                <Style TargetType="TabItem">
-                    <Setter Property="Padding" Value="18,10"/>
-                    <Setter Property="FontSize" Value="13"/>
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="BorderThickness" Value="0"/>
-                    <Setter Property="Foreground" Value="#6B7280"/>
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Foreground" Value="#1A56DB"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
+                <Style TargetType="TabItem" BasedOn="{StaticResource DarkTabItemStyle}"/>
             </TabControl.Resources>
 
             <!-- Tab 1: Equipos -->
@@ -82,55 +142,42 @@
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
                         <TextBlock Text="Archivos del proyecto y sus equipos"
                                    FontSize="15" FontWeight="SemiBold"
-                                   Foreground="#111827" VerticalAlignment="Center"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   VerticalAlignment="Center"
                                    Margin="0,0,16,0"/>
                         <Button Content="↑ Subir a Proyecto"
                                 Height="34" Padding="14,0"
-                                Background="#1A56DB" Foreground="White"
-                                FontWeight="SemiBold" BorderThickness="0"
-                                FontSize="12" Cursor="Hand" Margin="0,0,8,0"
+                                Margin="0,0,8,0"
                                 Click="BtnSubirArchivoProyecto_Click"/>
                         <Button Content="↓ Descargar / Abrir"
                                 Height="34" Padding="14,0"
-                                Background="White" Foreground="#374151"
-                                BorderBrush="#DDE1E9" BorderThickness="1"
-                                FontSize="12" Cursor="Hand" Margin="0,0,8,0"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Margin="0,0,8,0"
                                 Click="BtnDescargarArchivoProyecto_Click"/>
                         <Button Content="🗑 Eliminar"
                                 Height="34" Padding="14,0"
-                                Background="White" Foreground="#B91C1C"
-                                BorderBrush="#FECACA" BorderThickness="1"
-                                FontSize="12" Cursor="Hand"
+                                Style="{StaticResource DangerButtonStyle}"
                                 Click="BtnEliminarArchivoProyecto_Click"/>
                     </StackPanel>
 
                     <!-- DataGrid archivos -->
-                    <Border Grid.Row="1" Background="White" BorderBrush="#DDE1E9"
+                    <Border Grid.Row="1"
+                            Background="{StaticResource BgCard}"
+                            BorderBrush="{StaticResource BorderColor}"
                             BorderThickness="1" CornerRadius="6">
                         <DataGrid x:Name="dgArchivosProyecto"
                                   AutoGenerateColumns="False"
                                   CanUserAddRows="False"
                                   IsReadOnly="True"
-                                  Background="White"
-                                  RowBackground="White"
-                                  AlternatingRowBackground="#F9FAFB"
+                                  Background="{StaticResource BgCard}"
+                                  RowBackground="{StaticResource BgCard}"
+                                  AlternatingRowBackground="{StaticResource BgSecondary}"
                                   GridLinesVisibility="Horizontal"
                                   HeadersVisibility="Column"
                                   BorderThickness="0"
                                   ColumnHeaderHeight="38"
                                   RowHeight="40"
                                   MouseDoubleClick="DgArchivosProyecto_MouseDoubleClick">
-                            <DataGrid.ColumnHeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="Background"  Value="#F8FAFC"/>
-                                    <Setter Property="Foreground"  Value="#374151"/>
-                                    <Setter Property="FontWeight"  Value="SemiBold"/>
-                                    <Setter Property="FontSize"    Value="12"/>
-                                    <Setter Property="Padding"     Value="12,0"/>
-                                    <Setter Property="BorderBrush" Value="#DDE1E9"/>
-                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                                </Style>
-                            </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Nombre"         Binding="{Binding NombreOriginal}" Width="*"/>
                                 <DataGridTextColumn Header="Tipo"           Binding="{Binding Extension}"     Width="80"/>

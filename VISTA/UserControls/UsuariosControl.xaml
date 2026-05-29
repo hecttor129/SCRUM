@@ -5,58 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1100"
-             Background="#F4F6F9">
+             Background="{StaticResource BgPrimary}">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-
-        <!-- Botón primario -->
-        <Style x:Key="BtnPrimary" TargetType="Button">
-            <Setter Property="Background"   Value="#1A56DB"/>
-            <Setter Property="Foreground"   Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding"      Value="20,8"/>
-            <Setter Property="MinWidth" Value="120"/>
-            <Setter Property="FontWeight"   Value="SemiBold"/>
-            <Setter Property="FontSize"     Value="13"/>
-            <Setter Property="Cursor"       Value="Hand"/>
-            <Setter Property="Height"       Value="36"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Botón secundario -->
-        <Style x:Key="BtnSecondary" TargetType="Button">
-            <Setter Property="Background"   Value="White"/>
-            <Setter Property="Foreground"   Value="#374151"/>
-            <Setter Property="BorderBrush" Value="#DDE1E9"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"      Value="16,8"/>
-            <Setter Property="FontWeight"   Value="SemiBold"/>
-            <Setter Property="FontSize"     Value="13"/>
-            <Setter Property="Cursor"       Value="Hand"/>
-            <Setter Property="Height"       Value="36"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Padding="{TemplateBinding Padding}"
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -66,7 +18,11 @@
         </Grid.RowDefinitions>
 
         <!-- Cabecera -->
-        <Border Grid.Row="0" Background="White" BorderBrush="#DDE1E9" BorderThickness="0,0,0,1" Padding="24,16">
+        <Border Grid.Row="0"
+                Background="{StaticResource BgSecondary}"
+                BorderBrush="{StaticResource BorderColor}"
+                BorderThickness="0,0,0,1"
+                Padding="28,18">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -74,28 +30,27 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <TextBlock Text="Usuarios" FontSize="22" FontWeight="Bold" Foreground="#111827"/>
+                    <TextBlock Text="Usuarios"
+                               FontSize="22" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"/>
                     <TextBlock Text="Gestión de usuarios del sistema"
-                               FontSize="13" Foreground="#6B7280" Margin="0,2,0,0"/>
+                               FontSize="13"
+                               Foreground="{StaticResource TextSecondary}"
+                               Margin="0,4,0,0"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBox x:Name="txtBuscar"
                              Height="36" Width="220" Margin="0,0,12,0"
-                             Padding="10,0" VerticalContentAlignment="Center"
-                             BorderBrush="#DDE1E9" BorderThickness="1"
-                             Background="White" FontSize="13"
                              Text="Buscar por nombre o correo..."
-                             Foreground="#9CA3AF"
                              GotFocus="TxtBuscar_GotFocus"
                              LostFocus="TxtBuscar_LostFocus"
                              TextChanged="TxtBuscar_TextChanged"/>
                     <Button Content="+ Nuevo usuario"
-                            Style="{StaticResource BtnPrimary}"
                             Click="BtnNuevo_Click"/>
                     <Button x:Name="btnEditarTop"
                             Content="Editar"
-                            Style="{StaticResource BtnSecondary}"
+                            Style="{StaticResource SecondaryButtonStyle}"
                             Margin="8,0,0,0"
                             Click="BtnEditarTop_Click"/>
                 </StackPanel>
@@ -103,14 +58,18 @@
         </Border>
 
         <!-- Tabla de usuarios -->
-        <Border Grid.Row="1" Background="White" Margin="24,16" BorderBrush="#DDE1E9" BorderThickness="1" CornerRadius="6">
+        <Border Grid.Row="1"
+                Background="{StaticResource BgCard}"
+                Margin="28,16"
+                BorderBrush="{StaticResource BorderColor}"
+                BorderThickness="1" CornerRadius="6">
             <DataGrid x:Name="dgUsuarios"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
                       IsReadOnly="True"
-                      Background="White"
-                      RowBackground="White"
-                      AlternatingRowBackground="#F9FAFB"
+                      Background="{StaticResource BgCard}"
+                      RowBackground="{StaticResource BgCard}"
+                      AlternatingRowBackground="{StaticResource BgSecondary}"
                       GridLinesVisibility="Horizontal"
                       HeadersVisibility="Column"
                       BorderThickness="0"
@@ -122,13 +81,15 @@
                 <DataGrid.CellStyle>
                     <Style TargetType="DataGridCell">
                         <Setter Property="Padding" Value="12,0"/>
+                        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                        <Setter Property="BorderThickness" Value="0"/>
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="DataGridCell">
-                                    <Border Background="{TemplateBinding Background}" 
-                                            BorderBrush="{TemplateBinding BorderBrush}" 
-                                            BorderThickness="{TemplateBinding BorderThickness}" 
+                                    <Border Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
                                             Padding="{TemplateBinding Padding}">
                                         <ContentPresenter VerticalAlignment="Center"/>
                                     </Border>
@@ -137,48 +98,35 @@
                         </Setter>
                         <Style.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#EFF6FF"/>
-                                <Setter Property="Foreground" Value="#1A56DB"/>
+                                <Setter Property="Background" Value="#1E3A5F"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
                 </DataGrid.CellStyle>
-                <DataGrid.ColumnHeaderStyle>
-                    <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#F8FAFC"/>
-                        <Setter Property="Foreground" Value="#374151"/>
-                        <Setter Property="FontWeight" Value="SemiBold"/>
-                        <Setter Property="FontSize" Value="12"/>
-                        <Setter Property="Padding" Value="12,0"/>
-                        <Setter Property="BorderBrush" Value="#DDE1E9"/>
-                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                    </Style>
-                </DataGrid.ColumnHeaderStyle>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Nombre"       Binding="{Binding Nombre}"        Width="130"/>
-                    <DataGridTextColumn Header="Apellido"     Binding="{Binding Apellido}"       Width="130"/>
-                    <DataGridTextColumn Header="Correo"       Binding="{Binding Email}"          Width="200"/>
-                    <DataGridTextColumn Header="Rol"          Binding="{Binding RolDisplay}"     Width="100"/>
-                    <DataGridTextColumn Header="Nivel"        Binding="{Binding NivelJerarquico}" Width="60"/>
-                    <DataGridTextColumn Header="Superior"     Binding="{Binding NombreSuperior}" Width="150"/>
-                    <DataGridTextColumn Header="Hrs/Sem"      Binding="{Binding HorasSemanalesDisponibles, StringFormat={}{0:0.##}}" Width="80"/>
-                    <DataGridTextColumn Header="Estado"       Binding="{Binding EstadoDisplay}"  Width="80"/>
+                    <DataGridTextColumn Header="Nombre"    Binding="{Binding Nombre}"        Width="130"/>
+                    <DataGridTextColumn Header="Apellido"  Binding="{Binding Apellido}"       Width="130"/>
+                    <DataGridTextColumn Header="Correo"    Binding="{Binding Email}"          Width="200"/>
+                    <DataGridTextColumn Header="Rol"       Binding="{Binding RolDisplay}"     Width="100"/>
+                    <DataGridTextColumn Header="Nivel"     Binding="{Binding NivelJerarquico}" Width="60"/>
+                    <DataGridTextColumn Header="Superior"  Binding="{Binding NombreSuperior}" Width="150"/>
+                    <DataGridTextColumn Header="Hrs/Sem"   Binding="{Binding HorasSemanalesDisponibles, StringFormat={}{0:0.##}}" Width="80"/>
+                    <DataGridTextColumn Header="Estado"    Binding="{Binding EstadoDisplay}"  Width="80"/>
                     <DataGridTemplateColumn Header="Acciones" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0">
                                     <Button Content="Desactivar"
                                             Margin="0,0,6,0" Padding="10,4"
-                                            Background="#FEF2F2" Foreground="#B91C1C"
-                                            BorderBrush="#FECACA" BorderThickness="1"
-                                            FontSize="12" Cursor="Hand"
+                                            Style="{StaticResource DangerButtonStyle}"
+                                            FontSize="12"
                                             Visibility="{Binding PuedeDesactivar, Converter={StaticResource BoolToVis}}"
                                             Click="BtnDesactivar_Click"/>
                                     <Button Content="Reactivar"
                                             Padding="10,4"
-                                            Background="#F0FDF4" Foreground="#166534"
-                                            BorderBrush="#A7F3D0" BorderThickness="1"
-                                            FontSize="12" Cursor="Hand"
+                                            Style="{StaticResource SuccessButtonStyle}"
+                                            FontSize="12"
                                             Visibility="{Binding PuedeReactivar, Converter={StaticResource BoolToVis}}"
                                             Click="BtnReactivar_Click"/>
                                 </StackPanel>

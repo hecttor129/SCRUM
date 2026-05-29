@@ -5,68 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1100"
-             Background="#F4F6F9">
+             Background="{StaticResource BgPrimary}">
 
     <UserControl.Resources>
-        <!-- Colores corporativos -->
-        <SolidColorBrush x:Key="Primary"      Color="#1A56DB"/>
-        <SolidColorBrush x:Key="PrimaryHover" Color="#1447B5"/>
-        <SolidColorBrush x:Key="Surface"      Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="SurfaceAlt"   Color="#F4F6F9"/>
-        <SolidColorBrush x:Key="Border"       Color="#DDE1E9"/>
-        <SolidColorBrush x:Key="TextPrimary"  Color="#111827"/>
-        <SolidColorBrush x:Key="TextMuted"    Color="#6B7280"/>
-
-        <!-- Badge Activo -->
-        <Style x:Key="BadgeActivo" TargetType="Border">
-            <Setter Property="Background" Value="#DCFCE7"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Padding" Value="8,3"/>
-        </Style>
-        <Style x:Key="BadgePausado" TargetType="Border">
-            <Setter Property="Background" Value="#FEF9C3"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Padding" Value="8,3"/>
-        </Style>
-        <Style x:Key="BadgeFinalizado" TargetType="Border">
-            <Setter Property="Background" Value="#E5E7EB"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Padding" Value="8,3"/>
-        </Style>
-
-        <!-- Botón primario -->
-        <Style x:Key="BtnPrimary" TargetType="Button">
-            <Setter Property="Background"   Value="#1A56DB"/>
-            <Setter Property="Foreground"   Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding"      Value="16,8"/>
-            <Setter Property="FontWeight"   Value="SemiBold"/>
-            <Setter Property="FontSize"     Value="13"/>
-            <Setter Property="Cursor"       Value="Hand"/>
-            <Setter Property="Height"       Value="36"/>
-        </Style>
-
-        <!-- Botón icono (editar / eliminar en card) -->
-        <Style x:Key="BtnIcon" TargetType="Button">
-            <Setter Property="Background"      Value="Transparent"/>
-            <Setter Property="BorderBrush"     Value="#DDE1E9"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Width"           Value="30"/>
-            <Setter Property="Height"          Value="30"/>
-            <Setter Property="Cursor"          Value="Hand"/>
-            <Setter Property="FontSize"        Value="13"/>
-        </Style>
-
-        <!-- Input de búsqueda -->
-        <Style x:Key="SearchBox" TargetType="TextBox">
-            <Setter Property="Height"          Value="36"/>
-            <Setter Property="Padding"         Value="10,0"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="BorderBrush"     Value="#DDE1E9"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background"      Value="White"/>
-            <Setter Property="FontSize"        Value="13"/>
-        </Style>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
 
     <Grid>
@@ -77,7 +19,11 @@
         </Grid.RowDefinitions>
 
         <!-- Cabecera -->
-        <Border Grid.Row="0" Background="White" BorderBrush="#DDE1E9" BorderThickness="0,0,0,1" Padding="24,16">
+        <Border Grid.Row="0"
+                Background="{StaticResource BgSecondary}"
+                BorderBrush="{StaticResource BorderColor}"
+                BorderThickness="0,0,0,1"
+                Padding="28,18">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -85,59 +31,80 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <TextBlock Text="Proyectos" FontSize="22" FontWeight="Bold" Foreground="#111827"/>
-                    <TextBlock x:Name="txtSubtitulo" Text="Gestiona los proyectos de tu empresa"
-                               FontSize="13" Foreground="#6B7280" Margin="0,2,0,0"/>
+                    <TextBlock Text="Proyectos"
+                               FontSize="22" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock x:Name="txtSubtitulo"
+                               Text="Gestiona los proyectos de tu empresa"
+                               FontSize="13"
+                               Foreground="{StaticResource TextSecondary}"
+                               Margin="0,4,0,0"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBox x:Name="txtBuscar" Style="{StaticResource SearchBox}"
+                    <TextBox x:Name="txtBuscar"
                              Width="220" Margin="0,0,12,0"
                              TextChanged="TxtBuscar_TextChanged"/>
-                    <Button Content="+ Nuevo Proyecto" Style="{StaticResource BtnPrimary}"
+                    <Button Content="+ Nuevo Proyecto"
                             Click="BtnNuevoProyecto_Click"/>
                 </StackPanel>
             </Grid>
         </Border>
 
         <!-- Estadísticas -->
-        <UniformGrid Grid.Row="1" Columns="4" Margin="24,16,24,0">
-            <Border Background="White" BorderBrush="#DDE1E9" BorderThickness="1" CornerRadius="6"
+        <UniformGrid Grid.Row="1" Columns="4" Margin="28,16,28,0">
+            <Border Style="{StaticResource CardStyle}"
                     Padding="16,12" Margin="0,0,12,0">
                 <StackPanel>
-                    <TextBlock Text="Activos" Foreground="#6B7280" FontSize="12" FontWeight="SemiBold"/>
-                    <TextBlock x:Name="txtActivos" Text="0" FontSize="26" FontWeight="Bold"
-                               Foreground="#111827" Margin="0,4,0,0"/>
+                    <TextBlock Text="Activos"
+                               Foreground="{StaticResource TextSecondary}"
+                               FontSize="12" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="txtActivos" Text="0"
+                               FontSize="26" FontWeight="Bold"
+                               Foreground="{StaticResource AccentSuccess}"
+                               Margin="0,4,0,0"/>
                 </StackPanel>
             </Border>
-            <Border Background="White" BorderBrush="#DDE1E9" BorderThickness="1" CornerRadius="6"
+            <Border Style="{StaticResource CardStyle}"
                     Padding="16,12" Margin="0,0,12,0">
                 <StackPanel>
-                    <TextBlock Text="En Pausa" Foreground="#6B7280" FontSize="12" FontWeight="SemiBold"/>
-                    <TextBlock x:Name="txtPausados" Text="0" FontSize="26" FontWeight="Bold"
-                               Foreground="#111827" Margin="0,4,0,0"/>
+                    <TextBlock Text="En Pausa"
+                               Foreground="{StaticResource TextSecondary}"
+                               FontSize="12" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="txtPausados" Text="0"
+                               FontSize="26" FontWeight="Bold"
+                               Foreground="{StaticResource AccentWarning}"
+                               Margin="0,4,0,0"/>
                 </StackPanel>
             </Border>
-            <Border Background="White" BorderBrush="#DDE1E9" BorderThickness="1" CornerRadius="6"
+            <Border Style="{StaticResource CardStyle}"
                     Padding="16,12" Margin="0,0,12,0">
                 <StackPanel>
-                    <TextBlock Text="Finalizados" Foreground="#6B7280" FontSize="12" FontWeight="SemiBold"/>
-                    <TextBlock x:Name="txtFinalizados" Text="0" FontSize="26" FontWeight="Bold"
-                               Foreground="#111827" Margin="0,4,0,0"/>
+                    <TextBlock Text="Finalizados"
+                               Foreground="{StaticResource TextSecondary}"
+                               FontSize="12" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="txtFinalizados" Text="0"
+                               FontSize="26" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"
+                               Margin="0,4,0,0"/>
                 </StackPanel>
             </Border>
-            <Border Background="White" BorderBrush="#DDE1E9" BorderThickness="1" CornerRadius="6"
+            <Border Style="{StaticResource CardStyle}"
                     Padding="16,12">
                 <StackPanel>
-                    <TextBlock Text="Total" Foreground="#6B7280" FontSize="12" FontWeight="SemiBold"/>
-                    <TextBlock x:Name="txtTotal" Text="0" FontSize="26" FontWeight="Bold"
-                               Foreground="#111827" Margin="0,4,0,0"/>
+                    <TextBlock Text="Total"
+                               Foreground="{StaticResource TextSecondary}"
+                               FontSize="12" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="txtTotal" Text="0"
+                               FontSize="26" FontWeight="Bold"
+                               Foreground="{StaticResource AccentPrimary}"
+                               Margin="0,4,0,0"/>
                 </StackPanel>
             </Border>
         </UniformGrid>
 
         <!-- Grid de Cards -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="24,16,24,16">
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="28,16,28,16">
             <WrapPanel x:Name="panelCards" Orientation="Horizontal"/>
         </ScrollViewer>
     </Grid>
