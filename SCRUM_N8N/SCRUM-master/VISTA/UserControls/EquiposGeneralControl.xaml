@@ -1,0 +1,44 @@
+<UserControl x:Class="VISTA.UserControls.EquiposGeneralControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1100"
+             Background="#F4F6F9">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Cabecera -->
+        <Border Grid.Row="0" Background="White" BorderBrush="#DDE1E9" BorderThickness="0,0,0,1" Padding="24,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="Equipos" FontSize="22" FontWeight="Bold" Foreground="#111827"/>
+                    <TextBlock Text="Todos los equipos activos de la empresa"
+                               FontSize="13" Foreground="#6B7280" Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <TextBox x:Name="txtBuscar" Grid.Column="1"
+                         Height="36" Width="220"
+                         Padding="10,0" VerticalContentAlignment="Center"
+                         BorderBrush="#DDE1E9" BorderThickness="1"
+                         Background="White" FontSize="13"
+                         TextChanged="TxtBuscar_TextChanged"/>
+            </Grid>
+        </Border>
+
+        <!-- Cards -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="24,16,24,16">
+            <WrapPanel x:Name="panelCards" Orientation="Horizontal"/>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

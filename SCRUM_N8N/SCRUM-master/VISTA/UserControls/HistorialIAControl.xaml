@@ -1,0 +1,242 @@
+<UserControl x:Class="VISTA.UserControls.HistorialIAControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#F4F6F9">
+
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="AccentBrush"   Color="#1A56DB"/>
+        <SolidColorBrush x:Key="PurpleBrush"   Color="#7C3AED"/>
+        <SolidColorBrush x:Key="GreenBrush"    Color="#059669"/>
+        <SolidColorBrush x:Key="BorderCol"     Color="#DDE1E9"/>
+        <SolidColorBrush x:Key="TextPrimary"   Color="#111827"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#6B7280"/>
+
+        <Style x:Key="BtnSecondary" TargetType="Button">
+            <Setter Property="Background"      Value="White"/>
+            <Setter Property="Foreground"      Value="#374151"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderCol}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height"          Value="34"/>
+            <Setter Property="Padding"         Value="14,0"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style para DataGrid header -->
+        <Style x:Key="DgHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="Background"        Value="#F8FAFC"/>
+            <Setter Property="Foreground"        Value="#374151"/>
+            <Setter Property="FontWeight"        Value="SemiBold"/>
+            <Setter Property="FontSize"          Value="12"/>
+            <Setter Property="Padding"           Value="12,0"/>
+            <Setter Property="BorderBrush"       Value="{StaticResource BorderCol}"/>
+            <Setter Property="BorderThickness"   Value="0,0,0,1"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="24,20">
+        <Grid.RowDefinitions>
+            <!-- Header con título y botón refrescar -->
+            <RowDefinition Height="Auto"/>
+            <!-- Tabla principal -->
+            <RowDefinition Height="0.55*"/>
+            <!-- Panel de detalle -->
+            <RowDefinition Height="0.45*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══ HEADER ══════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="0" Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock Text="🤖  Historial de operaciones IA"
+                           FontSize="18" FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimary}"/>
+                <TextBlock Text="Registro de todos los análisis y generaciones de tareas realizados con inteligencia artificial."
+                           FontSize="12" Foreground="{StaticResource TextSecondary}"
+                           Margin="0,4,0,0"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Content="🔄  Refrescar"
+                    Style="{StaticResource BtnSecondary}"
+                    VerticalAlignment="Center"
+                    Click="BtnRefrescar_Click"/>
+        </Grid>
+
+        <!-- ═══ TABLA HISTORIAL ══════════════════════════════════════════════ -->
+        <Border Grid.Row="1"
+                Background="White"
+                BorderBrush="{StaticResource BorderCol}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Margin="0,0,0,14">
+            <DataGrid x:Name="dgHistorial"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      Background="White"
+                      RowBackground="White"
+                      AlternatingRowBackground="#F9FAFB"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
+                      BorderThickness="0"
+                      ColumnHeaderHeight="38"
+                      RowHeight="42"
+                      ColumnHeaderStyle="{StaticResource DgHeaderStyle}"
+                      SelectionChanged="DgHistorial_SelectionChanged">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Fecha"           Binding="{Binding Fecha}"          Width="140"/>
+                    <DataGridTextColumn Header="Documento"       Binding="{Binding Documento}"      Width="*"/>
+                    <DataGridTextColumn Header="Tipo de operación" Binding="{Binding TipoOperacion}" Width="170"/>
+                    <DataGridTextColumn Header="Estado"          Binding="{Binding Estado}"         Width="160"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- ═══ PANEL DETALLE ════════════════════════════════════════════════ -->
+        <Border Grid.Row="2"
+                Background="White"
+                BorderBrush="{StaticResource BorderCol}"
+                BorderThickness="1"
+                CornerRadius="8">
+            <Grid>
+                <!-- Estado vacío (nada seleccionado) -->
+                <StackPanel x:Name="panelDetalleVacio"
+                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="📋" FontSize="32" HorizontalAlignment="Center" Opacity="0.3"/>
+                    <TextBlock Text="Selecciona un registro para ver su detalle"
+                               FontSize="13" Foreground="{StaticResource TextSecondary}"
+                               HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                </StackPanel>
+
+                <!-- Detalle del registro seleccionado -->
+                <Grid x:Name="gridDetalle" Visibility="Collapsed">
+                    <Grid.ColumnDefinitions>
+                        <!-- Columna izquierda: metadatos -->
+                        <ColumnDefinition Width="240"/>
+                        <!-- Separador -->
+                        <ColumnDefinition Width="1"/>
+                        <!-- Columna derecha: JSON / resultado -->
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Metadatos -->
+                    <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Padding="16">
+                        <StackPanel>
+                            <TextBlock x:Name="txtDetalleTipo"
+                                       FontSize="13" FontWeight="Bold"
+                                       Foreground="{StaticResource PurpleBrush}"
+                                       Margin="0,0,0,12"/>
+
+                            <TextBlock Text="Documento" FontWeight="SemiBold" FontSize="11"
+                                       Foreground="{StaticResource TextSecondary}"/>
+                            <TextBlock x:Name="txtDetalleDocumento"
+                                       FontSize="13" Foreground="{StaticResource TextPrimary}"
+                                       TextWrapping="Wrap" Margin="0,2,0,10"/>
+
+                            <TextBlock Text="Fecha del análisis" FontWeight="SemiBold" FontSize="11"
+                                       Foreground="{StaticResource TextSecondary}"/>
+                            <TextBlock x:Name="txtDetalleFechaAnalisis"
+                                       FontSize="13" Foreground="{StaticResource TextPrimary}"
+                                       Margin="0,2,0,10"/>
+
+                            <TextBlock Text="Estado" FontWeight="SemiBold" FontSize="11"
+                                       Foreground="{StaticResource TextSecondary}"/>
+                            <TextBlock x:Name="txtDetalleEstado"
+                                       FontSize="13" Foreground="{StaticResource TextPrimary}"
+                                       Margin="0,2,0,10"/>
+
+                            <!-- Campos de análisis -->
+                            <StackPanel x:Name="spCamposAnalisis" Visibility="Collapsed">
+                                <Border Background="#EDE9FE" CornerRadius="4" Padding="8" Margin="0,0,0,10">
+                                    <TextBlock Text="📊  Datos del análisis"
+                                               FontWeight="SemiBold" FontSize="12" Foreground="#5B21B6"/>
+                                </Border>
+                                <TextBlock Text="HU procesadas" FontWeight="SemiBold" FontSize="11"
+                                           Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock x:Name="txtDetalleHU"
+                                           FontSize="13" Foreground="{StaticResource TextPrimary}"
+                                           Margin="0,2,0,10"/>
+                                <TextBlock Text="RF procesados" FontWeight="SemiBold" FontSize="11"
+                                           Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock x:Name="txtDetalleRF"
+                                           FontSize="13" Foreground="{StaticResource TextPrimary}"
+                                           Margin="0,2,0,10"/>
+                            </StackPanel>
+
+                            <!-- Campos de tareas -->
+                            <StackPanel x:Name="spCamposTareas" Visibility="Collapsed">
+                                <Border Background="#DCFCE7" CornerRadius="4" Padding="8" Margin="0,0,0,10">
+                                    <TextBlock Text="⚡  Datos de generación"
+                                               FontWeight="SemiBold" FontSize="12" Foreground="#065F46"/>
+                                </Border>
+                                <TextBlock Text="Tareas generadas" FontWeight="SemiBold" FontSize="11"
+                                           Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock x:Name="txtDetalleTareasResumen"
+                                           FontSize="13" Foreground="{StaticResource TextPrimary}"
+                                           Margin="0,2,0,10"/>
+                                <TextBlock Text="Equipos asignados" FontWeight="SemiBold" FontSize="11"
+                                           Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock x:Name="txtDetalleEquipos"
+                                           FontSize="13" Foreground="{StaticResource TextPrimary}"
+                                           Margin="0,2,0,10"/>
+                                <TextBlock Text="Fecha de generación" FontWeight="SemiBold" FontSize="11"
+                                           Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock x:Name="txtDetalleFechaGeneracion"
+                                           FontSize="13" Foreground="{StaticResource TextPrimary}"
+                                           Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Línea separadora -->
+                    <Border Grid.Column="1" Background="{StaticResource BorderCol}"/>
+
+                    <!-- JSON completo -->
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0"
+                                Background="#F8FAFC"
+                                BorderBrush="{StaticResource BorderCol}"
+                                BorderThickness="0,0,0,1"
+                                Padding="16,10">
+                            <TextBlock x:Name="txtLabelJson"
+                                       Text="JSON del resultado"
+                                       FontWeight="SemiBold" FontSize="13"
+                                       Foreground="{StaticResource TextPrimary}"/>
+                        </Border>
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      Padding="16">
+                            <TextBox x:Name="txtDetalleJson"
+                                     IsReadOnly="True"
+                                     TextWrapping="Wrap"
+                                     FontFamily="Consolas"
+                                     FontSize="11"
+                                     Foreground="{StaticResource TextPrimary}"
+                                     Background="Transparent"
+                                     BorderThickness="0"/>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,159 @@
+<UserControl x:Class="VISTA.UserControls.DashboardEquipoControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid>
+        <StackPanel Margin="22">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                <TextBlock x:Name="txtTituloEquipoSeleccionado"
+                           Text="Entorno del Equipo"
+                           FontSize="28"
+                           FontWeight="Bold"
+                           Foreground="#111827"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <Border Background="#F8FAFC" CornerRadius="12" Padding="14" BorderBrush="#E5E7EB" BorderThickness="1">
+                <TabControl MinHeight="400" x:Name="tabControlPrincipal" SelectionChanged="TabControlPrincipal_SelectionChanged">
+                    <TabItem Header="Tareas">
+                        <StackPanel Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="Lista de Tareas del Equipo" FontSize="16" FontWeight="Bold" Foreground="#111827" VerticalAlignment="Center"/>
+                                <Button Content="Nueva Tarea" Margin="14,0,6,0" Padding="12,6" Background="#2563EB" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand" Click="BtnNuevaTarea_Click"/>
+                                <Button Content="Editar Tarea" Margin="0,0,6,0" Padding="12,6" Background="#F3F4F6" Foreground="#1F2937" BorderBrush="#D1D5DB" BorderThickness="1" Cursor="Hand" Click="BtnEditarTarea_Click"/>
+                                <Button Content="Eliminar Tarea" Padding="12,6" Background="#EF4444" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand" Click="BtnEliminarTarea_Click"/>
+                            </StackPanel>
+                            <DataGrid x:Name="dgTareas"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      IsReadOnly="True"
+                                      Height="250"
+                                      Background="White"
+                                      Foreground="#111827"
+                                      BorderThickness="1"
+                                      BorderBrush="#E5E7EB"
+                                      RowBackground="White"
+                                      AlternatingRowBackground="#F9FAFB"
+                                      GridLinesVisibility="Horizontal"
+                                      HeadersVisibility="Column"
+                                      ColumnHeaderHeight="40"
+                                      RowHeight="40">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Título" Binding="{Binding Titulo}" Width="150"/>
+                                    <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*"/>
+                                    <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="100"/>
+                                    <DataGridTextColumn Header="Prioridad" Binding="{Binding Prioridad}" Width="80"/>
+                                    <DataGridTextColumn Header="Límite" Binding="{Binding FechaLimite}" Width="100"/>
+                                    <DataGridTextColumn Header="Disponible" Binding="{Binding DisponibleDisplay}" Width="90"/>
+                                    <DataGridTextColumn Header="Dependencias" Binding="{Binding DependenciasDisplay}" Width="160"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Header="Archivos" x:Name="tabItemArchivos">
+                        <StackPanel Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="Archivos compartidos en el equipo" FontSize="16" FontWeight="Bold" Foreground="#111827" VerticalAlignment="Center"/>
+                                <Button Content="Subir Archivo" Margin="14,0,6,0" Padding="12,6" Background="#2563EB" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand" Click="BtnSubirArchivo_Click"/>
+                                <Button Content="Descargar / Abrir" Margin="0,0,6,0" Padding="12,6" Background="#F3F4F6" Foreground="#1F2937" BorderBrush="#D1D5DB" BorderThickness="1" Cursor="Hand" Click="BtnDescargarArchivo_Click"/>
+                                <Button Content="Eliminar Archivo" Margin="0,0,6,0" Padding="12,6" Background="#EF4444" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand" Click="BtnEliminarArchivo_Click"/>
+                                <Button x:Name="btnAnalizarIAEquipo"
+                                        Content="🤖 Analizar con IA"
+                                        Padding="12,6"
+                                        Background="#7C3AED" Foreground="White"
+                                        FontWeight="SemiBold" BorderThickness="0"
+                                        Cursor="Hand"
+                                        Click="BtnAnalizarConIA_Click"/>
+                            </StackPanel>
+                            <DataGrid x:Name="dgArchivos"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      IsReadOnly="True"
+                                      Height="250"
+                                      Background="White"
+                                      Foreground="#111827"
+                                      BorderThickness="1"
+                                      BorderBrush="#E5E7EB"
+                                      RowBackground="White"
+                                      AlternatingRowBackground="#F9FAFB"
+                                      GridLinesVisibility="Horizontal"
+                                      HeadersVisibility="Column"
+                                      ColumnHeaderHeight="40"
+                                      RowHeight="40"
+                                      MouseDoubleClick="DgArchivos_MouseDoubleClick">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Nombre" Binding="{Binding NombreOriginal}" Width="*"/>
+                                    <DataGridTextColumn Header="Extensión" Binding="{Binding Extension}" Width="100"/>
+                                    <DataGridTextColumn Header="Tamaño" Binding="{Binding Tamano}" Width="120"/>
+                                    <DataGridTextColumn Header="Fecha de Subida" Binding="{Binding FechaSubida}" Width="150"/>
+                                    <DataGridTextColumn Header="Subido Por" Binding="{Binding SubidoPor}" Width="150"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <!-- Panel de resultado de análisis IA -->
+                            <Border x:Name="panelResultadoIAEquipo"
+                                    Visibility="Collapsed"
+                                    Background="#F5F3FF" BorderBrush="#C4B5FD"
+                                    BorderThickness="1" CornerRadius="8"
+                                    Margin="0,12,0,0" Padding="16">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="🤖 Resultado del análisis IA"
+                                                   FontSize="14" FontWeight="Bold"
+                                                   Foreground="#5B21B6" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="txtArchivoAnalizadoEquipo"
+                                                   FontSize="12" Foreground="#6D28D9"
+                                                   VerticalAlignment="Center" Margin="12,0,0,0"/>
+                                        <Button Content="✕ Cerrar"
+                                                Height="28" Padding="10,0"
+                                                Background="White" Foreground="#6D28D9"
+                                                BorderBrush="#C4B5FD" BorderThickness="1"
+                                                FontSize="11" Cursor="Hand" Margin="12,0,0,0"
+                                                Click="BtnCerrarResultadoIA_Click"/>
+                                    </StackPanel>
+                                    <Border Background="White" CornerRadius="6"
+                                            BorderBrush="#DDD6FE" BorderThickness="1"
+                                            Padding="12" MaxHeight="250">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                            <TextBlock x:Name="txtResultadoIAEquipo"
+                                                       TextWrapping="Wrap"
+                                                       FontSize="13" Foreground="#1F2937"
+                                                       FontFamily="Consolas"/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Indicador de carga -->
+                            <Border x:Name="panelCargandoIAEquipo"
+                                    Visibility="Collapsed"
+                                    Background="#F5F3FF" BorderBrush="#C4B5FD"
+                                    BorderThickness="1" CornerRadius="8"
+                                    Margin="0,12,0,0" Padding="16">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="⏳" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Analizando documento con IA... Esto puede tardar hasta 3 minutos."
+                                               FontSize="13" Foreground="#5B21B6"
+                                               VerticalAlignment="Center" FontStyle="Italic"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Header="Estadísticas">
+                        <StackPanel Margin="10">
+                            <TextBlock Text="Aquí irán las estadísticas del equipo seleccionado."/>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Header="Entorno de trabajo">
+                        <StackPanel Margin="10">
+                            <TextBlock Text="Aquí irán el chat y la videollamada del equipo."/>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>

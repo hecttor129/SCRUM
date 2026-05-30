@@ -1,0 +1,369 @@
+<UserControl x:Class="VISTA.UserControls.DocumentoAnalisisControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#F4F6F9">
+
+    <UserControl.Resources>
+        <!-- Paleta de colores -->
+        <SolidColorBrush x:Key="AccentBrush"     Color="#1A56DB"/>
+        <SolidColorBrush x:Key="PurpleBrush"     Color="#7C3AED"/>
+        <SolidColorBrush x:Key="GreenBrush"      Color="#059669"/>
+        <SolidColorBrush x:Key="BorderBrush"     Color="#DDE1E9"/>
+        <SolidColorBrush x:Key="TextPrimary"     Color="#111827"/>
+        <SolidColorBrush x:Key="TextSecondary"   Color="#6B7280"/>
+        <SolidColorBrush x:Key="SurfaceBrush"    Color="#FFFFFF"/>
+
+        <!-- Botón primario azul -->
+        <Style x:Key="BtnPrimary" TargetType="Button">
+            <Setter Property="Background"       Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground"       Value="White"/>
+            <Setter Property="BorderThickness"  Value="0"/>
+            <Setter Property="Height"           Value="38"/>
+            <Setter Property="Padding"          Value="18,0"/>
+            <Setter Property="FontWeight"       Value="SemiBold"/>
+            <Setter Property="FontSize"         Value="13"/>
+            <Setter Property="Cursor"           Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Botón secundario blanco -->
+        <Style x:Key="BtnSecondary" TargetType="Button">
+            <Setter Property="Background"      Value="White"/>
+            <Setter Property="Foreground"      Value="#374151"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height"          Value="38"/>
+            <Setter Property="Padding"         Value="18,0"/>
+            <Setter Property="FontWeight"      Value="SemiBold"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Botón púrpura IA -->
+        <Style x:Key="BtnIA" TargetType="Button" BasedOn="{StaticResource BtnPrimary}">
+            <Setter Property="Background" Value="{StaticResource PurpleBrush}"/>
+        </Style>
+
+        <!-- Botón verde confirmación -->
+        <Style x:Key="BtnGreen" TargetType="Button" BasedOn="{StaticResource BtnPrimary}">
+            <Setter Property="Background" Value="{StaticResource GreenBrush}"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="24,20">
+        <Grid.RowDefinitions>
+            <!-- Zona superior: selección de documento -->
+            <RowDefinition Height="Auto"/>
+            <!-- Zona central: paneles de resultado -->
+            <RowDefinition Height="*"/>
+            <!-- Zona inferior: botones de acción -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══ ZONA SUPERIOR: Documento ═══════════════════════════════════ -->
+        <Border Grid.Row="0"
+                Background="White"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20,16"
+                Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Ícono y label -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"
+                            Margin="0,0,16,0">
+                    <TextBlock Text="📄" FontSize="22" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Documento seleccionado"
+                                   FontWeight="SemiBold" FontSize="13"
+                                   Foreground="{StaticResource TextPrimary}"/>
+                        <TextBlock Text="Selecciona el documento de requerimientos a analizar."
+                                   FontSize="11" Foreground="{StaticResource TextSecondary}"
+                                   Margin="0,2,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Nombre del archivo seleccionado -->
+                <Border Grid.Column="1"
+                        Background="#F8FAFC"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Padding="14,0"
+                        VerticalAlignment="Center"
+                        Height="38">
+                    <TextBlock x:Name="txtNombreArchivo"
+                               Text="Ningún archivo seleccionado"
+                               VerticalAlignment="Center"
+                               FontSize="13"
+                               Foreground="{StaticResource TextSecondary}"
+                               TextTrimming="CharacterEllipsis"/>
+                </Border>
+
+                <!-- Botón subir -->
+                <Button Grid.Column="2"
+                        Content="📂  Seleccionar archivo"
+                        Style="{StaticResource BtnSecondary}"
+                        Margin="12,0,0,0"
+                        Click="BtnSeleccionarArchivo_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- ═══ ZONA CENTRAL: Paneles de resultado ══════════════════════════ -->
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Panel izquierdo: Resultado de análisis IA -->
+            <Border Grid.Column="0"
+                    Background="White"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header panel izquierdo -->
+                    <Border Grid.Row="0"
+                            Background="#EDE9FE"
+                            CornerRadius="8,8,0,0"
+                            Padding="16,12">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🔍" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="Resultado del análisis IA"
+                                       FontWeight="Bold" FontSize="14"
+                                       Foreground="#5B21B6"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Contenido panel izquierdo -->
+                    <Grid Grid.Row="1" Margin="0">
+                        <!-- Estado vacío inicial -->
+                        <StackPanel x:Name="panelAnalisisVacio"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="🔍" FontSize="36" HorizontalAlignment="Center" Opacity="0.3"/>
+                            <TextBlock Text="Selecciona un documento y"
+                                       FontSize="13" Foreground="{StaticResource TextSecondary}"
+                                       HorizontalAlignment="Center" Margin="0,12,0,4"/>
+                            <TextBlock Text="presiona «Generar análisis»"
+                                       FontSize="13" Foreground="{StaticResource TextSecondary}"
+                                       HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Indicador de carga análisis -->
+                        <Border x:Name="panelCargandoAnalisis"
+                                Visibility="Collapsed"
+                                Background="#F5F3FF" CornerRadius="0,0,8,8"
+                                Padding="24">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="⏳" FontSize="32"
+                                           HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                                <TextBlock Text="Analizando documento..."
+                                           FontSize="14" FontWeight="SemiBold"
+                                           Foreground="#5B21B6"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="Esto puede tardar hasta 3 minutos."
+                                           FontSize="12" Foreground="#6D28D9"
+                                           HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Resultado análisis -->
+                        <ScrollViewer x:Name="scrollAnalisis"
+                                      Visibility="Collapsed"
+                                      VerticalScrollBarVisibility="Auto"
+                                      Padding="16">
+                            <TextBox x:Name="txtResultadoAnalisis"
+                                     IsReadOnly="True"
+                                     TextWrapping="Wrap"
+                                     FontFamily="Consolas"
+                                     FontSize="12"
+                                     Foreground="{StaticResource TextPrimary}"
+                                     Background="Transparent"
+                                     BorderThickness="0"/>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Panel derecho: Resultado generación de tareas IA -->
+            <Border Grid.Column="2"
+                    Background="White"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header panel derecho -->
+                    <Border Grid.Row="0"
+                            Background="#DCFCE7"
+                            CornerRadius="8,8,0,0"
+                            Padding="16,12">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚡" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="Resultado de generación de tareas IA"
+                                       FontWeight="Bold" FontSize="14"
+                                       Foreground="#065F46"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Contenido panel derecho -->
+                    <Grid Grid.Row="1">
+                        <!-- Estado vacío inicial -->
+                        <StackPanel x:Name="panelTareasVacio"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="⚡" FontSize="36" HorizontalAlignment="Center" Opacity="0.3"/>
+                            <TextBlock Text="Primero genera el análisis y"
+                                       FontSize="13" Foreground="{StaticResource TextSecondary}"
+                                       HorizontalAlignment="Center" Margin="0,12,0,4"/>
+                            <TextBlock Text="luego presiona «Generar tareas»"
+                                       FontSize="13" Foreground="{StaticResource TextSecondary}"
+                                       HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Indicador de carga tareas -->
+                        <Border x:Name="panelCargandoTareas"
+                                Visibility="Collapsed"
+                                Background="#F0FDF4" CornerRadius="0,0,8,8"
+                                Padding="24">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="⏳" FontSize="32"
+                                           HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                                <TextBlock Text="Generando planificación de tareas..."
+                                           FontSize="14" FontWeight="SemiBold"
+                                           Foreground="#065F46"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="Esto puede tardar hasta 3 minutos."
+                                           FontSize="12" Foreground="#047857"
+                                           HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Resultado tareas -->
+                        <Grid x:Name="gridResultadoTareas" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <ScrollViewer Grid.Row="0"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Padding="16">
+                                <TextBox x:Name="txtResultadoTareas"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         FontFamily="Consolas"
+                                         FontSize="12"
+                                         Foreground="{StaticResource TextPrimary}"
+                                         Background="Transparent"
+                                         BorderThickness="0"/>
+                            </ScrollViewer>
+
+                            <!-- Botón confirmar inserción de tareas -->
+                            <Border Grid.Row="1"
+                                    Background="#F0FDF4"
+                                    BorderBrush="#A7F3D0"
+                                    BorderThickness="0,1,0,0"
+                                    Padding="16,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <TextBlock Text="✅  Tareas listas para insertar"
+                                                   FontWeight="SemiBold" FontSize="13"
+                                                   Foreground="#065F46"/>
+                                        <TextBlock x:Name="txtResumenTareas"
+                                                   FontSize="11" Foreground="#047857"
+                                                   Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1"
+                                            x:Name="btnConfirmarTareas"
+                                            Content="✔  Confirmar e insertar tareas"
+                                            Style="{StaticResource BtnGreen}"
+                                            Click="BtnConfirmarTareas_Click"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ═══ ZONA INFERIOR: Acciones ═════════════════════════════════════ -->
+        <Border Grid.Row="2"
+                Background="White"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Info del análisis activo -->
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock x:Name="txtInfoAnalisisActivo"
+                               Text="Selecciona un documento para comenzar."
+                               FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+                </StackPanel>
+
+                <!-- Botones de acción -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="btnGenerarAnalisis"
+                            Content="🔍  Generar análisis"
+                            Style="{StaticResource BtnIA}"
+                            IsEnabled="False"
+                            Click="BtnGenerarAnalisis_Click"/>
+                    <Button x:Name="btnGenerarTareas"
+                            Content="⚡  Generar tareas"
+                            Style="{StaticResource BtnGreen}"
+                            IsEnabled="False"
+                            Margin="10,0,0,0"
+                            Click="BtnGenerarTareas_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
