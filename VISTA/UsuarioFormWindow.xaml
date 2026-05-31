@@ -9,7 +9,7 @@
         ResizeMode="NoResize">
 
     <Window.Resources>
-        <DropShadowEffect x:Key="WindowShadow" BlurRadius="15" ShadowDepth="0" Opacity="0.5"/>
+        <DropShadowEffect x:Key="WindowShadow" BlurRadius="15" ShadowDepth="0" Opacity="0.15" Color="#64748B"/>
 
         <Style x:Key="WindowActionButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="28"/>

@@ -254,7 +254,7 @@
                                     Width="204"
                                     Margin="0,0,0,8">
                                 <Border.Effect>
-                                    <DropShadowEffect Color="#000000" Opacity="0.5" BlurRadius="10" ShadowDepth="4"/>
+                                    <DropShadowEffect Color="#64748B" Opacity="0.15" BlurRadius="10" ShadowDepth="4"/>
                                 </Border.Effect>
                                 
                                 <StackPanel>

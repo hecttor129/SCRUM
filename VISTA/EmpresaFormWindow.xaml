@@ -12,9 +12,8 @@
 
     <Window.Resources>
         <DropShadowEffect x:Key="WindowShadow"
-                           BlurRadius="15"
-                           ShadowDepth="0"
-                           Opacity="0.5"/>
+                          BlurRadius="15" ShadowDepth="0" 
+                          Opacity="0.15" Color="#64748B"/>
     </Window.Resources>
 
     <Border Margin="15"

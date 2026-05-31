@@ -5,23 +5,23 @@
     <Application.Resources>
         <!-- ═══ PALETA DE COLORES ═══ -->
         <!-- Backgrounds -->
-        <SolidColorBrush x:Key="BgPrimary" Color="#0F172A"/>
-        <SolidColorBrush x:Key="BgSecondary" Color="#111827"/>
-        <SolidColorBrush x:Key="BgCard" Color="#1E293B"/>
+        <SolidColorBrush x:Key="BgPrimary" Color="#F8FAFC"/>
+        <SolidColorBrush x:Key="BgSecondary" Color="#F1F5F9"/>
+        <SolidColorBrush x:Key="BgCard" Color="#FFFFFF"/>
 
         <!-- Borders -->
-        <SolidColorBrush x:Key="BorderColor" Color="#334155"/>
+        <SolidColorBrush x:Key="BorderColor" Color="#E2E8F0"/>
 
         <!-- Text -->
-        <SolidColorBrush x:Key="TextPrimary" Color="#F8FAFC"/>
-        <SolidColorBrush x:Key="TextSecondary" Color="#94A3B8"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#0F172A"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#475569"/>
 
         <!-- Accents -->
-        <SolidColorBrush x:Key="AccentPrimary" Color="#38BDF8"/>
-        <SolidColorBrush x:Key="AccentHover" Color="#0284C7"/>
-        <SolidColorBrush x:Key="AccentSuccess" Color="#22C55E"/>
-        <SolidColorBrush x:Key="AccentWarning" Color="#F59E0B"/>
-        <SolidColorBrush x:Key="AccentError" Color="#EF4444"/>
+        <SolidColorBrush x:Key="AccentPrimary" Color="#0284C7"/>
+        <SolidColorBrush x:Key="AccentHover" Color="#0369A1"/>
+        <SolidColorBrush x:Key="AccentSuccess" Color="#16A34A"/>
+        <SolidColorBrush x:Key="AccentWarning" Color="#D97706"/>
+        <SolidColorBrush x:Key="AccentError" Color="#DC2626"/>
 
         <!-- ═══ ESTILOS GLOBALES ═══ -->
 
@@ -141,10 +141,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="itemBorder" Property="Background" Value="#1E293B"/>
+                                <Setter TargetName="itemBorder" Property="Background" Value="{StaticResource BgSecondary}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="itemBorder" Property="Background" Value="#1E3A5F"/>
+                                <Setter TargetName="itemBorder" Property="Background" Value="{StaticResource BorderColor}"/>
                                 <Setter Property="Foreground" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                             <MultiTrigger>
@@ -152,7 +152,7 @@
                                     <Condition Property="IsSelected" Value="True"/>
                                     <Condition Property="IsMouseOver" Value="True"/>
                                 </MultiTrigger.Conditions>
-                                <Setter TargetName="itemBorder" Property="Background" Value="#1E3A5F"/>
+                                <Setter TargetName="itemBorder" Property="Background" Value="{StaticResource BorderColor}"/>
                             </MultiTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -232,7 +232,7 @@
                                                         </Grid.ColumnDefinitions>
                                                         <Path Grid.Column="1"
                                                               Data="M4 6L8 10L12 6"
-                                                              Stroke="#64748B"
+                                                              Stroke="{StaticResource TextSecondary}"
                                                               StrokeThickness="1.8"
                                                               StrokeLineJoin="Round"
                                                               StrokeStartLineCap="Round"
@@ -258,14 +258,14 @@
                                    PopupAnimation="Fade"
                                    VerticalOffset="4">
                                 <Border x:Name="dropdownBorder"
-                                        Background="#1E293B"
-                                        BorderBrush="#334155"
+                                        Background="{StaticResource BgSecondary}"
+                                        BorderBrush="{StaticResource BorderColor}"
                                         BorderThickness="1"
                                         CornerRadius="6"
                                         MinWidth="{Binding ActualWidth, ElementName=mainBorder}"
                                         MaxHeight="{TemplateBinding MaxDropDownHeight}">
                                     <Border.Effect>
-                                        <DropShadowEffect Color="#000000" Opacity="0.5" BlurRadius="12" ShadowDepth="4"/>
+                                        <DropShadowEffect Color="#64748B" Opacity="0.15" BlurRadius="12" ShadowDepth="4"/>
                                     </Border.Effect>
                                     <ScrollViewer Margin="2" CanContentScroll="True"
                                                   VerticalScrollBarVisibility="Auto"
@@ -285,7 +285,7 @@
                                 <Setter TargetName="mainBorder" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="mainBorder" Property="BorderBrush" Value="#475569"/>
+                                <Setter TargetName="mainBorder" Property="BorderBrush" Value="{StaticResource TextSecondary}"/>
                             </Trigger>
                             <Trigger Property="IsDropDownOpen" Value="True">
                                 <Setter TargetName="mainBorder" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
@@ -300,7 +300,7 @@
         <!-- Button (Primary Default) -->
         <Style TargetType="Button">
             <Setter Property="Background" Value="{StaticResource AccentPrimary}"/>
-            <Setter Property="Foreground" Value="#0F172A"/> <!-- Dark text for better contrast on bright primary -->
+            <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Padding" Value="16,10"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -370,7 +370,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="#DC2626"/>
+                                <Setter TargetName="bd" Property="Background" Value="#B91C1C"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -389,7 +389,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="#16A34A"/>
+                                <Setter TargetName="bd" Property="Background" Value="#15803D"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -510,7 +510,7 @@
 
         <!-- Calendar day buttons -->
         <Style TargetType="CalendarDayButton">
-            <Setter Property="Background"      Value="#1E293B"/>
+            <Setter Property="Background"      Value="Transparent"/>
             <Setter Property="Foreground"      Value="{StaticResource TextPrimary}"/>
             <Setter Property="FontSize"        Value="13"/>
             <Setter Property="Width"           Value="32"/>
@@ -529,11 +529,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="dayBorder" Property="Background" Value="#1E293B"/>
+                                <Setter TargetName="dayBorder" Property="Background" Value="{StaticResource BgSecondary}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="dayBorder" Property="Background" Value="{StaticResource AccentPrimary}"/>
-                                <Setter Property="Foreground" Value="#0F172A"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                             </Trigger>
                             <Trigger Property="IsToday" Value="True">
@@ -541,7 +541,7 @@
                                 <Setter TargetName="dayBorder" Property="BorderThickness" Value="1"/>
                             </Trigger>
                             <Trigger Property="IsInactive" Value="True">
-                                <Setter Property="Foreground" Value="#475569"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
                             </Trigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
@@ -558,7 +558,7 @@
 
         <!-- Calendar month/year buttons -->
         <Style TargetType="CalendarButton">
-            <Setter Property="Background"  Value="#1E293B"/>
+            <Setter Property="Background"  Value="Transparent"/>
             <Setter Property="Foreground"  Value="{StaticResource TextPrimary}"/>
             <Setter Property="FontSize"    Value="13"/>
             <Setter Property="Margin"      Value="2"/>
@@ -576,11 +576,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="calBorder" Property="Background" Value="#1E293B"/>
+                                <Setter TargetName="calBorder" Property="Background" Value="{StaticResource BgSecondary}"/>
                             </Trigger>
                             <Trigger Property="HasSelectedDays" Value="True">
                                 <Setter TargetName="calBorder" Property="Background" Value="{StaticResource AccentPrimary}"/>
-                                <Setter Property="Foreground" Value="#0F172A"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -591,23 +591,23 @@
 
         <!-- Calendar outer container -->
         <Style TargetType="Calendar">
-            <Setter Property="Background"      Value="#1E293B"/>
+            <Setter Property="Background"      Value="{StaticResource BgCard}"/>
             <Setter Property="Foreground"      Value="{StaticResource TextPrimary}"/>
-            <Setter Property="BorderBrush"     Value="#334155"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderColor}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Calendar">
-                        <Border Background="#1E293B"
-                                BorderBrush="#334155"
+                        <Border Background="{StaticResource BgCard}"
+                                BorderBrush="{StaticResource BorderColor}"
                                 BorderThickness="1"
                                 CornerRadius="8"
                                 Padding="6">
                             <Border.Effect>
-                                <DropShadowEffect Color="#000000" Opacity="0.5" BlurRadius="14" ShadowDepth="4"/>
+                                <DropShadowEffect Color="#64748B" Opacity="0.15" BlurRadius="14" ShadowDepth="4"/>
                             </Border.Effect>
                             <CalendarItem x:Name="PART_CalendarItem"
-                                          Background="#1E293B"
+                                          Background="{StaticResource BgCard}"
                                           BorderBrush="Transparent"
                                           BorderThickness="0"/>
                         </Border>
@@ -618,7 +618,7 @@
 
         <!-- CalendarItem: custom template to completely remove white background -->
         <Style TargetType="CalendarItem">
-            <Setter Property="Background"      Value="#1E293B"/>
+            <Setter Property="Background"      Value="{StaticResource BgCard}"/>
             <Setter Property="BorderBrush"     Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Template">
@@ -630,13 +630,13 @@
                                 <TextBlock Text="{Binding}" 
                                            FontWeight="SemiBold" 
                                            FontSize="12" 
-                                           Foreground="#94A3B8" 
+                                           Foreground="{StaticResource TextSecondary}" 
                                            HorizontalAlignment="Center" 
                                            VerticalAlignment="Center" 
                                            Margin="0,6,0,6"/>
                             </DataTemplate>
                         </ControlTemplate.Resources>
-                        <Border Background="#1E293B"
+                        <Border Background="{StaticResource BgCard}"
                                 BorderBrush="Transparent"
                                 BorderThickness="0"
                                 CornerRadius="8">
@@ -653,9 +653,9 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <Button x:Name="PART_PreviousButton" Grid.Column="0" Content="&lt;" Foreground="#F8FAFC" Background="Transparent" BorderThickness="0" Cursor="Hand" Width="28" Height="28"/>
-                                    <Button x:Name="PART_HeaderButton" Grid.Column="1" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#F8FAFC" Background="Transparent" BorderThickness="0" Cursor="Hand"/>
-                                    <Button x:Name="PART_NextButton" Grid.Column="2" Content="&gt;" Foreground="#F8FAFC" Background="Transparent" BorderThickness="0" Cursor="Hand" Width="28" Height="28"/>
+                                    <Button x:Name="PART_PreviousButton" Grid.Column="0" Content="&lt;" Foreground="{StaticResource TextPrimary}" Background="Transparent" BorderThickness="0" Cursor="Hand" Width="28" Height="28"/>
+                                    <Button x:Name="PART_HeaderButton" Grid.Column="1" HorizontalAlignment="Center" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Background="Transparent" BorderThickness="0" Cursor="Hand"/>
+                                    <Button x:Name="PART_NextButton" Grid.Column="2" Content="&gt;" Foreground="{StaticResource TextPrimary}" Background="Transparent" BorderThickness="0" Cursor="Hand" Width="28" Height="28"/>
                                 </Grid>
 
                                 <!-- Month View -->
@@ -703,10 +703,10 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#2A384E"/>
+                    <Setter Property="Background" Value="{StaticResource BorderColor}"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#1E40AF"/>
+                    <Setter Property="Background" Value="{StaticResource AccentPrimary}"/>
                     <Setter Property="Foreground" Value="#FFFFFF"/>
                 </Trigger>
             </Style.Triggers>
