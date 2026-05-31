@@ -1,0 +1,425 @@
+using DAL;
+using ENTITY;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using static ENTITY.ENUMS;
+
+namespace BLL
+{
+    /// <summary>
+    /// Item para poblar el ComboBox de superior en UsuarioFormWindow.
+    /// </summary>
+    public class UsuarioSuperiorItem
+    {
+        public int    IdUsuario       { get; set; }
+        public string NombreCompleto  { get; set; } = string.Empty;
+        public int    NivelJerarquico { get; set; }
+        public string NombreConNivel  => $"{NombreCompleto} (Nivel {NivelJerarquico})";
+    }
+
+    /// <summary>
+    /// Service que centraliza toda la lógica de autenticación y gestión de usuarios.
+    /// </summary>
+    public class UsuarioService
+    {
+        private readonly UsuarioRepository             _repo;
+        private readonly RelacionJerarquicaRepository  _relacionRepo;
+
+        public UsuarioService()
+        {
+            _repo         = new UsuarioRepository();
+            _relacionRepo = new RelacionJerarquicaRepository();
+        }
+
+        // ── Utilidad privada ─────────────────────────────────────────────────
+
+        private static string HashPassword(string password)
+        {
+            byte[] bytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+            var sb = new StringBuilder(64);
+            foreach (byte b in bytes)
+                sb.Append(b.ToString("x2"));
+            return sb.ToString();
+        }
+
+        // ── Consultas ────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Verifica si existe al menos un Admin activo en el sistema.
+        /// </summary>
+        public bool ExisteAdmin() => _repo.ExisteAdmin();
+
+        /// <summary>
+        /// Retorna todos los usuarios (activos e inactivos) para UsuariosWindow.
+        /// </summary>
+        public List<Usuario> ObtenerTodos() => _repo.GetAllConInactivos();
+
+        /// <summary>
+        /// Retorna el superior directo actual de un usuario (para pre-cargar el form de edición).
+        /// </summary>
+        public RelacionJerarquica ObtenerSuperiorActual(int idUsuario)
+            => _relacionRepo.GetSuperiorActual(idUsuario);
+
+        public class UsuarioVistaDto
+        {
+            public int IdUsuario { get; set; }
+            public string Nombre { get; set; } = string.Empty;
+            public string Apellido { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
+            public string RolDisplay { get; set; } = string.Empty;
+            public int NivelJerarquico { get; set; }
+            public string EstadoDisplay { get; set; } = string.Empty;
+            public string NombreSuperior { get; set; } = string.Empty;
+            public string FechaCreacion { get; set; } = string.Empty;
+            public int Activo { get; set; }
+            public decimal HorasSemanalesDisponibles { get; set; }
+
+            public bool EsAdmin => RolDisplay == "Admin";
+            public bool PuedeDesactivar => Activo == 1 && !EsAdmin;
+            public bool PuedeReactivar => Activo == 0 && !EsAdmin;
+        }
+
+        /// <summary>
+        /// Retorna todos los usuarios formateados para la vista de gestión.
+        /// </summary>
+        public List<UsuarioVistaDto> ObtenerUsuariosVista()
+        {
+            var usuarios = _repo.GetAllConInactivos();
+            
+            // Obtener todas las disponibilidades para calcular horas semanales
+            using var ctx = new DB_Context();
+            var disponibilidades = ctx.Disponibilidades.ToList();
+            var horasPorUsuario = disponibilidades
+                .GroupBy(d => d.IdUsuario)
+                .ToDictionary(g => g.Key, g => g.Sum(d => d.CapacidadPorDia ?? 0m));
+
+            return usuarios.Select(u => {
+                string sup = "-";
+                var rel = _relacionRepo.GetSuperiorActual(u.IdUsuario);
+                if (rel != null)
+                {
+                    var j = usuarios.FirstOrDefault(x => x.IdUsuario == rel.IdJefe);
+                    if (j != null) sup = $"{j.Nombre} {j.Apellido}".Trim();
+                }
+
+                return new UsuarioVistaDto
+                {
+                    IdUsuario = u.IdUsuario,
+                    Nombre = u.Nombre,
+                    Apellido = u.Apellido,
+                    Email = u.Email,
+                    RolDisplay = u.Rol.ToString(),
+                    NivelJerarquico = u.NivelJerarquico,
+                    EstadoDisplay = u.Activo == 1 ? "Activo" : "Inactivo",
+                    NombreSuperior = sup,
+                    FechaCreacion = u.FechaCreacion.ToString("dd/MM/yyyy"),
+                    Activo = u.Activo,
+                    HorasSemanalesDisponibles = horasPorUsuario.ContainsKey(u.IdUsuario) 
+                                                ? horasPorUsuario[u.IdUsuario] 
+                                                : 0m
+                };
+            }).ToList();
+        }
+
+        /// <summary>
+        /// Retorna la lista de posibles superiores (Admin + Jefes activos) para el ComboBox.
+        /// </summary>
+        public List<UsuarioSuperiorItem> ObtenerSupervisoresDisponibles(int? exceptoIdUsuario = null)
+        {
+            return _repo.GetSupervisoresDisponibles(exceptoIdUsuario)
+                .Select(u => new UsuarioSuperiorItem
+                {
+                    IdUsuario       = u.IdUsuario,
+                    NombreCompleto  = $"{u.Nombre} {u.Apellido}".Trim(),
+                    NivelJerarquico = u.NivelJerarquico
+                })
+                .ToList();
+        }
+
+        /// <summary>
+        /// Retorna todas las especialidades únicas registradas en el sistema (para el ComboBox sugerido).
+        /// </summary>
+        public List<string> ObtenerTodasLasEspecialidades()
+        {
+            return _repo.GetAllConInactivos()
+                .SelectMany(u => u.Especializaciones ?? new List<string>())
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(s => s)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Retorna los registros de disponibilidad semanal de un usuario (días 0-6 con horas por día).
+        /// </summary>
+        public List<Disponibilidad> ObtenerDisponibilidadUsuario(int idUsuario)
+        {
+            using var ctx = new DB_Context();
+            return ctx.Disponibilidades
+                      .Where(d => d.IdUsuario == idUsuario)
+                      .OrderBy(d => d.DiaSemana)
+                      .ToList();
+        }
+
+        /// <summary>
+        /// Reemplaza todos los registros de disponibilidad del usuario con los valores nuevos.
+        /// horasPorDia: clave = DiaSemana (0=Dom … 6=Sáb), valor = horas diarias.
+        /// </summary>
+        private void GuardarDisponibilidadUsuario(int idUsuario, Dictionary<int, decimal> horasPorDia)
+        {
+            using var ctx = new DB_Context();
+            // Eliminar registros existentes
+            var existentes = ctx.Disponibilidades
+                               .Where(d => d.IdUsuario == idUsuario)
+                               .ToList();
+            ctx.Disponibilidades.RemoveRange(existentes);
+
+            // Insertar los 7 días (0-6)
+            for (int dia = 0; dia <= 6; dia++)
+            {
+                decimal horas = horasPorDia.TryGetValue(dia, out decimal h) ? h : 0m;
+                ctx.Disponibilidades.Add(new Disponibilidad
+                {
+                    IdUsuario      = idUsuario,
+                    DiaSemana      = dia,
+                    CapacidadPorDia = horas
+                });
+            }
+            ctx.SaveChanges();
+        }
+
+        // ── Autenticación ────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Intenta autenticar al usuario. Si es exitoso, puebla SesionActual y retorna true.
+        /// </summary>
+        public bool Login(string email, string password)
+        {
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                throw new Exception("Completa todos los campos.");
+
+            string hash    = HashPassword(password);
+            var    usuario = _repo.GetByEmailYPassword(email.Trim().ToLower(), hash);
+
+            if (usuario == null)
+                return false;
+
+            SesionActual.IdUsuario      = usuario.IdUsuario;
+            SesionActual.NombreCompleto = $"{usuario.Nombre} {usuario.Apellido}".Trim();
+            SesionActual.Rol            = usuario.Rol;
+            SesionActual.NivelJerarquico = usuario.NivelJerarquico;
+
+            return true;
+        }
+
+        // ── Creación ─────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Crea el único Admin del sistema. Solo se debe llamar cuando ExisteAdmin() == false.
+        /// </summary>
+        public void CrearPrimerAdmin(string nombre, string apellido, string email, string password, string passwordConfirmacion)
+        {
+            if (password != passwordConfirmacion)
+                throw new Exception("Las contraseñas no coinciden.");
+
+            ValidarCamposBase(nombre, apellido, email, password);
+
+            if (_repo.EmailExiste(email.Trim()))
+                throw new Exception("Ese correo ya está registrado.");
+
+            var admin = new Usuario
+            {
+                Nombre          = nombre.Trim(),
+                Apellido        = apellido.Trim(),
+                Email           = email.Trim().ToLower(),
+                password        = HashPassword(password),
+                Rol             = RolUsuario.Admin,
+                NivelJerarquico = 1,
+                Activo          = 1,
+                FechaCreacion   = DateTime.Now
+            };
+
+            _repo.Add(admin);
+            _repo.Save();
+            // El Admin no tiene RelacionJerarquica (no tiene superior)
+        }
+
+        /// <summary>
+        /// Crea un nuevo usuario (Jefe o Empleado). Solo el Admin puede invocar esto.
+        /// </summary>
+        public void CrearUsuario(
+            string nombre, string apellido, string email,
+            string password, RolUsuario rol, int idSuperior,
+            List<string> especializaciones = null,
+            Dictionary<int, decimal> horasPorDia = null)
+        {
+            ValidarCamposBase(nombre, apellido, email, password);
+
+            if (rol == RolUsuario.Admin)
+                throw new Exception("No se puede crear otro administrador.");
+
+            if (_repo.EmailExiste(email.Trim()))
+                throw new Exception("Ese correo ya está registrado.");
+
+            var superior = _repo.GetById(idSuperior);
+            if (superior == null)
+                throw new Exception("El superior seleccionado no existe.");
+
+            var nuevo = new Usuario
+            {
+                Nombre            = nombre.Trim(),
+                Apellido          = apellido.Trim(),
+                Email             = email.Trim().ToLower(),
+                password          = HashPassword(password),
+                Rol               = rol,
+                NivelJerarquico   = superior.NivelJerarquico + 1,
+                Activo            = 1,
+                FechaCreacion     = DateTime.Now,
+                Especializaciones = especializaciones ?? new List<string>()
+            };
+
+            _repo.Add(nuevo);
+            _repo.Save();
+
+            _relacionRepo.Crear(idSuperior, nuevo.IdUsuario);
+
+            // Persistir disponibilidad semanal si se proporcionó
+            if (horasPorDia != null && horasPorDia.Count > 0)
+                GuardarDisponibilidadUsuario(nuevo.IdUsuario, horasPorDia);
+        }
+
+        // ── Edición ──────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Edita los datos de un usuario existente (no Admin). Actualiza la relación jerárquica si cambia el superior.
+        /// </summary>
+        public void EditarUsuario(
+            int idUsuario, string nombre, string apellido,
+            string email, RolUsuario rol, decimal? salario, int idSuperior,
+            List<string> especializaciones = null,
+            Dictionary<int, decimal> horasPorDia = null)
+        {
+            var usuario = _repo.GetById(idUsuario)
+                ?? throw new Exception("Usuario no encontrado.");
+
+            if (usuario.Rol == RolUsuario.Admin)
+                throw new Exception("No se puede editar al administrador.");
+
+            ValidarNombreApellidoEmail(nombre, apellido, email);
+
+            if (rol == RolUsuario.Admin)
+                throw new Exception("No se puede asignar el rol de administrador.");
+
+            if (_repo.EmailExiste(email.Trim(), exceptoIdUsuario: idUsuario))
+                throw new Exception("Ese correo ya está en uso por otro usuario.");
+
+            var superior = _repo.GetById(idSuperior)
+                ?? throw new Exception("El superior seleccionado no existe.");
+
+            usuario.Nombre            = nombre.Trim();
+            usuario.Apellido          = apellido.Trim();
+            usuario.Email             = email.Trim().ToLower();
+            usuario.Rol               = rol;
+            usuario.NivelJerarquico   = superior.NivelJerarquico + 1;
+            usuario.Salario           = salario;
+            usuario.Especializaciones = especializaciones ?? usuario.Especializaciones;
+
+            _repo.Update(usuario);
+            _repo.Save();
+
+            // Actualizar relación jerárquica si el superior cambió
+            var relacionActual = _relacionRepo.GetSuperiorActual(idUsuario);
+            if (relacionActual == null || relacionActual.IdJefe != idSuperior)
+            {
+                _relacionRepo.CerrarRelacion(idUsuario);
+                _relacionRepo.Crear(idSuperior, idUsuario);
+            }
+
+            // Actualizar disponibilidad semanal si se proporcionó
+            if (horasPorDia != null && horasPorDia.Count > 0)
+                GuardarDisponibilidadUsuario(idUsuario, horasPorDia);
+        }
+
+        /// <summary>
+        /// Cambia la contraseña de un usuario (hashea antes de guardar).
+        /// </summary>
+        public void CambiarPassword(int idUsuario, string nuevaPassword)
+        {
+            if (string.IsNullOrWhiteSpace(nuevaPassword) || nuevaPassword.Length < 6)
+                throw new Exception("La contraseña debe tener al menos 6 caracteres.");
+
+            var usuario = _repo.GetById(idUsuario)
+                ?? throw new Exception("Usuario no encontrado.");
+
+            usuario.password = HashPassword(nuevaPassword);
+            _repo.Update(usuario);
+            _repo.Save();
+        }
+
+        // ── Activación / Desactivación ───────────────────────────────────────
+
+        /// <summary>
+        /// Desactiva un usuario (soft delete). No se puede desactivar al Admin.
+        /// </summary>
+        public void DesactivarUsuario(int idUsuario)
+        {
+            var usuario = _repo.GetById(idUsuario)
+                ?? throw new Exception("Usuario no encontrado.");
+
+            if (usuario.Rol == RolUsuario.Admin)
+                throw new Exception("No se puede desactivar al administrador.");
+
+            usuario.Activo = 0;
+            _repo.Update(usuario);
+            _repo.Save();
+        }
+
+        /// <summary>
+        /// Reactiva un usuario previamente desactivado.
+        /// </summary>
+        public void ReactivarUsuario(int idUsuario)
+        {
+            var usuario = _repo.GetById(idUsuario)
+                ?? throw new Exception("Usuario no encontrado.");
+
+            usuario.Activo = 1;
+            _repo.Update(usuario);
+            _repo.Save();
+        }
+
+        // ── Validaciones ─────────────────────────────────────────────────────
+
+        private static void ValidarCamposBase(
+            string nombre, string apellido, string email, string password)
+        {
+            ValidarNombreApellidoEmail(nombre, apellido, email);
+
+            if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
+                throw new Exception("La contraseña debe tener al menos 6 caracteres.");
+        }
+
+        private static void ValidarNombreApellidoEmail(
+            string nombre, string apellido, string email)
+        {
+            if (string.IsNullOrWhiteSpace(nombre))
+                throw new Exception("El nombre es obligatorio.");
+            if (nombre.Length > 15)
+                throw new Exception("El nombre no puede superar 15 caracteres.");
+
+            if (string.IsNullOrWhiteSpace(apellido))
+                throw new Exception("El apellido es obligatorio.");
+            if (apellido.Length > 15)
+                throw new Exception("El apellido no puede superar 15 caracteres.");
+
+            if (string.IsNullOrWhiteSpace(email))
+                throw new Exception("El correo es obligatorio.");
+            if (email.Length > 30)
+                throw new Exception("El correo no puede superar 30 caracteres.");
+            if (!email.Contains('@') || !email.Contains('.'))
+                throw new Exception("El formato del correo no es válido.");
+        }
+    }
+}
