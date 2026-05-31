@@ -18,6 +18,8 @@ namespace BLL
         public string NombreCompleto  { get; set; } = string.Empty;
         public int    NivelJerarquico { get; set; }
         public string NombreConNivel  => $"{NombreCompleto} (Nivel {NivelJerarquico})";
+
+        public override string ToString() => NombreConNivel;
     }
 
     /// <summary>
